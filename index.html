@@ -4,39 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meta Comercial – Faço a Conta</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0d0d0d; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding: 24px; }
-    h1 { font-size: 22px; font-weight: 700; }
-    .sub { color: #888; font-size: 14px; margin-top: 4px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
-    .badge { font-size: 12px; padding: 6px 12px; border-radius: 20px; }
-    .card { background: #1a1a1a; border-radius: 14px; padding: 20px; border: 1px solid #222; margin-bottom: 16px; }
-    .progress-nums { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
-    .big { font-size: 48px; font-weight: 800; }
-    .meta-total { font-size: 20px; color: #555; margin-left: 4px; }
-    .pct { font-size: 28px; font-weight: 700; }
+    body { background: #0d0d0d; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding: 16px; }
+    h1 { font-size: 20px; font-weight: 700; }
+    .sub { color: #888; font-size: 13px; margin-top: 4px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+    .badge { font-size: 12px; padding: 6px 12px; border-radius: 20px; white-space: nowrap; }
+    .card { background: #1a1a1a; border-radius: 14px; padding: 16px; border: 1px solid #222; margin-bottom: 14px; }
+    .progress-nums { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 4px; }
+    .big { font-size: 42px; font-weight: 800; }
+    .meta-total { font-size: 18px; color: #555; margin-left: 4px; }
+    .pct { font-size: 24px; font-weight: 700; }
     .bar-bg { background: #2a2a2a; border-radius: 999px; height: 14px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
     .bar-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #666; }
-    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .kpi-label { font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .kpi-val { font-size: 32px; font-weight: 800; }
-    .kpi-sub { font-size: 12px; color: #555; margin-top: 4px; }
-    .plan-label { font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+    @media (max-width: 600px) {
+      .grid3 { grid-template-columns: 1fr; }
+      .grid2 { grid-template-columns: 1fr; }
+      .rec-grid { grid-template-columns: 1fr !important; }
+      .big { font-size: 34px; }
+    }
+    @media (max-width: 900px) and (min-width: 601px) {
+      .grid3 { grid-template-columns: 1fr 1fr; }
+      .rec-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+    .kpi-label { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .kpi-val { font-size: 28px; font-weight: 800; }
+    .kpi-sub { font-size: 11px; color: #555; margin-top: 4px; }
+    .plan-label { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 1px; }
     .plan-sub { font-size: 11px; color: #555; margin-top: 2px; }
-    .plan-val { font-size: 38px; font-weight: 800; margin: 12px 0; }
-    .plan-receita { font-size: 12px; margin-bottom: 14px; }
+    .plan-val { font-size: 34px; font-weight: 800; margin: 10px 0; }
+    .plan-receita { font-size: 12px; margin-bottom: 12px; }
     .controls { display: flex; gap: 8px; }
-    .btn { width: 40px; height: 40px; border-radius: 8px; border: none; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    input[type=number] { flex: 1; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; text-align: center; font-size: 16px; padding: 8px 0; }
+    .btn { width: 40px; height: 40px; border-radius: 8px; border: none; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    input[type=number] { flex: 1; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; text-align: center; font-size: 16px; padding: 8px 0; min-width: 0; }
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .rec-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .rec-card { background: #111; border-radius: 10px; padding: 14px; }
+    .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .rec-card { background: #111; border-radius: 10px; padding: 12px; }
     .rec-label { font-size: 11px; color: #666; margin-bottom: 4px; }
-    .rec-val { font-size: 18px; font-weight: 700; color: #00e676; }
-    .rec-sub { font-size: 11px; color: #444; margin-top: 2px; }
+    .rec-val { font-size: 16px; font-weight: 700; color: #00e676; }
+    .rec-sub { font-size: 10px; color: #444; margin-top: 2px; }
+    .chart-wrap { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
     .footer { text-align: center; font-size: 11px; color: #333; margin-top: 16px; }
   </style>
 </head>
@@ -89,9 +101,9 @@
 <!-- Planos -->
 <div class="grid2">
   <div class="card" style="border-color:#29b6f633">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div><p class="plan-label">Plano Mensal</p><p class="plan-sub">R$ 337/mês</p></div>
-      <span style="font-size:28px">📅</span>
+      <span style="font-size:26px">📅</span>
     </div>
     <p class="plan-val" id="val-mensal" style="color:#29b6f6">0</p>
     <p class="plan-receita" id="rec-mensal" style="color:#29b6f6aa">Receita: R$ 0,00/mês</p>
@@ -102,9 +114,9 @@
     </div>
   </div>
   <div class="card" style="border-color:#ab47bc33">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div><p class="plan-label">Plano Anual</p><p class="plan-sub">R$ 4.044,00/ano (12×)</p></div>
-      <span style="font-size:28px">🏆</span>
+      <span style="font-size:26px">🏆</span>
     </div>
     <p class="plan-val" id="val-anuais" style="color:#ab47bc">0</p>
     <p class="plan-receita" id="rec-anuais" style="color:#ab47bcaa">Receita: R$ 0,00/ano</p>
@@ -116,9 +128,17 @@
   </div>
 </div>
 
+<!-- Gráfico -->
+<div class="card" style="border-color:#ffffff11">
+  <p style="font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">📊 Distribuição dos Planos</p>
+  <div class="chart-wrap">
+    <canvas id="grafico"></canvas>
+  </div>
+</div>
+
 <!-- Receita -->
 <div class="card" style="border-color:#00e67633">
-  <p style="font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">💰 Receita Recorrente</p>
+  <p style="font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">💰 Receita Recorrente</p>
   <div class="rec-grid">
     <div class="rec-card"><p class="rec-label">MRR Atual</p><p class="rec-val" id="mrr">R$ 0,00</p><p class="rec-sub">mensal recorrente</p></div>
     <div class="rec-card"><p class="rec-label">Receita Contratada</p><p class="rec-val" id="contratada">R$ 0,00</p><p class="rec-sub">mensais + anuais</p></div>
@@ -129,14 +149,57 @@
 <p class="footer">Faço a Conta · Meta Comercial 2025</p>
 
 <script>
-  // ⬇️ COLE AQUI SUA API KEY DO JSONBIN
   const BIN_ID  = '69a83d79ae596e708f5eb480';
   const API_KEY = '$2a$10$T8MLsd4dkQLEQuDioAUhR.dVUxrpWdCgYyUQO6ZcxlB5.YfDT6QYW';
-
   const META = 240, MENSAL = 337, ANUAL = 337 * 12;
   let data = { mensais: 0, anuais: 0 };
+  let chart;
 
   const fmt = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+  // Inicializa gráfico
+  function initChart() {
+    const ctx = document.getElementById('grafico').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Plano Mensal', 'Plano Anual', 'Meta Total'],
+        datasets: [{
+          label: 'Clientes',
+          data: [0, 0, 240],
+          backgroundColor: ['#29b6f644', '#ab47bc44', '#5c6bc044'],
+          borderColor: ['#29b6f6', '#ab47bc', '#5c6bc0'],
+          borderWidth: 2,
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.y} clientes`
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: '#ffffff11' }, ticks: { color: '#888' } },
+          y: {
+            grid: { color: '#ffffff11' },
+            ticks: { color: '#888', stepSize: 40 },
+            min: 0, max: 260
+          }
+        }
+      }
+    });
+  }
+
+  function updateChart() {
+    if (!chart) return;
+    chart.data.datasets[0].data = [data.mensais, data.anuais, META];
+    chart.update();
+  }
 
   async function load() {
     badge('⏳ Carregando...','#ffca2822','#ffca28');
@@ -185,7 +248,9 @@
     document.getElementById('pct').style.color=cor;
     document.getElementById('bar').style.width=pct+'%';
     document.getElementById('bar').style.background=`linear-gradient(90deg,${cor}88,${cor})`;
-    document.getElementById('faltam-label').innerHTML=faltam>0?`<span style="color:#ff9800;font-weight:600">${faltam} clientes</span> para a meta`:`<span style="color:#00e676;font-weight:600">✅ Meta atingida!</span>`;
+    document.getElementById('faltam-label').innerHTML=faltam>0
+      ?`<span style="color:#ff9800;font-weight:600">${faltam} clientes</span> para a meta`
+      :`<span style="color:#00e676;font-weight:600">✅ Meta atingida!</span>`;
 
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-total').style.color=cor;
@@ -202,8 +267,11 @@
     document.getElementById('rec-anuais').textContent='Receita: '+fmt(rAnual)+'/ano';
     document.getElementById('mrr').textContent=fmt(rMensal+rAnual/12);
     document.getElementById('contratada').textContent=fmt(rMensal+rAnual);
+
+    updateChart();
   }
 
+  initChart();
   load();
 </script>
 </body>
