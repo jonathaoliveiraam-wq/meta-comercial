@@ -267,17 +267,16 @@
         <div style="flex:1">
           <p style="font-size:10px;color:#666;margin-bottom:4px">QTD</p>
           <input type="number" id="inp-custom-qty" value="0" min="0" placeholder="0"
-            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"
-            oninput="setCustom()" />
+            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;" />
         </div>
         <div style="flex:2">
           <p style="font-size:10px;color:#666;margin-bottom:4px">VALOR (R$)</p>
           <input type="number" id="inp-custom-val" value="0" min="0" placeholder="Ex: 6500"
-            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"
-            oninput="setCustom()" />
+            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;" />
         </div>
       </div>
-      <p style="font-size:11px;color:#555;text-align:center" id="custom-calc-info">Digite a qtd e o valor do plano</p>
+      <button onclick="confirmarCustom()" style="width:100%;background:linear-gradient(90deg,#ff6f00,#ff9800);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px;cursor:pointer;">✔ Confirmar</button>
+      <p style="font-size:11px;color:#555;text-align:center;margin-top:8px" id="custom-calc-info">Digite a qtd e o valor do plano</p>
     </div>
   </div>
 
@@ -552,7 +551,12 @@
     badge('⏳ Carregando...','#ffca2822','#ffca28');
     try {
       const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
-      const j = await r.json(); data = j.record; render();
+      const j = await r.json();
+      data = { mensais:0, anuais:0, customQty:0, customVal:0, ...j.record };
+      // preenche campos do personalizado
+      document.getElementById('inp-custom-qty').value = data.customQty || 0;
+      document.getElementById('inp-custom-val').value = data.customVal || 0;
+      render();
       badge('✅ Salvo','#1b5e2022','#00e676');
     } catch(e){ badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
   }
@@ -574,30 +578,53 @@
   }
 
   function render(){
-    const {mensais,anuais}=data;
-    const total=mensais+anuais, faltam=Math.max(META-total,0);
-    const pct=Math.min(total/META*100,100);
-    const cor=pct>=100?'#00e676':pct>=70?'#ffca28':pct>=40?'#ff9800':'#f44336';
-    document.getElementById('total').textContent=total; document.getElementById('total').style.color=cor;
-    document.getElementById('pct').textContent=pct.toFixed(1)+'%'; document.getElementById('pct').style.color=cor;
-    document.getElementById('bar').style.width=pct+'%';
-    document.getElementById('bar').style.background=`linear-gradient(90deg,${cor}88,${cor})`;
-    document.getElementById('faltam-label').innerHTML=faltam>0
-      ?`<span style="color:#ff9800;font-weight:600">${faltam} clientes</span> para a meta`
+    const {mensais, anuais, customQty, customVal} = data;
+
+    // Clientes equivalentes do plano personalizado
+    const customEquiv = customVal > 0 ? (customQty * customVal) / MENSAL : 0;
+    const total = mensais + anuais + customEquiv;
+    const faltam = Math.max(META - total, 0);
+    const pct = Math.min(total / META * 100, 100);
+    const cor = pct>=100?'#00e676':pct>=70?'#ffca28':pct>=40?'#ff9800':'#f44336';
+
+    document.getElementById('total').textContent = Math.round(total);
+    document.getElementById('total').style.color = cor;
+    document.getElementById('pct').textContent = pct.toFixed(1)+'%';
+    document.getElementById('pct').style.color = cor;
+    document.getElementById('bar').style.width = pct+'%';
+    document.getElementById('bar').style.background = `linear-gradient(90deg,${cor}88,${cor})`;
+    document.getElementById('faltam-label').innerHTML = faltam>0
+      ?`<span style="color:#ff9800;font-weight:600">${faltam.toFixed(1)} clientes equiv.</span> para a meta`
       :`<span style="color:#00e676;font-weight:600">✅ Meta atingida!</span>`;
-    document.getElementById('kpi-total').textContent=total; document.getElementById('kpi-total').style.color=cor;
-    document.getElementById('kpi-pct-sub').textContent=pct.toFixed(0)+'% da meta';
-    document.getElementById('kpi-faltam').textContent=faltam;
-    document.getElementById('val-mensal').textContent=mensais;
-    document.getElementById('val-anuais').textContent=anuais;
-    document.getElementById('inp-mensais').value=mensais;
-    document.getElementById('inp-anuais').value=anuais;
-    const rMensal=mensais*MENSAL, rAnual=anuais*ANUAL;
-    document.getElementById('rec-mensal').textContent='Receita: '+fmt(rMensal)+'/mês';
-    document.getElementById('rec-anuais').textContent='Receita: '+fmt(rAnual)+'/ano';
-    document.getElementById('mrr').textContent=fmt(rMensal+rAnual/12);
-    document.getElementById('contratada').textContent=fmt(rMensal+rAnual);
-    updateCharts(mensais,anuais,total,rMensal,rAnual);
+
+    document.getElementById('kpi-total').textContent = Math.round(total);
+    document.getElementById('kpi-total').style.color = cor;
+    document.getElementById('kpi-pct-sub').textContent = pct.toFixed(0)+'% da meta';
+    document.getElementById('kpi-faltam').textContent = faltam.toFixed(1);
+
+    document.getElementById('val-mensal').textContent = mensais;
+    document.getElementById('val-anuais').textContent = anuais;
+    document.getElementById('inp-mensais').value = mensais;
+    document.getElementById('inp-anuais').value = anuais;
+
+    // Plano personalizado
+    const rCustom = customQty * customVal;
+    document.getElementById('val-custom').textContent = customQty;
+    document.getElementById('rec-custom').textContent = 'Receita: '+fmt(rCustom);
+    document.getElementById('custom-equiv-label').textContent = `Equivale a ${customEquiv.toFixed(1)} clientes`;
+    document.getElementById('custom-calc-info').textContent = customVal > 0
+      ? `${fmt(customVal)} ÷ R$ 337 = ${(customVal/MENSAL).toFixed(2)} clientes/contrato`
+      : 'Digite a qtd e o valor do plano';
+
+    const rMensal = mensais * MENSAL;
+    const rAnual  = anuais * ANUAL;
+    const rTotal  = rMensal + rAnual + rCustom;
+    document.getElementById('rec-mensal').textContent = 'Receita: '+fmt(rMensal)+'/mês';
+    document.getElementById('rec-anuais').textContent = 'Receita: '+fmt(rAnual)+'/ano';
+    document.getElementById('mrr').textContent = fmt(rMensal + rAnual/12 + rCustom/12);
+    document.getElementById('contratada').textContent = fmt(rTotal);
+
+    updateCharts(mensais, anuais, customEquiv, total, rMensal, rAnual, rCustom);
   }
 </script>
 </body>
