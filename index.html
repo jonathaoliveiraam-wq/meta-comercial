@@ -263,6 +263,10 @@
       </div>
       <p class="plan-val" id="val-custom" style="color:#ff9800">0</p>
       <p class="plan-receita" id="rec-custom" style="color:#ff9800aa">Receita: R$ 0,00</p>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="btn-tipo-recebido" onclick="setTipo('recebido')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #ff9800;background:#ff980033;color:#ff9800;font-size:11px;font-weight:700;cursor:pointer;">💰 Valor recebido</button>
+        <button id="btn-tipo-sebrae" onclick="setTipo('sebrae')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #333;background:#111;color:#555;font-size:11px;font-weight:700;cursor:pointer;">🏦 Valor SEBRAE</button>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="flex:1">
           <p style="font-size:10px;color:#666;margin-bottom:4px">QTD</p>
@@ -271,7 +275,7 @@
         </div>
         <div style="flex:2">
           <p style="font-size:10px;color:#666;margin-bottom:4px">VALOR (R$)</p>
-          <input type="number" id="inp-custom-val" value="0" min="0" placeholder="Ex: 6500"
+          <input type="number" id="inp-custom-val" value="0" min="0" placeholder="Ex: 1950"
             style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;" />
         </div>
       </div>
@@ -580,8 +584,7 @@
   function render(){
     const {mensais, anuais, customQty, customVal} = data;
 
-    // Clientes equivalentes do plano personalizado
-    const customEquiv = customVal > 0 ? (customQty * customVal) / MENSAL : 0;
+    const customEquiv = data.customEquivCalc || 0;
     const total = mensais + anuais + customEquiv;
     const faltam = Math.max(META - total, 0);
     const pct = Math.min(total / META * 100, 100);
