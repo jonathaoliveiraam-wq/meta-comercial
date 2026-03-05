@@ -13,77 +13,80 @@
     #login-screen {
       min-height: 100vh;
       display: flex;
+      align-items: stretch;
+      background: #0d0d1a;
+    }
+    /* Lado esquerdo — animação */
+    .login-left {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a0533 0%, #2d0a5e 60%, #0d0d1a 100%);
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #1a0533 0%, #2d0a5e 50%, #1a0533 100%);
+      padding: 40px;
     }
-    .login-box {
+    @media (max-width: 700px) { .login-left { display: none; } }
+    canvas#particles { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .login-left-content { position: relative; z-index: 2; text-align: center; }
+    .login-left-content h2 {
+      font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 8px;
+    }
+    .login-left-content p { color: #a78bfa99; font-size: 14px; margin-bottom: 40px; }
+    /* Cards flutuantes */
+    .float-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 300px; }
+    .float-card {
       background: #ffffff0d;
-      border: 1px solid #7c3aed55;
-      border-radius: 20px;
+      border: 1px solid #7c3aed44;
+      border-radius: 14px;
+      padding: 14px 18px;
+      backdrop-filter: blur(8px);
+      animation: floatY 4s ease-in-out infinite;
+    }
+    .float-card:nth-child(2) { animation-delay: 0.8s; animation-duration: 5s; }
+    .float-card:nth-child(3) { animation-delay: 1.6s; animation-duration: 4.5s; }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .fc-label { font-size: 11px; color: #a78bfa88; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .fc-val { font-size: 22px; font-weight: 800; }
+    .fc-bar-bg { background: #ffffff11; border-radius: 999px; height: 6px; margin-top: 8px; overflow: hidden; }
+    .fc-bar-fill { height: 100%; border-radius: 999px; }
+
+    /* Lado direito — formulário */
+    .login-right {
+      width: 420px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d0d;
       padding: 40px 36px;
-      width: 100%;
-      max-width: 380px;
-      backdrop-filter: blur(10px);
     }
-    .login-brand {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .login-brand h2 {
-      font-size: 26px;
-      font-weight: 800;
-      background: linear-gradient(90deg, #a855f7, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-    .login-brand p {
-      color: #a78bfa88;
-      font-size: 13px;
-      margin-top: 4px;
-    }
+    @media (max-width: 700px) { .login-right { width: 100%; } }
+    .login-box { width: 100%; }
+    .login-brand { text-align: center; margin-bottom: 32px; }
+    .login-brand p { color: #a78bfa88; font-size: 13px; margin-top: 8px; }
     .login-label {
-      font-size: 12px;
-      color: #a78bfa;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      font-size: 12px; color: #a78bfa;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
     }
     .login-input {
-      width: 100%;
-      background: #ffffff0a;
-      border: 1px solid #7c3aed44;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 15px;
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      outline: none;
-      transition: border 0.2s;
+      width: 100%; background: #ffffff0a; border: 1px solid #7c3aed44;
+      border-radius: 10px; color: #fff; font-size: 15px; padding: 12px 14px;
+      margin-bottom: 16px; outline: none; transition: border 0.2s;
     }
     .login-input:focus { border-color: #a855f7; }
     .login-btn {
-      width: 100%;
-      background: linear-gradient(90deg, #7c3aed, #a855f7);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 13px;
-      cursor: pointer;
-      margin-top: 4px;
-      transition: opacity 0.2s;
+      width: 100%; background: linear-gradient(90deg, #7c3aed, #a855f7);
+      border: none; border-radius: 10px; color: #fff; font-size: 15px;
+      font-weight: 700; padding: 13px; cursor: pointer; margin-top: 4px; transition: opacity 0.2s;
     }
     .login-btn:hover { opacity: 0.9; }
-    .login-error {
-      color: #f87171;
-      font-size: 13px;
-      text-align: center;
-      margin-top: 12px;
-      min-height: 20px;
-    }
+    .login-error { color: #f87171; font-size: 13px; text-align: center; margin-top: 12px; min-height: 20px; }
 
     /* DASHBOARD */
     #dashboard { display: none; padding: 16px; }
@@ -152,18 +155,49 @@
 
 <!-- TELA DE LOGIN -->
 <div id="login-screen">
-  <div class="login-box">
-    <div class="login-brand">
-      <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" alt="Faço a Conta" style="max-width:180px;margin-bottom:12px;"/>
-      <p style="color:#a78bfa88;font-size:13px;">Meta Comercial · Plano Essencial</p>
+
+  <!-- ESQUERDA: animação -->
+  <div class="login-left">
+    <canvas id="particles"></canvas>
+    <div class="login-left-content">
+      <h2>Meta Comercial 2026</h2>
+      <p>Faço a Conta · Plano Essencial</p>
+      <div class="float-cards">
+        <div class="float-card">
+          <p class="fc-label">🎯 Progresso da Meta</p>
+          <p class="fc-val" style="color:#a855f7">0 / 240</p>
+          <div class="fc-bar-bg"><div class="fc-bar-fill" style="width:0%;background:linear-gradient(90deg,#7c3aed,#a855f7)"></div></div>
+        </div>
+        <div class="float-card">
+          <p class="fc-label">📅 Plano Mensal</p>
+          <p class="fc-val" style="color:#29b6f6">R$ 337<span style="font-size:13px;color:#555">/mês</span></p>
+          <div class="fc-bar-bg"><div class="fc-bar-fill" style="width:60%;background:#29b6f6"></div></div>
+        </div>
+        <div class="float-card">
+          <p class="fc-label">🏆 Plano Anual</p>
+          <p class="fc-val" style="color:#ab47bc">R$ 4.044<span style="font-size:13px;color:#555">/ano</span></p>
+          <div class="fc-bar-bg"><div class="fc-bar-fill" style="width:40%;background:#ab47bc"></div></div>
+        </div>
+      </div>
     </div>
-    <p class="login-label">Usuário</p>
-    <input class="login-input" type="text" id="inp-user" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter')entrar()"/>
-    <p class="login-label">Senha</p>
-    <input class="login-input" type="password" id="inp-senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()"/>
-    <button class="login-btn" onclick="entrar()">Entrar →</button>
-    <p class="login-error" id="login-error"></p>
   </div>
+
+  <!-- DIREITA: formulário -->
+  <div class="login-right">
+    <div class="login-box">
+      <div class="login-brand">
+        <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" alt="Faço a Conta" style="max-width:180px;"/>
+        <p>Meta Comercial · Plano Essencial</p>
+      </div>
+      <p class="login-label">Usuário</p>
+      <input class="login-input" type="text" id="inp-user" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter')entrar()"/>
+      <p class="login-label">Senha</p>
+      <input class="login-input" type="password" id="inp-senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()"/>
+      <button class="login-btn" onclick="entrar()">Entrar →</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+  </div>
+
 </div>
 
 <!-- DASHBOARD -->
@@ -303,6 +337,50 @@
     if (!chartsReady) { initCharts(); chartsReady = true; }
     load();
   }
+
+  // Partículas
+  (function(){
+    const c = document.getElementById('particles');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    let pts = [];
+    function resize(){ c.width=c.offsetWidth; c.height=c.offsetHeight; }
+    function init(){
+      pts = Array.from({length:60},()=>({
+        x:Math.random()*c.width, y:Math.random()*c.height,
+        r:Math.random()*2+1, vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+        a:Math.random()
+      }));
+    }
+    function draw(){
+      ctx.clearRect(0,0,c.width,c.height);
+      pts.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>c.width) p.vx*=-1;
+        if(p.y<0||p.y>c.height) p.vy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(168,85,247,${p.a*0.6})`;
+        ctx.fill();
+      });
+      // linhas entre pontos próximos
+      for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<100){
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x,pts[i].y);
+          ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle=`rgba(124,58,237,${(1-d/100)*0.3})`;
+          ctx.lineWidth=1;
+          ctx.stroke();
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize',()=>{ resize(); init(); });
+    resize(); init(); draw();
+  })();
 
   // Verifica sessão ao carregar
   window.onload = () => {
