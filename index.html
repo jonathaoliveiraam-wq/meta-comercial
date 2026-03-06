@@ -10,154 +10,76 @@
     body { background: #0d0d0d; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
 
     /* LOGIN */
-    #login-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      background: #0d0d1a;
-    }
-    /* Lado esquerdo — animação */
-    .login-left {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(135deg, #1a0533 0%, #2d0a5e 60%, #0d0d1a 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-    }
-    @media (max-width: 700px) { .login-left { display: none; } }
-    canvas#particles { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .login-left-content { position: relative; z-index: 2; text-align: center; }
-    .login-left-content h2 {
-      font-size: 52px; font-weight: 800; color: #fff; margin-bottom: 8px;
-      text-shadow: 0 0 30px #a855f766;
-    }
-    .login-left-content p { color: #a78bfa99; font-size: 14px; margin-bottom: 40px; }
-    /* Cards flutuantes */
-    .float-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 300px; }
-    .float-card {
-      background: #ffffff0d;
-      border: 1px solid #7c3aed44;
-      border-radius: 14px;
-      padding: 14px 18px;
-      backdrop-filter: blur(8px);
-      animation: floatY 4s ease-in-out infinite;
-    }
-    .float-card:nth-child(2) { animation-delay: 0.8s; animation-duration: 5s; }
-    .float-card:nth-child(3) { animation-delay: 1.6s; animation-duration: 4.5s; }
-    @keyframes floatY {
-      0%,100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-    .fc-label { font-size: 11px; color: #a78bfa88; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .fc-val { font-size: 22px; font-weight: 800; }
-    .fc-bar-bg { background: #ffffff11; border-radius: 999px; height: 6px; margin-top: 8px; overflow: hidden; }
-    .fc-bar-fill { height: 100%; border-radius: 999px; }
-
-    /* Lado direito — formulário */
-    .login-right {
-      width: 420px;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0d0d0d;
-      padding: 40px 36px;
-    }
-    @media (max-width: 700px) { .login-right { width: 100%; } }
-    .login-box { width: 100%; }
-    .login-brand { text-align: center; margin-bottom: 32px; }
-    .login-brand p { color: #a78bfa88; font-size: 13px; margin-top: 8px; }
-    .login-label {
-      font-size: 12px; color: #a78bfa;
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
-    }
-    .login-input {
-      width: 100%; background: #ffffff0a; border: 1px solid #7c3aed44;
-      border-radius: 10px; color: #fff; font-size: 15px; padding: 12px 14px;
-      margin-bottom: 16px; outline: none; transition: border 0.2s;
-    }
-    .login-input:focus { border-color: #a855f7; }
-    .login-btn {
-      width: 100%; background: linear-gradient(90deg, #7c3aed, #a855f7);
-      border: none; border-radius: 10px; color: #fff; font-size: 15px;
-      font-weight: 700; padding: 13px; cursor: pointer; margin-top: 4px; transition: opacity 0.2s;
-    }
-    .login-btn:hover { opacity: 0.9; }
-    .login-error { color: #f87171; font-size: 13px; text-align: center; margin-top: 12px; min-height: 20px; }
+    #login-screen { min-height:100vh; display:flex; align-items:stretch; background:#0d0d1a; }
+    .login-left { flex:1; position:relative; overflow:hidden; background:linear-gradient(135deg,#1a0533 0%,#2d0a5e 60%,#0d0d1a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; }
+    @media(max-width:700px){.login-left{display:none;}}
+    canvas#particles { position:absolute; inset:0; width:100%; height:100%; }
+    .login-left-content { position:relative; z-index:2; text-align:center; }
+    .login-left-content h2 { font-size:52px; font-weight:800; color:#fff; margin-bottom:8px; text-shadow:0 0 30px #a855f766; }
+    .login-left-content p { color:#a78bfa99; font-size:14px; margin-bottom:40px; }
+    .login-right { width:420px; min-height:100vh; display:flex; align-items:center; justify-content:center; background:#0d0d0d; padding:40px 36px; }
+    @media(max-width:700px){.login-right{width:100%;}}
+    .login-box { width:100%; }
+    .login-brand { text-align:center; margin-bottom:32px; }
+    .login-brand p { color:#a78bfa88; font-size:13px; margin-top:8px; }
+    .login-label { font-size:12px; color:#a78bfa; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .login-input { width:100%; background:#ffffff0a; border:1px solid #7c3aed44; border-radius:10px; color:#fff; font-size:15px; padding:12px 14px; margin-bottom:16px; outline:none; transition:border 0.2s; }
+    .login-input:focus { border-color:#a855f7; }
+    .login-btn { width:100%; background:linear-gradient(90deg,#7c3aed,#a855f7); border:none; border-radius:10px; color:#fff; font-size:15px; font-weight:700; padding:13px; cursor:pointer; margin-top:4px; }
+    .login-error { color:#f87171; font-size:13px; text-align:center; margin-top:12px; min-height:20px; }
 
     /* DASHBOARD */
-    #dashboard { display: none; padding: 16px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
-    h1 { font-size: 20px; font-weight: 700; }
-    .sub { color: #888; font-size: 13px; margin-top: 4px; }
-    .badge { font-size: 12px; padding: 6px 12px; border-radius: 20px; white-space: nowrap; }
-    .logout-btn {
-      background: #7c3aed22;
-      border: 1px solid #7c3aed55;
-      color: #a78bfa;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .top-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .card { background: #1a1a1a; border-radius: 14px; padding: 16px; border: 1px solid #222; margin-bottom: 14px; }
-    .progress-nums { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 4px; }
-    .big { font-size: 42px; font-weight: 800; }
-    .meta-total { font-size: 18px; color: #555; margin-left: 4px; }
-    .pct { font-size: 24px; font-weight: 700; }
-    .bar-bg { background: #2a2a2a; border-radius: 999px; height: 14px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
-    .bar-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #666; }
-    .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 14px; }
-    .grid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 14px; }
-    .grid-charts { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 14px; }
-    @media (max-width: 700px) {
-      .grid3,.grid-charts { grid-template-columns: 1fr; }
-      .grid2 { grid-template-columns: 1fr; }
-      .rec-grid { grid-template-columns: 1fr !important; }
-      .big { font-size: 34px; }
-    }
-    @media (max-width: 1000px) and (min-width: 701px) {
-      .grid3 { grid-template-columns: 1fr 1fr; }
-      .grid-charts { grid-template-columns: 1fr 1fr; }
-      .rec-grid { grid-template-columns: 1fr 1fr !important; }
-    }
-    .kpi-label { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .kpi-val { font-size: 28px; font-weight: 800; }
-    .kpi-sub { font-size: 11px; color: #555; margin-top: 4px; }
-    .plan-label { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 1px; }
-    .plan-sub { font-size: 11px; color: #555; margin-top: 2px; }
-    .plan-val { font-size: 34px; font-weight: 800; margin: 10px 0; }
-    .plan-receita { font-size: 12px; margin-bottom: 12px; }
-    .controls { display: flex; gap: 8px; }
-    .btn { width: 40px; height: 40px; border-radius: 8px; border: none; font-size: 20px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-    input[type=number] { flex: 1; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; text-align: center; font-size: 16px; padding: 8px 0; min-width: 0; }
-    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .rec-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-    .rec-card { background: #111; border-radius: 10px; padding: 12px; }
-    .rec-label { font-size: 11px; color: #666; margin-bottom: 4px; }
-    .rec-val { font-size: 16px; font-weight: 700; color: #00e676; }
-    .rec-sub { font-size: 10px; color: #444; margin-top: 2px; }
-    .chart-title { font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
-    .chart-wrap { position: relative; width: 100%; max-width: 200px; margin: 0 auto; }
-    .chart-wrap-bar { position: relative; width: 100%; }
-    .legend { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #aaa; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 16px; padding-bottom: 16px; }
+    #dashboard { display:none; padding:16px; }
+    .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:8px; }
+    h1 { font-size:20px; font-weight:700; }
+    .sub { color:#888; font-size:13px; margin-top:4px; }
+    .badge { font-size:12px; padding:6px 12px; border-radius:20px; white-space:nowrap; }
+    .logout-btn { background:#7c3aed22; border:1px solid #7c3aed55; color:#a78bfa; border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer; }
+    .top-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .card { background:#1a1a1a; border-radius:14px; padding:16px; border:1px solid #222; margin-bottom:14px; }
+    .progress-nums { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; flex-wrap:wrap; gap:4px; }
+    .big { font-size:42px; font-weight:800; }
+    .meta-total { font-size:18px; color:#555; margin-left:4px; }
+    .pct { font-size:24px; font-weight:700; }
+    .bar-bg { background:#2a2a2a; border-radius:999px; height:14px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:999px; transition:width 0.6s ease; }
+    .bar-labels { display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:#666; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+    .grid-charts { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+    @media(max-width:700px){ .grid3,.grid-charts{grid-template-columns:1fr;} .rec-grid{grid-template-columns:1fr!important;} .big{font-size:34px;} }
+    @media(max-width:1000px) and (min-width:701px){ .grid3{grid-template-columns:1fr 1fr;} .grid-charts{grid-template-columns:1fr 1fr;} .rec-grid{grid-template-columns:1fr 1fr!important;} }
+    .kpi-label { font-size:11px; color:#777; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .kpi-val { font-size:28px; font-weight:800; }
+    .kpi-sub { font-size:11px; color:#555; margin-top:4px; }
+    .plan-label { font-size:11px; color:#777; text-transform:uppercase; letter-spacing:1px; }
+    .plan-sub { font-size:11px; color:#555; margin-top:2px; }
+    .plan-val { font-size:34px; font-weight:800; margin:10px 0; }
+    .plan-receita { font-size:12px; margin-bottom:12px; }
+    .controls { display:flex; gap:8px; }
+    .btn { width:40px; height:40px; border-radius:8px; border:none; font-size:20px; font-weight:700; cursor:pointer; flex-shrink:0; }
+    input[type=number] { flex:1; background:#111; border:1px solid #333; border-radius:8px; color:#fff; text-align:center; font-size:16px; padding:8px 0; min-width:0; }
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+    .rec-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .rec-card { background:#111; border-radius:10px; padding:12px; }
+    .rec-label { font-size:11px; color:#666; margin-bottom:4px; }
+    .rec-val { font-size:16px; font-weight:700; color:#00e676; }
+    .rec-sub { font-size:10px; color:#444; margin-top:2px; }
+    .chart-title { font-size:12px; color:#777; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; text-align:center; }
+    .chart-wrap { position:relative; width:100%; max-width:200px; margin:0 auto; }
+    .chart-wrap-bar { position:relative; width:100%; }
+    .legend { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+    .legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:#aaa; }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .tipo-btn { flex:1; padding:7px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .tipo-btn.active { background:#ff980033; color:#ff9800; border:1px solid #ff9800; }
+    .tipo-btn.inactive { background:#111; color:#555; border:1px solid #333; }
+    .footer { text-align:center; font-size:11px; color:#333; margin-top:16px; padding-bottom:16px; }
   </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
+<!-- LOGIN -->
 <div id="login-screen">
-
-  <!-- ESQUERDA: animação -->
   <div class="login-left">
     <canvas id="particles"></canvas>
     <div class="login-left-content">
@@ -166,8 +88,6 @@
       <canvas id="chartAnim" width="340" height="300" style="margin-top:32px;filter:drop-shadow(0 0 18px #7c3aed88)"></canvas>
     </div>
   </div>
-
-  <!-- DIREITA: formulário -->
   <div class="login-right">
     <div class="login-box">
       <div class="login-brand">
@@ -182,7 +102,6 @@
       <p class="login-error" id="login-error"></p>
     </div>
   </div>
-
 </div>
 
 <!-- DASHBOARD -->
@@ -198,6 +117,7 @@
     </div>
   </div>
 
+  <!-- Progresso -->
   <div class="card">
     <div class="progress-nums">
       <div><span class="big" id="total">0</span><span class="meta-total">/ 240</span></div>
@@ -209,6 +129,7 @@
     </div>
   </div>
 
+  <!-- KPIs -->
   <div class="grid3">
     <div class="card">
       <p class="kpi-label">Total Fechado</p>
@@ -218,7 +139,7 @@
     <div class="card">
       <p class="kpi-label">Faltam</p>
       <p class="kpi-val" id="kpi-faltam" style="color:#ff9800">240</p>
-      <p class="kpi-sub">clientes restantes</p>
+      <p class="kpi-sub">clientes equiv.</p>
     </div>
     <div class="card" style="border-color:#5c6bc033">
       <p class="kpi-label">Meta</p>
@@ -227,7 +148,9 @@
     </div>
   </div>
 
+  <!-- Planos -->
   <div class="grid3">
+    <!-- Mensal -->
     <div class="card" style="border-color:#29b6f633">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div><p class="plan-label">Plano Mensal</p><p class="plan-sub">R$ 337/mês</p></div>
@@ -242,9 +165,10 @@
       </div>
     </div>
 
+    <!-- Anual -->
     <div class="card" style="border-color:#ab47bc33">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div><p class="plan-label">Plano Anual</p><p class="plan-sub">R$ 4.044,00/ano (12×)</p></div>
+        <div><p class="plan-label">Plano Anual</p><p class="plan-sub">R$ 4.044/ano (12×)</p></div>
         <span style="font-size:26px">🏆</span>
       </div>
       <p class="plan-val" id="val-anuais" style="color:#ab47bc">0</p>
@@ -256,6 +180,7 @@
       </div>
     </div>
 
+    <!-- Personalizado -->
     <div class="card" style="border-color:#ff980033">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div><p class="plan-label">Plano Personalizado</p><p class="plan-sub" id="custom-equiv-label">Equivale a 0 clientes</p></div>
@@ -263,27 +188,31 @@
       </div>
       <p class="plan-val" id="val-custom" style="color:#ff9800">0</p>
       <p class="plan-receita" id="rec-custom" style="color:#ff9800aa">Receita: R$ 0,00</p>
+
+      <!-- Tipo -->
       <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="btn-tipo-recebido" onclick="setTipo('recebido')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #ff9800;background:#ff980033;color:#ff9800;font-size:11px;font-weight:700;cursor:pointer;">💰 Valor recebido</button>
-        <button id="btn-tipo-sebrae" onclick="setTipo('sebrae')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #333;background:#111;color:#555;font-size:11px;font-weight:700;cursor:pointer;">🏦 Valor SEBRAE</button>
+        <button id="btn-recebido" class="tipo-btn active" onclick="ativarTipo('recebido')">💰 Valor recebido</button>
+        <button id="btn-sebrae" class="tipo-btn inactive" onclick="ativarTipo('sebrae')">🏦 Valor SEBRAE</button>
       </div>
+
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="flex:1">
           <p style="font-size:10px;color:#666;margin-bottom:4px">QTD</p>
-          <input type="number" id="inp-custom-qty" value="0" min="0" placeholder="0"
-            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;" />
+          <input type="number" id="inp-cqty" value="" min="0" placeholder="0"
+            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/>
         </div>
         <div style="flex:2">
-          <p style="font-size:10px;color:#666;margin-bottom:4px">VALOR (R$)</p>
-          <input type="number" id="inp-custom-val" value="0" min="0" placeholder="Ex: 1950"
-            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;" />
+          <p style="font-size:10px;color:#666;margin-bottom:4px" id="label-cval">VALOR RECEBIDO (R$)</p>
+          <input type="number" id="inp-cval" value="" min="0" placeholder="Ex: 6500"
+            style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/>
         </div>
       </div>
       <button onclick="confirmarCustom()" style="width:100%;background:linear-gradient(90deg,#ff6f00,#ff9800);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px;cursor:pointer;">✔ Confirmar</button>
-      <p style="font-size:11px;color:#555;text-align:center;margin-top:8px" id="custom-calc-info">Digite a qtd e o valor do plano</p>
+      <p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;min-height:16px" id="custom-info"></p>
     </div>
   </div>
 
+  <!-- Gráficos -->
   <div class="grid-charts">
     <div class="card" style="border-color:#5c6bc033">
       <p class="chart-title">🎯 % da Meta</p>
@@ -299,6 +228,7 @@
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#29b6f6"></div><span id="leg-fat-mensal">Mensal: R$ 0</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:#ab47bc"></div><span id="leg-fat-anual">Anual: R$ 0</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff9800"></div><span id="leg-fat-custom">Person.: R$ 0</span></div>
       </div>
     </div>
     <div class="card" style="border-color:#ffffff11">
@@ -307,16 +237,17 @@
     </div>
   </div>
 
+  <!-- Receita -->
   <div class="card" style="border-color:#00e67633">
     <p style="font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">💰 Receita Recorrente</p>
     <div class="rec-grid">
       <div class="rec-card"><p class="rec-label">MRR Atual</p><p class="rec-val" id="mrr">R$ 0,00</p><p class="rec-sub">mensal recorrente</p></div>
-      <div class="rec-card"><p class="rec-label">Receita Contratada</p><p class="rec-val" id="contratada">R$ 0,00</p><p class="rec-sub">mensais + anuais</p></div>
+      <div class="rec-card"><p class="rec-label">Receita Contratada</p><p class="rec-val" id="contratada">R$ 0,00</p><p class="rec-sub">todos os planos</p></div>
       <div class="rec-card"><p class="rec-label">Receita na Meta</p><p class="rec-val">R$ 80.880,00</p><p class="rec-sub">240 × R$ 337</p></div>
     </div>
   </div>
 
-  <p class="footer">Faço a Conta · Meta Comercial 2025</p>
+  <p class="footer">Faço a Conta · Meta Comercial 2026</p>
 </div>
 
 <script>
@@ -351,256 +282,92 @@
     load();
   }
 
-  // Gráfico animado lado esquerdo
-  (function(){
-    const c = document.getElementById('chartAnim');
-    if (!c) return;
-    const ctx = c.getContext('2d');
-    const W = c.width, H = c.height;
-    const bars = [
-      { label:'Jan', val:0.3, color:'#7c3aed' },
-      { label:'Fev', val:0.5, color:'#a855f7' },
-      { label:'Mar', val:0.4, color:'#7c3aed' },
-      { label:'Abr', val:0.7, color:'#a855f7' },
-      { label:'Mai', val:0.6, color:'#7c3aed' },
-      { label:'Jun', val:0.9, color:'#a855f7' },
-    ];
-    // linha de tendência animada
-    const linePoints = [0.2,0.35,0.45,0.6,0.72,0.88];
-    let progress = 0;
-    let pulse = 0;
-
-    function draw() {
-      ctx.clearRect(0,0,W,H);
-      progress = Math.min(progress + 0.012, 1);
-      pulse += 0.04;
-
-      const padL=40, padR=20, padT=30, padB=50;
-      const chartW = W-padL-padR;
-      const chartH = H-padT-padB;
-      const bw = chartW/bars.length;
-
-      // Grid lines
-      for(let i=0;i<=4;i++){
-        const y = padT + chartH - (chartH/4)*i;
-        ctx.beginPath();
-        ctx.moveTo(padL, y);
-        ctx.lineTo(W-padR, y);
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.2)';
-        ctx.font='10px Segoe UI';
-        ctx.fillText(Math.round(i*60)+'', 2, y+4);
-      }
-
-      // Barras animadas
-      bars.forEach((b,i) => {
-        const x = padL + i*bw + bw*0.15;
-        const bWidth = bw*0.7;
-        const bH = chartH * b.val * progress;
-        const y = padT + chartH - bH;
-
-        // Glow
-        const grd = ctx.createLinearGradient(x, y, x, padT+chartH);
-        grd.addColorStop(0, b.color+'cc');
-        grd.addColorStop(1, b.color+'22');
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.roundRect(x, y, bWidth, bH, 6);
-        ctx.fill();
-
-        // Label
-        ctx.fillStyle='rgba(255,255,255,0.5)';
-        ctx.font='11px Segoe UI';
-        ctx.textAlign='center';
-        ctx.fillText(b.label, x+bWidth/2, H-padB+16);
-      });
-
-      // Linha de tendência animada
-      if(progress > 0.1){
-        ctx.beginPath();
-        linePoints.forEach((v,i) => {
-          const x = padL + i*(chartW/(linePoints.length-1));
-          const y = padT + chartH - chartH*v*Math.min(progress*1.2,1);
-          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-        });
-        ctx.strokeStyle = '#00e676';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#00e676';
-        ctx.shadowBlur = 10;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // Ponto pulsante no final
-        const lx = padL + chartW;
-        const ly = padT + chartH - chartH*linePoints[5]*Math.min(progress*1.2,1);
-        const r = 5 + Math.sin(pulse)*2;
-        ctx.beginPath();
-        ctx.arc(lx, ly, r, 0, Math.PI*2);
-        ctx.fillStyle = '#00e676';
-        ctx.shadowColor = '#00e676';
-        ctx.shadowBlur = 15;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      ctx.textAlign = 'left';
-      if(progress < 1) requestAnimationFrame(draw);
-      else animLoop();
-    }
-
-    function animLoop(){
-      pulse += 0.04;
-      ctx.clearRect(0,0,W,H);
-
-      const padL=40,padR=20,padT=30,padB=50;
-      const chartW=W-padL-padR, chartH=H-padT-padB;
-      const bw=chartW/bars.length;
-
-      for(let i=0;i<=4;i++){
-        const y=padT+chartH-(chartH/4)*i;
-        ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y);
-        ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px Segoe UI';
-        ctx.fillText(Math.round(i*60)+'',2,y+4);
-      }
-
-      bars.forEach((b,i)=>{
-        const x=padL+i*bw+bw*0.15, bWidth=bw*0.7;
-        const bH=chartH*b.val, y=padT+chartH-bH;
-        const grd=ctx.createLinearGradient(x,y,x,padT+chartH);
-        grd.addColorStop(0,b.color+'cc'); grd.addColorStop(1,b.color+'22');
-        ctx.fillStyle=grd; ctx.beginPath();
-        ctx.roundRect(x,y,bWidth,bH,6); ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px Segoe UI';
-        ctx.textAlign='center'; ctx.fillText(b.label,x+bWidth/2,H-padB+16);
-      });
-
-      ctx.beginPath();
-      linePoints.forEach((v,i)=>{
-        const x=padL+i*(chartW/(linePoints.length-1));
-        const y=padT+chartH-chartH*v;
-        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      });
-      ctx.strokeStyle='#00e676'; ctx.lineWidth=2.5;
-      ctx.shadowColor='#00e676'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
-
-      const lx=padL+chartW, ly=padT+chartH-chartH*linePoints[5];
-      const r=5+Math.sin(pulse)*2.5;
-      ctx.beginPath(); ctx.arc(lx,ly,r,0,Math.PI*2);
-      ctx.fillStyle='#00e676'; ctx.shadowColor='#00e676'; ctx.shadowBlur=15;
-      ctx.fill(); ctx.shadowBlur=0; ctx.textAlign='left';
-      requestAnimationFrame(animLoop);
-    }
-
-    draw();
-  })();
-
-  // Verifica sessão ao carregar
   window.onload = () => {
+    iniciarAnimacoes();
     if (sessionStorage.getItem('logado') === '1') mostrarDash();
   };
 
-  // ─── DASHBOARD ──────────────────────────────────────
+  // ─── CONSTANTES ─────────────────────────────────────
   const BIN_ID  = '69a83d79ae596e708f5eb480';
   const API_KEY = '$2a$10$T8MLsd4dkQLEQuDioAUhR.dVUxrpWdCgYyUQO6ZcxlB5.YfDT6QYW';
   const META = 240, MENSAL = 337, ANUAL = 337 * 12;
-  let data = { mensais: 0, anuais: 0, customQty: 0, customVal: 0 };
-  let pizza1, pizza2, barras, chartsReady = false;
+
+  // ─── ESTADO ─────────────────────────────────────────
+  let data = { mensais:0, anuais:0, cqty:0, cval:0, ctipo:'recebido', cequiv:0, crec:0 };
+  let chartsReady = false;
+  let tipoAtivo = 'recebido';
 
   const fmt  = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const fmtK = v => v >= 1000 ? 'R$ '+(v/1000).toFixed(1)+'k' : fmt(v);
 
-  function initCharts() {
-    pizza1 = new Chart(document.getElementById('graficoPizza1').getContext('2d'), {
-      type: 'doughnut',
-      data: { datasets: [{ data:[0,240], backgroundColor:['#00e676','#2a2a2a'], borderWidth:0 }] },
-      options: { responsive:true, cutout:'70%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c=>` ${c.parsed} clientes` } } } }
-    });
-    pizza2 = new Chart(document.getElementById('graficoPizza2').getContext('2d'), {
-      type: 'doughnut',
-      data: { datasets: [{ data:[0,0], backgroundColor:['#29b6f6','#ab47bc'], borderWidth:0 }] },
-      options: { responsive:true, cutout:'70%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c=>` ${fmtK(c.parsed)}` } } } }
-    });
-    barras = new Chart(document.getElementById('graficoBarras').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels:['Mensal','Anual','Meta'],
-        datasets:[{ data:[0,0,240], backgroundColor:['#29b6f644','#ab47bc44','#5c6bc044'], borderColor:['#29b6f6','#ab47bc','#5c6bc0'], borderWidth:2, borderRadius:8 }]
-      },
-      options: {
-        responsive:true,
-        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c=>` ${c.parsed.y} clientes` } } },
-        scales:{
-          x:{ grid:{color:'#ffffff11'}, ticks:{color:'#888',font:{size:11}} },
-          y:{ grid:{color:'#ffffff11'}, ticks:{color:'#888',stepSize:60}, min:0, max:260 }
-        }
-      }
-    });
+  // ─── TIPO PERSONALIZADO ─────────────────────────────
+  function ativarTipo(tipo) {
+    tipoAtivo = tipo;
+    document.getElementById('btn-recebido').className = 'tipo-btn ' + (tipo==='recebido'?'active':'inactive');
+    document.getElementById('btn-sebrae').className   = 'tipo-btn ' + (tipo==='sebrae'?'active':'inactive');
+    document.getElementById('label-cval').textContent = tipo==='recebido' ? 'VALOR RECEBIDO (R$)' : 'VALOR SEBRAE (R$)';
   }
 
-  function updateCharts(mensais,anuais,total,rMensal,rAnual) {
-    const faltam = Math.max(META-total,0);
-    pizza1.data.datasets[0].data = total>0?[total,faltam]:[0,240]; pizza1.update();
-    pizza2.data.datasets[0].data = (rMensal+rAnual)>0?[rMensal,rAnual]:[1,1]; pizza2.update();
-    barras.data.datasets[0].data = [mensais,anuais,META]; barras.update();
-    document.getElementById('leg-fechado').textContent=`Fechados: ${total}`;
-    document.getElementById('leg-faltam').textContent=`Faltam: ${faltam}`;
-    document.getElementById('leg-fat-mensal').textContent=`Mensal: ${fmtK(rMensal)}`;
-    document.getElementById('leg-fat-anual').textContent=`Anual: ${fmtK(rAnual)}`;
+  function confirmarCustom() {
+    const qty = parseFloat(document.getElementById('inp-cqty').value) || 0;
+    const val = parseFloat(document.getElementById('inp-cval').value) || 0;
+    if (qty <= 0 || val <= 0) {
+      document.getElementById('custom-info').textContent = '⚠️ Preencha qtd e valor!';
+      return;
+    }
+    // Calcula valor recebido
+    const valorRecebido = tipoAtivo === 'sebrae' ? val / 0.3 : val;
+    // Receita total do plano personalizado
+    const receitaTotal = qty * valorRecebido;
+    // Clientes equivalentes = receita total / (337 * 12)
+    const equiv = receitaTotal / ANUAL;
+
+    data.cqty   = qty;
+    data.cval   = val;
+    data.ctipo  = tipoAtivo;
+    data.cequiv = equiv;
+    data.crec   = receitaTotal;
+
+    // Info de cálculo
+    let info = '';
+    if (tipoAtivo === 'sebrae') {
+      info = `${fmt(val)} ÷ 0,3 = ${fmt(valorRecebido)} × ${qty} = ${fmt(receitaTotal)} → ${equiv.toFixed(2)} clientes`;
+    } else {
+      info = `${fmt(val)} × ${qty} = ${fmt(receitaTotal)} → ${equiv.toFixed(2)} clientes`;
+    }
+    document.getElementById('custom-info').textContent = info;
+
+    render();
+    save();
   }
 
-  async function load() {
-    badge('⏳ Carregando...','#ffca2822','#ffca28');
-    try {
-      const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
-      const j = await r.json();
-      data = { mensais:0, anuais:0, customQty:0, customVal:0, ...j.record };
-      // preenche campos do personalizado
-      document.getElementById('inp-custom-qty').value = data.customQty || 0;
-      document.getElementById('inp-custom-val').value = data.customVal || 0;
-      render();
-      badge('✅ Salvo','#1b5e2022','#00e676');
-    } catch(e){ badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
-  }
-
-  async function save() {
-    badge('⏳ Salvando...','#ffca2822','#ffca28');
-    try {
-      await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{ method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':API_KEY}, body:JSON.stringify(data) });
-      badge('✅ Salvo','#1b5e2022','#00e676');
-    } catch(e){ badge('⚠️ Erro ao salvar','#f4433622','#f44336'); }
-  }
-
-  function badge(txt,bg,cor){ const b=document.getElementById('badge'); b.textContent=txt; b.style.background=bg; b.style.color=cor; }
-  function update(field,delta){ setVal(field,data[field]+delta); }
-  function setVal(field,v){
-    data[field]=Math.max(0,isNaN(v)?0:v);
-    document.getElementById('inp-'+field).value=data[field];
+  // ─── PLANOS PADRÃO ──────────────────────────────────
+  function update(field, delta) { setVal(field, data[field] + delta); }
+  function setVal(field, v) {
+    data[field] = Math.max(0, isNaN(v) ? 0 : v);
+    document.getElementById('inp-' + field).value = data[field];
     render(); save();
   }
 
-  function render(){
-    const {mensais, anuais, customQty, customVal} = data;
-
-    const customEquiv = data.customEquivCalc || 0;
-    const total = mensais + anuais + customEquiv;
+  // ─── RENDER ─────────────────────────────────────────
+  function render() {
+    const { mensais, anuais, cequiv, crec } = data;
+    const total  = mensais + anuais + (cequiv || 0);
     const faltam = Math.max(META - total, 0);
-    const pct = Math.min(total / META * 100, 100);
-    const cor = pct>=100?'#00e676':pct>=70?'#ffca28':pct>=40?'#ff9800':'#f44336';
+    const pct    = Math.min(total / META * 100, 100);
+    const cor    = pct>=100?'#00e676':pct>=70?'#ffca28':pct>=40?'#ff9800':'#f44336';
 
-    document.getElementById('total').textContent = Math.round(total);
+    document.getElementById('total').textContent = total.toFixed(1);
     document.getElementById('total').style.color = cor;
     document.getElementById('pct').textContent = pct.toFixed(1)+'%';
     document.getElementById('pct').style.color = cor;
     document.getElementById('bar').style.width = pct+'%';
     document.getElementById('bar').style.background = `linear-gradient(90deg,${cor}88,${cor})`;
-    document.getElementById('faltam-label').innerHTML = faltam>0
-      ?`<span style="color:#ff9800;font-weight:600">${faltam.toFixed(1)} clientes equiv.</span> para a meta`
-      :`<span style="color:#00e676;font-weight:600">✅ Meta atingida!</span>`;
+    document.getElementById('faltam-label').innerHTML = faltam > 0
+      ? `<span style="color:#ff9800;font-weight:600">${faltam.toFixed(1)} clientes equiv.</span> para a meta`
+      : `<span style="color:#00e676;font-weight:600">✅ Meta atingida!</span>`;
 
-    document.getElementById('kpi-total').textContent = Math.round(total);
+    document.getElementById('kpi-total').textContent = total.toFixed(1);
     document.getElementById('kpi-total').style.color = cor;
     document.getElementById('kpi-pct-sub').textContent = pct.toFixed(0)+'% da meta';
     document.getElementById('kpi-faltam').textContent = faltam.toFixed(1);
@@ -608,26 +375,137 @@
     document.getElementById('val-mensal').textContent = mensais;
     document.getElementById('val-anuais').textContent = anuais;
     document.getElementById('inp-mensais').value = mensais;
-    document.getElementById('inp-anuais').value = anuais;
+    document.getElementById('inp-anuais').value  = anuais;
 
-    // Plano personalizado
-    const rCustom = customQty * customVal;
-    document.getElementById('val-custom').textContent = customQty;
-    document.getElementById('rec-custom').textContent = 'Receita: '+fmt(rCustom);
-    document.getElementById('custom-equiv-label').textContent = `Equivale a ${customEquiv.toFixed(1)} clientes`;
-    document.getElementById('custom-calc-info').textContent = customVal > 0
-      ? `${fmt(customVal)} ÷ R$ 337 = ${(customVal/MENSAL).toFixed(2)} clientes/contrato`
-      : 'Digite a qtd e o valor do plano';
+    document.getElementById('val-custom').textContent = data.cqty || 0;
+    document.getElementById('custom-equiv-label').textContent = `Equivale a ${(cequiv||0).toFixed(2)} clientes`;
+    document.getElementById('rec-custom').textContent = 'Receita: ' + fmt(crec || 0);
 
     const rMensal = mensais * MENSAL;
-    const rAnual  = anuais * ANUAL;
-    const rTotal  = rMensal + rAnual + rCustom;
-    document.getElementById('rec-mensal').textContent = 'Receita: '+fmt(rMensal)+'/mês';
-    document.getElementById('rec-anuais').textContent = 'Receita: '+fmt(rAnual)+'/ano';
-    document.getElementById('mrr').textContent = fmt(rMensal + rAnual/12 + rCustom/12);
-    document.getElementById('contratada').textContent = fmt(rTotal);
+    const rAnual  = anuais  * ANUAL;
+    const rTotal  = rMensal + rAnual + (crec || 0);
+    document.getElementById('rec-mensal').textContent   = 'Receita: '+fmt(rMensal)+'/mês';
+    document.getElementById('rec-anuais').textContent   = 'Receita: '+fmt(rAnual)+'/ano';
+    document.getElementById('mrr').textContent          = fmt(rMensal + rAnual/12 + (crec||0)/12);
+    document.getElementById('contratada').textContent   = fmt(rTotal);
 
-    updateCharts(mensais, anuais, customEquiv, total, rMensal, rAnual, rCustom);
+    updateCharts(mensais, anuais, cequiv||0, total, rMensal, rAnual, crec||0);
+  }
+
+  // ─── CHARTS ─────────────────────────────────────────
+  let pizza1, pizza2, barras;
+
+  function initCharts() {
+    pizza1 = new Chart(document.getElementById('graficoPizza1').getContext('2d'), {
+      type:'doughnut',
+      data:{ datasets:[{ data:[0,240], backgroundColor:['#00e676','#2a2a2a'], borderWidth:0 }] },
+      options:{ responsive:true, cutout:'70%', plugins:{ legend:{display:false} } }
+    });
+    pizza2 = new Chart(document.getElementById('graficoPizza2').getContext('2d'), {
+      type:'doughnut',
+      data:{ datasets:[{ data:[1,1,0], backgroundColor:['#29b6f6','#ab47bc','#ff9800'], borderWidth:0 }] },
+      options:{ responsive:true, cutout:'70%', plugins:{ legend:{display:false} } }
+    });
+    barras = new Chart(document.getElementById('graficoBarras').getContext('2d'), {
+      type:'bar',
+      data:{
+        labels:['Mensal','Anual','Person.','Meta'],
+        datasets:[{ data:[0,0,0,240], backgroundColor:['#29b6f644','#ab47bc44','#ff980044','#5c6bc044'], borderColor:['#29b6f6','#ab47bc','#ff9800','#5c6bc0'], borderWidth:2, borderRadius:8 }]
+      },
+      options:{
+        responsive:true,
+        plugins:{ legend:{display:false} },
+        scales:{ x:{grid:{color:'#ffffff11'},ticks:{color:'#888',font:{size:11}}}, y:{grid:{color:'#ffffff11'},ticks:{color:'#888'},min:0,max:260} }
+      }
+    });
+  }
+
+  function updateCharts(mensais, anuais, cequiv, total, rMensal, rAnual, rCustom) {
+    const faltam = Math.max(META - total, 0);
+    pizza1.data.datasets[0].data = total > 0 ? [total, faltam] : [0, 240];
+    pizza1.update();
+    pizza2.data.datasets[0].data = (rMensal+rAnual+rCustom) > 0 ? [rMensal, rAnual, rCustom] : [1,1,0];
+    pizza2.update();
+    barras.data.datasets[0].data = [mensais, anuais, +cequiv.toFixed(2), META];
+    barras.update();
+    document.getElementById('leg-fechado').textContent   = `Fechados: ${total.toFixed(1)}`;
+    document.getElementById('leg-faltam').textContent    = `Faltam: ${faltam.toFixed(1)}`;
+    document.getElementById('leg-fat-mensal').textContent= `Mensal: ${fmtK(rMensal)}`;
+    document.getElementById('leg-fat-anual').textContent = `Anual: ${fmtK(rAnual)}`;
+    document.getElementById('leg-fat-custom').textContent= `Person.: ${fmtK(rCustom)}`;
+  }
+
+  // ─── API JSONBIN ─────────────────────────────────────
+  async function load() {
+    badge('⏳ Carregando...','#ffca2822','#ffca28');
+    try {
+      const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
+      const j = await r.json();
+      data = { mensais:0, anuais:0, cqty:0, cval:0, ctipo:'recebido', cequiv:0, crec:0, ...j.record };
+      // Restaura campos na tela
+      document.getElementById('inp-cqty').value = data.cqty || '';
+      document.getElementById('inp-cval').value = data.cval || '';
+      if (data.ctipo) ativarTipo(data.ctipo);
+      if (data.cequiv > 0) {
+        const recalcInfo = `${data.cqty} contratos → ${(data.cequiv).toFixed(2)} clientes equiv.`;
+        document.getElementById('custom-info').textContent = recalcInfo;
+      }
+      render();
+      badge('✅ Salvo','#1b5e2022','#00e676');
+    } catch(e) { badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
+  }
+
+  async function save() {
+    badge('⏳ Salvando...','#ffca2822','#ffca28');
+    try {
+      await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+        body: JSON.stringify(data)
+      });
+      badge('✅ Salvo','#1b5e2022','#00e676');
+    } catch(e) { badge('⚠️ Erro ao salvar','#f4433622','#f44336'); }
+  }
+
+  function badge(txt,bg,cor){ const b=document.getElementById('badge'); b.textContent=txt; b.style.background=bg; b.style.color=cor; }
+
+  // ─── ANIMAÇÕES LOGIN ─────────────────────────────────
+  function iniciarAnimacoes() {
+    // Partículas
+    (function(){
+      const c = document.getElementById('particles'); if(!c) return;
+      const ctx = c.getContext('2d'); let pts=[];
+      function resize(){ c.width=c.offsetWidth; c.height=c.offsetHeight; }
+      function init(){ pts=Array.from({length:60},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,a:Math.random()})); }
+      function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        pts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>c.width)p.vx*=-1; if(p.y<0||p.y>c.height)p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(168,85,247,${p.a*0.6})`; ctx.fill(); });
+        for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){ const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy); if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(124,58,237,${(1-d/100)*0.3})`;ctx.lineWidth=1;ctx.stroke();} }
+        requestAnimationFrame(draw);
+      }
+      window.addEventListener('resize',()=>{resize();init();}); resize(); init(); draw();
+    })();
+
+    // Gráfico animado
+    (function(){
+      const c=document.getElementById('chartAnim'); if(!c) return;
+      const ctx=c.getContext('2d'),W=c.width,H=c.height;
+      const bars=[{val:.3,color:'#7c3aed'},{val:.5,color:'#a855f7'},{val:.4,color:'#7c3aed'},{val:.7,color:'#a855f7'},{val:.6,color:'#7c3aed'},{val:.9,color:'#a855f7'}];
+      const linePoints=[.2,.35,.45,.6,.72,.88];
+      const labels=['Jan','Fev','Mar','Abr','Mai','Jun'];
+      let progress=0,pulse=0;
+      function frame(){
+        ctx.clearRect(0,0,W,H);
+        progress=Math.min(progress+0.012,1); pulse+=0.04;
+        const pL=40,pR=20,pT=30,pB=50,cW=W-pL-pR,cH=H-pT-pB,bw=cW/bars.length;
+        for(let i=0;i<=4;i++){const y=pT+cH-(cH/4)*i;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='rgba(255,255,255,0.2)';ctx.font='10px Segoe UI';ctx.fillText(Math.round(i*60)+'',2,y+4);}
+        bars.forEach((b,i)=>{const x=pL+i*bw+bw*.15,bW=bw*.7,bH=cH*b.val*progress,y=pT+cH-bH;const grd=ctx.createLinearGradient(x,y,x,pT+cH);grd.addColorStop(0,b.color+'cc');grd.addColorStop(1,b.color+'22');ctx.fillStyle=grd;ctx.beginPath();ctx.roundRect(x,y,bW,bH,6);ctx.fill();ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px Segoe UI';ctx.textAlign='center';ctx.fillText(labels[i],x+bW/2,H-pB+16);});
+        if(progress>.1){ctx.beginPath();linePoints.forEach((v,i)=>{const x=pL+i*(cW/(linePoints.length-1)),y=pT+cH-cH*v*Math.min(progress*1.2,1);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.strokeStyle='#00e676';ctx.lineWidth=2.5;ctx.shadowColor='#00e676';ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;const lx=pL+cW,ly=pT+cH-cH*linePoints[5]*Math.min(progress*1.2,1),r=5+Math.sin(pulse)*2;ctx.beginPath();ctx.arc(lx,ly,r,0,Math.PI*2);ctx.fillStyle='#00e676';ctx.shadowColor='#00e676';ctx.shadowBlur=15;ctx.fill();ctx.shadowBlur=0;}
+        ctx.textAlign='left';
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
   }
 </script>
 </body>
