@@ -325,7 +325,7 @@
             <p style="font-size:12px;font-weight:600;color:#ff9800;">${l.desc || (l.tipo==='sebrae'?'🏦 SEBRAE':'💰 Recebido')}</p>
             <p style="font-size:11px;color:#666;margin-top:2px;">
               ${l.tipo==='sebrae'
-                ? `${l.qty}x ${fmt(l.val)} ÷ 0,3 = <span style="color:#fff">${fmt(l.valorRec)}</span> → <span style="color:#ff9800">${l.equiv.toFixed(2)} clientes</span>`
+                ? `${l.qty}x ${fmt(l.val)} ÷ 0,3 = <span style="color:#fff">${fmt(l.qty * l.valorRec)}</span> → <span style="color:#ff9800">${l.equiv.toFixed(2)} clientes</span>`
                 : `${l.qty}x ${fmt(l.val)} → <span style="color:#ff9800">${l.equiv.toFixed(2)} clientes</span>`
               }
             </p>
