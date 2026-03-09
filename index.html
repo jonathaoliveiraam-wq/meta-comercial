@@ -459,8 +459,16 @@
     try {
       const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
       const j = await r.json();
-      data = { mensais:0, anuais:0, lancamentos:[], ...j.record };
-      if (!Array.isArray(data.lancamentos)) data.lancamentos = [];
+      const rec = j.record || {};
+      data = {
+        mensais:    rec.mensais    || 0,
+        anuais:     rec.anuais     || 0,
+        lancamentos: Array.isArray(rec.lancamentos) ? rec.lancamentos : []
+      };
+      render();
+      badge('✅ Salvo','#1b5e2022','#00e676');
+    } catch(e) { badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
+  }
       render();
       badge('✅ Salvo','#1b5e2022','#00e676');
     } catch(e) { badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
