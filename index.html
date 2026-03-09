@@ -313,10 +313,12 @@
     const tipoLabel = tipoAtivo === 'sebrae' ? '🏦 SEBRAE' : '💰 Recebido';
     const totalAtual = (data.mensais + data.anuais + (data.lancamentos||[]).reduce((s,l)=>s+l.equiv,0)).toFixed(1);
     const recAtual = fmt((data.mensais*MENSAL) + (data.anuais*ANUAL) + (data.lancamentos||[]).reduce((s,l)=>s+l.recTotal,0));
+    const valorAReceber = qty * (tipoAtivo === 'sebrae' ? val / 0.3 : val);
     alertarTelegram(
       '🔔 <b>Meta Comercial atualizada!</b>\n' +
       '📋 Tipo: ' + tipoLabel + (desc ? ' — ' + desc : '') + '\n' +
-      '👥 Qtd: ' + qty + ' | Valor: ' + fmt(val) + '\n' +
+      '👥 Qtd: ' + qty + ' | Valor: ' + fmt(val) + (tipoAtivo === 'sebrae' ? ' ÷ 0,3' : '') + '\n' +
+      '💵 Valor a receber: <b>' + fmt(valorAReceber) + '</b>\n' +
       '📊 Total: <b>' + totalAtual + ' clientes</b>\n' +
       '💰 Receita contratada: <b>' + recAtual + '</b>'
     );
