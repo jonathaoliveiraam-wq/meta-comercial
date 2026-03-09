@@ -189,26 +189,31 @@
       <p class="plan-val" id="val-custom" style="color:#ff9800">0</p>
       <p class="plan-receita" id="rec-custom" style="color:#ff9800aa">Receita: R$ 0,00</p>
 
-      <!-- Tipo -->
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <button id="btn-recebido" class="tipo-btn active" onclick="ativarTipo('recebido')">💰 Valor recebido</button>
         <button id="btn-sebrae" class="tipo-btn inactive" onclick="ativarTipo('sebrae')">🏦 Valor SEBRAE</button>
       </div>
-
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="flex:1">
           <p style="font-size:10px;color:#666;margin-bottom:4px">QTD</p>
-          <input type="number" id="inp-cqty" value="" min="0" placeholder="0"
+          <input type="number" id="inp-cqty" min="0" placeholder="0"
             style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/>
         </div>
         <div style="flex:2">
           <p style="font-size:10px;color:#666;margin-bottom:4px" id="label-cval">VALOR RECEBIDO (R$)</p>
-          <input type="number" id="inp-cval" value="" min="0" placeholder="Ex: 6500"
+          <input type="number" id="inp-cval" min="0" placeholder="Ex: 6500"
             style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/>
         </div>
       </div>
-      <button onclick="confirmarCustom()" style="width:100%;background:linear-gradient(90deg,#ff6f00,#ff9800);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px;cursor:pointer;">✔ Confirmar</button>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="inp-cdesc" placeholder="Descrição (opcional)" 
+          style="flex:1;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;outline:none;"/>
+      </div>
+      <button onclick="confirmarCustom()" id="btn-confirmar-custom" style="width:100%;background:linear-gradient(90deg,#ff6f00,#ff9800);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px;cursor:pointer;">✔ Confirmar Lançamento</button>
       <p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;min-height:16px" id="custom-info"></p>
+
+      <!-- Lista de lançamentos -->
+      <div id="lista-custom" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
     </div>
   </div>
 
@@ -308,6 +313,14 @@
     document.getElementById('label-cval').textContent = tipo==='recebido' ? 'VALOR RECEBIDO (R$)' : 'VALOR SEBRAE (R$)';
   }
 
+  function limparCustom() {
+    data.cqty = 0; data.cval = 0; data.cequiv = 0; data.crec = 0;
+    document.getElementById('inp-cqty').value = '';
+    document.getElementById('inp-cval').value = '';
+    document.getElementById('custom-info').textContent = '';
+    render(); save();
+  }
+
   function confirmarCustom() {
     const qty = parseFloat(document.getElementById('inp-cqty').value) || 0;
     const val = parseFloat(document.getElementById('inp-cval').value) || 0;
@@ -349,10 +362,14 @@
     render(); save();
   }
 
-  // ─── RENDER ─────────────────────────────────────────
   function render() {
-    const { mensais, anuais, cequiv, crec } = data;
-    const total  = mensais + anuais + (cequiv || 0);
+    const { mensais, anuais } = data;
+    const lans = data.lancamentos || [];
+    const totalEquiv = lans.reduce((s, l) => s + l.equiv, 0);
+    const totalRec   = lans.reduce((s, l) => s + l.receitaTotal, 0);
+    const totalQty   = lans.reduce((s, l) => s + l.qty, 0);
+
+    const total  = mensais + anuais + totalEquiv;
     const faltam = Math.max(META - total, 0);
     const pct    = Math.min(total / META * 100, 100);
     const cor    = pct>=100?'#00e676':pct>=70?'#ffca28':pct>=40?'#ff9800':'#f44336';
@@ -377,19 +394,20 @@
     document.getElementById('inp-mensais').value = mensais;
     document.getElementById('inp-anuais').value  = anuais;
 
-    document.getElementById('val-custom').textContent = data.cqty || 0;
-    document.getElementById('custom-equiv-label').textContent = `Equivale a ${(cequiv||0).toFixed(2)} clientes`;
-    document.getElementById('rec-custom').textContent = 'Receita: ' + fmt(crec || 0);
+    document.getElementById('val-custom').textContent = totalQty;
+    document.getElementById('custom-equiv-label').textContent = `Equivale a ${totalEquiv.toFixed(2)} clientes`;
+    document.getElementById('rec-custom').textContent = 'Receita: ' + fmt(totalRec);
 
     const rMensal = mensais * MENSAL;
     const rAnual  = anuais  * ANUAL;
-    const rTotal  = rMensal + rAnual + (crec || 0);
-    document.getElementById('rec-mensal').textContent   = 'Receita: '+fmt(rMensal)+'/mês';
-    document.getElementById('rec-anuais').textContent   = 'Receita: '+fmt(rAnual)+'/ano';
-    document.getElementById('mrr').textContent          = fmt(rMensal + rAnual/12 + (crec||0)/12);
-    document.getElementById('contratada').textContent   = fmt(rTotal);
+    const rTotal  = rMensal + rAnual + totalRec;
+    document.getElementById('rec-mensal').textContent = 'Receita: '+fmt(rMensal)+'/mês';
+    document.getElementById('rec-anuais').textContent = 'Receita: '+fmt(rAnual)+'/ano';
+    document.getElementById('mrr').textContent        = fmt(rMensal + rAnual/12 + totalRec/12);
+    document.getElementById('contratada').textContent = fmt(rTotal);
 
-    updateCharts(mensais, anuais, cequiv||0, total, rMensal, rAnual, crec||0);
+    renderLista();
+    updateCharts(mensais, anuais, totalEquiv, total, rMensal, rAnual, totalRec);
   }
 
   // ─── CHARTS ─────────────────────────────────────────
@@ -441,15 +459,8 @@
     try {
       const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
       const j = await r.json();
-      data = { mensais:0, anuais:0, cqty:0, cval:0, ctipo:'recebido', cequiv:0, crec:0, ...j.record };
-      // Restaura campos na tela
-      document.getElementById('inp-cqty').value = data.cqty || '';
-      document.getElementById('inp-cval').value = data.cval || '';
-      if (data.ctipo) ativarTipo(data.ctipo);
-      if (data.cequiv > 0) {
-        const recalcInfo = `${data.cqty} contratos → ${(data.cequiv).toFixed(2)} clientes equiv.`;
-        document.getElementById('custom-info').textContent = recalcInfo;
-      }
+      data = { mensais:0, anuais:0, lancamentos:[], ...j.record };
+      if (!Array.isArray(data.lancamentos)) data.lancamentos = [];
       render();
       badge('✅ Salvo','#1b5e2022','#00e676');
     } catch(e) { badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
