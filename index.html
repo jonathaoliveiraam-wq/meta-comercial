@@ -283,7 +283,9 @@
   function mostrarDash() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    if (!chartsReady) { initCharts(); chartsReady = true; }
+    if (!chartsReady) {
+      try { initCharts(); chartsReady = true; } catch(e) { console.error('Erro charts:', e); }
+    }
     load();
   }
 
@@ -293,7 +295,7 @@
   };
 
   // ─── CONSTANTES ─────────────────────────────────────
-  const BIN_ID  = '69a83d79ae596e708f5eb480';
+  const BIN_ID  = '69ae36e9d0ea881f40fe72ac';
   const API_KEY = '$2a$10$T8MLsd4dkQLEQuDioAUhR.dVUxrpWdCgYyUQO6ZcxlB5.YfDT6QYW';
   const META = 240, MENSAL = 337, ANUAL = 337 * 12;
 
@@ -461,13 +463,18 @@
       const j = await r.json();
       const rec = j.record || {};
       data = {
-        mensais:    rec.mensais    || 0,
-        anuais:     rec.anuais     || 0,
+        mensais:     rec.mensais    || 0,
+        anuais:      rec.anuais     || 0,
         lancamentos: Array.isArray(rec.lancamentos) ? rec.lancamentos : []
       };
       render();
       badge('✅ Salvo','#1b5e2022','#00e676');
-    } catch(e) { badge('⚠️ Erro ao carregar','#f4433622','#f44336'); }
+    } catch(e) {
+      console.error('Erro load:', e);
+      data = { mensais:0, anuais:0, lancamentos:[] };
+      render();
+      badge('⚠️ Erro ao carregar','#f4433622','#f44336');
+    }
   }
       render();
       badge('✅ Salvo','#1b5e2022','#00e676');
