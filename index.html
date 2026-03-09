@@ -362,12 +362,13 @@
 
   // PLANOS PADRÃO
   function update(field, delta) { setVal(field, data[field] + delta); }
+  let _tgTimer = null;
   function setVal(field, v) {
-    const anterior = data[field] || 0;
     data[field] = Math.max(0, isNaN(v) ? 0 : v);
     document.getElementById('inp-' + field).value = data[field];
     render(); save();
-    if (data[field] !== anterior) {
+    clearTimeout(_tgTimer);
+    _tgTimer = setTimeout(() => {
       const label = field === 'mensais' ? '📅 Plano Mensal' : '🏆 Plano Anual';
       const totalAtual = (data.mensais + data.anuais + (data.lancamentos||[]).reduce((s,l)=>s+l.equiv,0)).toFixed(1);
       const recAtual = fmt((data.mensais*MENSAL) + (data.anuais*ANUAL) + (data.lancamentos||[]).reduce((s,l)=>s+l.recTotal,0));
@@ -378,7 +379,7 @@
         '📊 Meta geral: <b>' + totalAtual + ' clientes</b>\n' +
         '💰 Receita contratada: <b>' + recAtual + '</b>'
       );
-    }
+    }, 2000);
   }
 
   // RENDER
