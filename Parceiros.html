@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portal do Parceiro – Faço a Conta</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0d0d0d;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;}
+
+    /* LOGIN */
+    #login-screen{min-height:100vh;display:flex;align-items:stretch;background:#0d0d1a;}
+    .login-left{flex:1;position:relative;overflow:hidden;background:linear-gradient(135deg,#0a1a33 0%,#0a3d2e 60%,#0d0d1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;}
+    @media(max-width:700px){.login-left{display:none;}}
+    #particles{position:absolute;inset:0;width:100%;height:100%;}
+    .login-left-content{position:relative;z-index:2;text-align:center;}
+    .login-left-content h2{font-size:42px;font-weight:800;color:#fff;margin-bottom:8px;text-shadow:0 0 30px #00e67666;}
+    .login-left-content p{color:#00e67699;font-size:14px;margin-bottom:40px;}
+    .faixas-preview{display:flex;flex-direction:column;gap:10px;margin-top:20px;width:100%;max-width:300px;}
+    .fp-item{background:#ffffff08;border:1px solid #00e67622;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+    .fp-val{font-size:20px;font-weight:800;color:#00e676;}
+    .fp-label{font-size:12px;color:#555;}
+    .login-right{width:420px;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0d0d0d;padding:40px 36px;}
+    @media(max-width:700px){.login-right{width:100%;}}
+    .login-box{width:100%;}
+    .login-brand{text-align:center;margin-bottom:32px;}
+    .login-brand p{color:#00e67688;font-size:13px;margin-top:8px;}
+    .lbl{font-size:12px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .linput{width:100%;background:#ffffff0a;border:1px solid #00e67644;border-radius:10px;color:#fff;font-size:15px;padding:12px 14px;margin-bottom:16px;outline:none;}
+    .linput:focus{border-color:#00e676;}
+    .lbtn{width:100%;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;padding:13px;cursor:pointer;}
+    .lerror{color:#f87171;font-size:13px;text-align:center;margin-top:12px;min-height:20px;}
+
+    /* APP */
+    #app{display:none;min-height:100vh;background:#0d0d0d;}
+    .topbar{background:#111;border-bottom:1px solid #1e1e1e;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+    .topbar-left{display:flex;align-items:center;gap:12px;}
+    .topbar-left img{max-height:32px;}
+    .topbar-title{font-size:14px;font-weight:700;color:#fff;}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .user-chip{background:#00e67618;border:1px solid #00e67644;border-radius:20px;padding:5px 12px;font-size:12px;color:#00e676;font-weight:600;}
+    .logout-btn{background:#ffffff11;border:1px solid #333;color:#888;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;}
+    .content{max-width:960px;margin:0 auto;padding:24px 20px;}
+
+    /* TABS */
+    .tabs{display:flex;gap:4px;background:#111;border-radius:10px;padding:4px;margin-bottom:24px;}
+    .tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;color:#555;border:none;background:none;transition:all 0.15s;}
+    .tab.active{background:#00e67618;color:#00e676;border:1px solid #00e67644;}
+
+    /* CARDS */
+    .card{background:#1a1a1a;border-radius:14px;padding:16px;border:1px solid #222;margin-bottom:14px;}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+    @media(max-width:600px){.g3{grid-template-columns:1fr;}}
+    .stat-card{background:#111;border-radius:12px;padding:16px;border:1px solid #222;text-align:center;}
+    .stat-val{font-size:36px;font-weight:800;color:#00e676;}
+    .stat-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+
+    /* FAIXA */
+    .faixa-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    @media(max-width:600px){.faixa-wrap{grid-template-columns:repeat(2,1fr);}}
+    .faixa-item{background:#111;border-radius:10px;padding:12px;text-align:center;border:2px solid #222;transition:all 0.2s;}
+    .faixa-item.ativa{border-color:#00e676;background:#00e67611;}
+    .faixa-item.proxima{border-color:#ffca2844;}
+    .faixa-val{font-size:18px;font-weight:800;color:#aaa;}
+    .faixa-item.ativa .faixa-val{color:#00e676;}
+    .faixa-item.proxima .faixa-val{color:#ffca28;}
+    .faixa-sub{font-size:10px;color:#555;margin-top:2px;}
+    .faixa-range{font-size:11px;color:#444;margin-top:4px;}
+
+    /* PROGRESS */
+    .prog-wrap{margin-bottom:16px;}
+    .prog-bar{background:#2a2a2a;border-radius:999px;height:10px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#00a844,#00e676);transition:width 0.6s ease;}
+    .prog-labels{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:6px;}
+
+    /* CLIENTES LIST */
+    .cliente-item{background:#111;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;border:1px solid #1e1e1e;}
+    .cli-info{flex:1;}
+    .cli-nome{font-size:13px;font-weight:600;color:#fff;}
+    .cli-sub{font-size:11px;color:#555;margin-top:2px;}
+    .cli-badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;}
+    .badge-mensal{background:#29b6f622;color:#29b6f6;border:1px solid #29b6f644;}
+    .badge-anual{background:#ab47bc22;color:#ab47bc;border:1px solid #ab47bc44;}
+    .badge-custom{background:#ff980022;color:#ff9800;border:1px solid #ff980044;}
+    .badge-pago{background:#00e67622;color:#00e676;border:1px solid #00e67644;}
+    .badge-pendente{background:#ff980022;color:#ff9800;border:1px solid #ff980044;}
+
+    /* INDICAR LEAD */
+    .form-group{margin-bottom:12px;}
+    .form-label{font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .form-input{width:100%;background:#111;border:1px solid #00e67633;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;outline:none;}
+    .form-input:focus{border-color:#00e676;}
+    select.form-input option{background:#111;}
+    .submit-btn{width:100%;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:13px;cursor:pointer;margin-top:6px;}
+    .submit-msg{font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
+
+    /* ELITE */
+    .elite-banner{background:linear-gradient(135deg,#1a1a00,#2a2000);border:1px solid #ffca2844;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;}
+    .elite-icon{font-size:40px;margin-bottom:8px;}
+    .elite-title{font-size:18px;font-weight:800;color:#ffca28;}
+    .elite-sub{font-size:12px;color:#ffca2888;margin-top:4px;}
+    .recorrencia-val{font-size:32px;font-weight:800;color:#ffca28;margin-top:12px;}
+    .recorrencia-label{font-size:11px;color:#ffca2866;}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-left">
+    <canvas id="particles"></canvas>
+    <div class="login-left-content">
+      <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" style="max-width:160px;margin-bottom:16px;"/>
+      <h2>Portal do Parceiro</h2>
+      <p>Indique. Ajude. Ganhe.</p>
+      <div class="faixas-preview">
+        <div class="fp-item"><span class="fp-label">1 a 3 clientes</span><span class="fp-val">R$ 150</span></div>
+        <div class="fp-item"><span class="fp-label">4 a 6 clientes</span><span class="fp-val">R$ 200</span></div>
+        <div class="fp-item"><span class="fp-label">7 a 10 clientes</span><span class="fp-val">R$ 250</span></div>
+        <div class="fp-item" style="border-color:#ffca2844"><span class="fp-label">11+ clientes</span><span class="fp-val" style="color:#ffca28">R$ 300</span></div>
+        <div class="fp-item" style="border-color:#ffca2844;background:#ffca2808"><span class="fp-label">⭐ 10+ recorrente/mês</span><span class="fp-val" style="color:#ffca28">R$ 50</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-box">
+      <div class="login-brand">
+        <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" style="max-width:160px;"/>
+        <p>Portal do Parceiro Faço a Conta</p>
+      </div>
+      <p class="lbl">Usuário</p>
+      <input class="linput" type="text" id="inp-user" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter')entrar()"/>
+      <p class="lbl">Senha</p>
+      <input class="linput" type="password" id="inp-senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()"/>
+      <button class="lbtn" onclick="entrar()">Entrar →</button>
+      <p class="lerror" id="login-error"></p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png"/>
+      <span class="topbar-title">Portal do Parceiro</span>
+    </div>
+    <div class="topbar-right">
+      <span class="user-chip">🤝 <span id="nome-parceiro"></span></span>
+      <button class="logout-btn" onclick="sair()">Sair →</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="mudarAba('dashboard')">📊 Meu Painel</button>
+      <button class="tab" onclick="mudarAba('clientes')">👥 Clientes Indicados</button>
+      <button class="tab" onclick="mudarAba('indicar')">➕ Indicar Cliente</button>
+    </div>
+
+    <!-- ABA: DASHBOARD -->
+    <div id="aba-dashboard">
+
+      <!-- Stats -->
+      <div class="g3">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-total">0</div>
+          <div class="stat-label">Indicações fechadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:#ff9800;" id="stat-areceber">R$ 0</div>
+          <div class="stat-label">A receber</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-recebido">R$ 0</div>
+          <div class="stat-label">Já recebido</div>
+        </div>
+      </div>
+
+      <!-- Elite banner -->
+      <div id="elite-banner" style="display:none;" class="elite-banner">
+        <div class="elite-icon">🏆</div>
+        <div class="elite-title">Clube Parceiros Elite</div>
+        <div class="elite-sub">Você atingiu 10+ indicações!</div>
+        <div class="recorrencia-val" id="stat-recorrencia">R$ 0</div>
+        <div class="recorrencia-label">renda recorrente por mês</div>
+      </div>
+
+      <!-- Faixas -->
+      <div class="card">
+        <p style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🏅 Sua Faixa de Comissão</p>
+        <div class="faixa-wrap">
+          <div class="faixa-item" id="faixa-0"><div class="faixa-val">R$ 150</div><div class="faixa-sub">por cliente</div><div class="faixa-range">1 a 3</div></div>
+          <div class="faixa-item" id="faixa-1"><div class="faixa-val">R$ 200</div><div class="faixa-sub">por cliente</div><div class="faixa-range">4 a 6</div></div>
+          <div class="faixa-item" id="faixa-2"><div class="faixa-val">R$ 250</div><div class="faixa-sub">por cliente</div><div class="faixa-range">7 a 10</div></div>
+          <div class="faixa-item" id="faixa-3"><div class="faixa-val">R$ 300</div><div class="faixa-sub">por cliente</div><div class="faixa-range">11+</div></div>
+        </div>
+
+        <!-- Progresso -->
+        <div class="prog-wrap" id="prog-wrap">
+          <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+          <div class="prog-labels">
+            <span id="prog-atual">0 indicações</span>
+            <span id="prog-prox"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Últimas indicações -->
+      <div class="card">
+        <p style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📋 Últimas Indicações Fechadas</p>
+        <div id="ultimas-lista">
+          <p style="color:#555;font-size:13px;text-align:center;padding:16px;">Nenhuma indicação fechada ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA: CLIENTES -->
+    <div id="aba-clientes" style="display:none;">
+      <div class="card">
+        <p style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">👥 Todos os Clientes que Você Indicou</p>
+        <div id="todos-clientes-lista">
+          <p style="color:#555;font-size:13px;text-align:center;padding:16px;">Nenhum cliente indicado ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA: INDICAR -->
+    <div id="aba-indicar" style="display:none;">
+      <div class="card" style="border-color:#00e67633;max-width:560px;margin:0 auto;">
+        <p style="font-size:15px;font-weight:700;color:#00e676;margin-bottom:4px;">➕ Indicar um Novo Cliente</p>
+        <p style="font-size:12px;color:#555;margin-bottom:20px;">Preencha os dados e nossa equipe entrará em contato com o empresário.</p>
+
+        <div class="form-group">
+          <p class="form-label">Nome do empresário / empresa</p>
+          <input class="form-input" type="text" id="lead-nome" placeholder="Ex: João Silva – Padaria do João"/>
+        </div>
+        <div class="form-group">
+          <p class="form-label">WhatsApp</p>
+          <input class="form-input" type="text" id="lead-whats" placeholder="(92) 99999-9999"/>
+        </div>
+        <div class="form-group">
+          <p class="form-label">Segmento / Ramo de atividade</p>
+          <select class="form-input" id="lead-segmento">
+            <option value="">Selecione o segmento</option>
+            <option>Comércio</option>
+            <option>Serviços</option>
+            <option>Indústria</option>
+            <option>Agronegócio</option>
+            <option>Saúde</option>
+            <option>Educação</option>
+            <option>Tecnologia</option>
+            <option>Alimentação</option>
+            <option>Construção</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <p class="form-label">Observação (opcional)</p>
+          <textarea class="form-input" id="lead-obs" rows="3" placeholder="Ex: Tem interesse no plano anual, já ouviu falar da Faço a Conta..." style="resize:vertical;"></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="enviarLead()">📲 Enviar Indicação</button>
+        <p class="submit-msg" id="lead-msg"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const BIN_ID  = '69a83d79ae596e708f5eb480';
+  const API_KEY = '$2a$10$RFRgtuGRGmuK1MO9At0wK.p8pi1POTd9uxAxTwANdU3msxd0DBeAi';
+  const TG_TOKEN  = '8639780068:AAGqild5uWcsDkn383SlUeA252BnoypXx0I';
+  const TG_CHATID = '1407909663';
+
+  let parceiro = null;
+  let dadosGlobais = null;
+
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+  function calcComissao(total) {
+    if(total<=3) return 150;
+    if(total<=6) return 200;
+    if(total<=10) return 250;
+    return 300;
+  }
+
+  function obterClientesParceiro(parceiroId, dados) {
+    let lista = [];
+    (dados.clientesMensais||[]).forEach((c,i)=>{ if(c.parceiro===parceiroId) lista.push({...c, plano:'mensal', tipo:'mensais', idx:i}); });
+    (dados.clientesAnuais||[]).forEach((c,i)=>{ if(c.parceiro===parceiroId) lista.push({...c, plano:'anual', tipo:'anuais', idx:i}); });
+    (dados.lancamentos||[]).forEach((l,i)=>{ if(l.parceiro===parceiroId) lista.push({...l, plano:'personalizado', tipo:'lancamentos', idx:i, desc: l.desc||'Personalizado'}); });
+    lista.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+    return lista;
+  }
+
+  // AUTH
+  async function entrar() {
+    const u = document.getElementById('inp-user').value.trim().toLowerCase();
+    const s = document.getElementById('inp-senha').value.trim();
+    document.getElementById('login-error').textContent = '⏳ Verificando...';
+    try {
+      const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest', {headers:{'X-Master-Key':API_KEY}});
+      const j = await r.json();
+      dadosGlobais = j.record || {};
+      const parceiros = dadosGlobais.parceiros || [];
+      const found = parceiros.find(p => p.user === u && p.senha === s);
+      if (found) {
+        parceiro = found;
+        sessionStorage.setItem('parceiro', JSON.stringify(found));
+        mostrarApp();
+      } else {
+        document.getElementById('login-error').textContent = '❌ Usuário ou senha incorretos.';
+      }
+    } catch(e) {
+      document.getElementById('login-error').textContent = '⚠️ Erro de conexão. Tente novamente.';
+    }
+  }
+
+  function sair() {
+    sessionStorage.removeItem('parceiro');
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('inp-user').value = '';
+    document.getElementById('inp-senha').value = '';
+    document.getElementById('login-error').textContent = '';
+  }
+
+  function mostrarApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('nome-parceiro').textContent = parceiro.nome;
+    renderDashboard();
+  }
+
+  window.onload = async function() {
+    iniciarParticulas();
+    const saved = sessionStorage.getItem('parceiro');
+    if (saved) {
+      parceiro = JSON.parse(saved);
+      try {
+        const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+        const j = await r.json();
+        dadosGlobais = j.record || {};
+        mostrarApp();
+      } catch(e) { sessionStorage.removeItem('parceiro'); }
+    }
+  };
+
+  // TABS
+  function mudarAba(aba) {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('aba-dashboard').style.display = 'none';
+    document.getElementById('aba-clientes').style.display  = 'none';
+    document.getElementById('aba-indicar').style.display   = 'none';
+    document.getElementById('aba-'+aba).style.display = 'block';
+    if (aba==='clientes') renderTodosClientes();
+  }
+
+  // RENDER DASHBOARD
+  function renderDashboard() {
+    const clientes = obterClientesParceiro(parceiro.id, dadosGlobais);
+    const total = clientes.length;
+    const comissaoUnit = calcComissao(total);
+    const aReceber = clientes.filter(c=>!c.pago).length * comissaoUnit;
+    const recebido = clientes.filter(c=>c.pago).reduce((s,c)=>s+(c.valorPago||0),0);
+    const recorrencia = total >= 10 ? total * 50 : 0;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-areceber').textContent = fmt(aReceber);
+    document.getElementById('stat-recebido').textContent = fmt(recebido);
+
+    // Elite
+    if (total >= 10) {
+      document.getElementById('elite-banner').style.display = 'block';
+      document.getElementById('stat-recorrencia').textContent = fmt(recorrencia) + '/mês';
+    }
+
+    // Faixas
+    const faixaIdx = total<=3?0:total<=6?1:total<=10?2:3;
+    for(let i=0;i<4;i++) {
+      const el = document.getElementById('faixa-'+i);
+      el.classList.remove('ativa','proxima');
+      if(i===faixaIdx) el.classList.add('ativa');
+      else if(i===faixaIdx+1) el.classList.add('proxima');
+    }
+
+    // Progresso
+    const faixaMetas = [3,6,10,Infinity];
+    const faixaInicio = faixaIdx===0?0:[3,6,10][faixaIdx-1]||0;
+    const faixaMeta = faixaMetas[faixaIdx];
+    const progPct = faixaMeta===Infinity ? 100 : Math.min((total-faixaInicio)/(faixaMeta-faixaInicio)*100,100);
+    document.getElementById('prog-fill').style.width = progPct+'%';
+    document.getElementById('prog-atual').textContent = total+' indicações fechadas';
+    document.getElementById('prog-prox').textContent = faixaIdx<3
+      ? 'Próxima faixa em '+(faixaMeta-total)+' indicação(ões)'
+      : '🏆 Faixa máxima atingida!';
+
+    // Últimas 5
+    const lista = document.getElementById('ultimas-lista');
+    if(!clientes.length) {
+      lista.innerHTML='<p style="color:#555;font-size:13px;text-align:center;padding:16px;">Nenhuma indicação fechada ainda.</p>';
+    } else {
+      lista.innerHTML = clientes.slice(0,5).map(c=>clienteItemHTML(c, comissaoUnit)).join('');
+    }
+  }
+
+  function renderTodosClientes() {
+    const clientes = obterClientesParceiro(parceiro.id, dadosGlobais);
+    const comissaoUnit = calcComissao(clientes.length);
+    const el = document.getElementById('todos-clientes-lista');
+    if(!clientes.length) {
+      el.innerHTML='<p style="color:#555;font-size:13px;text-align:center;padding:16px;">Nenhum cliente indicado ainda.</p>';
+    } else {
+      el.innerHTML = clientes.map(c=>clienteItemHTML(c, comissaoUnit)).join('');
+    }
+  }
+
+  function clienteItemHTML(c, comissaoUnit) {
+    const badgeMap = {mensal:'badge-mensal',anual:'badge-anual',personalizado:'badge-custom'};
+    const labelMap = {mensal:'📅 Mensal',anual:'🏆 Anual',personalizado:'⭐ Personal.'};
+    return `
+      <div class="cliente-item">
+        <div class="cli-info">
+          <div class="cli-nome">${c.desc||'Cliente'}</div>
+          <div class="cli-sub">${c.data?c.data.split('-').reverse().join('/'):'—'}</div>
+        </div>
+        <span class="cli-badge ${badgeMap[c.plano]}">${labelMap[c.plano]}</span>
+        <span class="cli-badge ${c.pago?'badge-pago':'badge-pendente'}">${c.pago?'✅ Pago':'⏳ Pendente'}</span>
+        <span style="font-size:13px;font-weight:700;color:${c.pago?'#00e676':'#ff9800'};">${fmt(c.pago?c.valorPago:comissaoUnit)}</span>
+      </div>`;
+  }
+
+  // ENVIAR LEAD
+  async function enviarLead() {
+    const nome     = document.getElementById('lead-nome').value.trim();
+    const whats    = document.getElementById('lead-whats').value.trim();
+    const segmento = document.getElementById('lead-segmento').value;
+    const obs      = document.getElementById('lead-obs').value.trim();
+    const msg      = document.getElementById('lead-msg');
+
+    if(!nome||!whats||!segmento) {
+      msg.style.color='#f44336'; msg.textContent='⚠️ Preencha nome, WhatsApp e segmento!'; return;
+    }
+
+    msg.style.color='#ffca28'; msg.textContent='⏳ Enviando indicação...';
+
+    const texto =
+      '🤝 <b>Nova Indicação de Parceiro!</b>\n' +
+      '👤 Parceiro: <b>'+parceiro.nome+'</b>\n\n' +
+      '🏢 Empresa/Empresário: <b>'+nome+'</b>\n' +
+      '📱 WhatsApp: <b>'+whats+'</b>\n' +
+      '🏷️ Segmento: <b>'+segmento+'</b>\n' +
+      (obs?'📝 Obs: '+obs+'\n':'') +
+      '\n💡 Entre em contato para fechar!';
+
+    try {
+      await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: TG_CHATID, text: texto, parse_mode:'HTML' })
+      });
+      msg.style.color='#00e676'; msg.textContent='✅ Indicação enviada com sucesso!';
+      document.getElementById('lead-nome').value='';
+      document.getElementById('lead-whats').value='';
+      document.getElementById('lead-segmento').value='';
+      document.getElementById('lead-obs').value='';
+    } catch(e) {
+      msg.style.color='#f44336'; msg.textContent='⚠️ Erro ao enviar. Tente novamente.';
+    }
+  }
+
+  // PARTICLES
+  function iniciarParticulas() {
+    const c = document.getElementById('particles'); if(!c) return;
+    const ctx = c.getContext('2d'); let pts=[];
+    function resize(){c.width=c.offsetWidth;c.height=c.offsetHeight;}
+    function init(){pts=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,a:Math.random()}));}
+    function draw(){
+      ctx.clearRect(0,0,c.width,c.height);
+      pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,230,118,'+(p.a*.4)+')';ctx.fill();});
+      for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle='rgba(0,180,80,'+((1-d/100)*.2)+')';ctx.lineWidth=1;ctx.stroke();}}
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize',()=>{resize();init();}); resize();init();draw();
+  }
+</script>
+</body>
+</html>
