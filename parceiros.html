@@ -620,26 +620,39 @@
   }
 </script>
 <!-- MODAL EDITAR LEAD -->
-<div id="modal-lead" style="display:none;position:fixed;inset:0;background:#000000aa;z-index:100;align-items:center;justify-content:center;">
-  <div style="background:#1a1a1a;border:1px solid #00e67644;border-radius:16px;padding:28px;width:100%;max-width:460px;margin:20px;">
-    <p style="font-size:15px;font-weight:700;color:#00e676;margin-bottom:16px;">✏️ Editar Indicação</p>
-    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Nome do empresário / empresa</p>
-    <input class="linput" type="text" id="edit-nome" style="margin-bottom:12px;"/>
-    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">WhatsApp</p>
-    <input class="linput" type="text" id="edit-whats" style="margin-bottom:12px;"/>
-    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Segmento</p>
-    <select class="linput" id="edit-segmento" style="margin-bottom:12px;">
-      <option>Comércio</option><option>Serviços</option><option>Indústria</option>
-      <option>Agronegócio</option><option>Saúde</option><option>Educação</option>
-      <option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option>
+<div id="modal-lead" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:100;align-items:center;justify-content:center;">
+  <div style="background:#141414;border:1px solid #00e67633;border-radius:16px;padding:28px;width:100%;max-width:460px;margin:20px;box-shadow:0 0 40px #00000088;">
+    <p style="font-size:15px;font-weight:700;color:#00e676;margin-bottom:4px;">✏️ Editar Indicação</p>
+    <p style="font-size:12px;color:#444;margin-bottom:20px;">Atualize os dados do lead abaixo.</p>
+
+    <p style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Nome do empresário / empresa</p>
+    <input type="text" id="edit-nome" style="width:100%;background:#0d0d0d;border:1px solid #00e67633;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;outline:none;margin-bottom:12px;"/>
+
+    <p style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">WhatsApp</p>
+    <input type="text" id="edit-whats" style="width:100%;background:#0d0d0d;border:1px solid #00e67633;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;outline:none;margin-bottom:12px;"/>
+
+    <p style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Segmento</p>
+    <select id="edit-segmento" style="width:100%;background:#0d0d0d;border:1px solid #00e67633;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;outline:none;margin-bottom:12px;">
+      <option style="background:#0d0d0d;">Comércio</option>
+      <option style="background:#0d0d0d;">Serviços</option>
+      <option style="background:#0d0d0d;">Indústria</option>
+      <option style="background:#0d0d0d;">Agronegócio</option>
+      <option style="background:#0d0d0d;">Saúde</option>
+      <option style="background:#0d0d0d;">Educação</option>
+      <option style="background:#0d0d0d;">Tecnologia</option>
+      <option style="background:#0d0d0d;">Alimentação</option>
+      <option style="background:#0d0d0d;">Construção</option>
+      <option style="background:#0d0d0d;">Outro</option>
     </select>
-    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Observação</p>
-    <textarea class="linput" id="edit-obs" rows="3" style="resize:vertical;margin-bottom:16px;"></textarea>
+
+    <p style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Observação</p>
+    <textarea id="edit-obs" rows="3" style="width:100%;background:#0d0d0d;border:1px solid #00e67633;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;outline:none;resize:vertical;margin-bottom:18px;"></textarea>
+
     <div style="display:flex;gap:10px;">
-      <button onclick="fecharModal()" style="flex:1;background:#333;border:none;border-radius:8px;color:#888;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">Cancelar</button>
-      <button onclick="salvarEdicaoLead()" style="flex:2;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">Salvar</button>
+      <button onclick="fecharModal()" style="flex:1;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#666;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">Cancelar</button>
+      <button onclick="salvarEdicaoLead()" style="flex:2;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">✔ Salvar</button>
     </div>
-    <p id="edit-msg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px;"></p>
+    <p id="edit-msg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px;color:#aaa;"></p>
   </div>
 </div>
 
