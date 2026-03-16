@@ -399,11 +399,20 @@
   };
 
   // TABS
-  function mudarAba(aba, btn) {
+  async function mudarAba(aba, btn) {
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
     ['dashboard','clientes','indicar'].forEach(a=>document.getElementById('aba-'+a).style.display='none');
     document.getElementById('aba-'+aba).style.display='block';
+    // Sempre recarrega dados frescos do JSONBin ao trocar de aba
+    try {
+      const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const j = await r.json();
+      dadosGlobais = j.record||{};
+      const atualizado = (dadosGlobais.parceiros||[]).find(p=>p.id===parceiro.id);
+      if(atualizado) parceiro = atualizado;
+    } catch(e){}
+    if(aba==='dashboard') renderDashboard();
     if(aba==='clientes') renderTodosClientes(filtroAtivo);
   }
 
