@@ -515,8 +515,8 @@
       </div>
       <span class="cli-badge badge-lead">📋 Lead</span>
       <span style="font-size:11px;color:#555;white-space:nowrap;">${l.data?l.data.split('-').reverse().join('/'):'—'}</span>
-      <span class="lead-btn" onclick="editarLead('${l.id}')">✏️ Editar</span>
-      <span class="lead-btn del" onclick="excluirLead('${l.id}')">🗑 Excluir</span>
+      <span class="lead-btn" onclick="editarLead('${l.id}')" style="cursor:pointer;">✏️ Editar</span>
+      <span class="lead-btn del" onclick="excluirLead('${l.id}')" style="cursor:pointer;">🗑 Excluir</span>
     </div>`;
   }
 
