@@ -29,7 +29,19 @@
     .lerror{color:#f87171;font-size:13px;text-align:center;margin-top:12px;min-height:20px;}
 
     /* SIDEBAR */
-    .sidebar{width:220px;min-width:220px;background:#111;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;padding:20px 0;height:100vh;position:fixed;left:0;top:0;}
+    .sidebar{width:220px;min-width:220px;background:#111;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;padding:20px 0;height:100vh;position:fixed;left:0;top:0;transition:width 0.25s ease;}
+    .sidebar.collapsed{width:220px;}
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .user-info,
+    .sidebar.collapsed .logout-btn{display:none;}
+    .sidebar.collapsed .nav-item{justify-content:center;padding:11px 0;}
+    .nav-section{transition:all 0.25s ease;}
+    .nav-section.collapsed .nav-label,
+    .nav-section.collapsed .user-info,
+    .nav-section.collapsed .logout-btn{display:none;}
+    .nav-section.collapsed .nav-item{justify-content:center;padding:11px 0;}
+    .toggle-btn{width:100%;background:none;border:none;border-top:1px solid #1e1e1e;color:#555;font-size:12px;padding:10px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.15s;}
+    .toggle-btn:hover{color:#a78bfa;background:#7c3aed11;}
     .sidebar-logo{padding:0 20px 24px;border-bottom:1px solid #1e1e1e;margin-bottom:16px;}
     .sidebar-logo img{max-width:140px;}
     .sidebar-logo p{font-size:11px;color:#555;margin-top:6px;}
@@ -162,18 +174,21 @@
 <div id="app">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" alt="Faço a Conta"/>
       <p>Meta Comercial 2026</p>
     </div>
-    <div class="nav-item active" onclick="navegar('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
-    <div class="nav-item" onclick="navegar('clientes')"><span class="nav-icon">👥</span> Clientes</div>
-    <div class="nav-item" onclick="navegar('lancamentos')"><span class="nav-icon">➕</span> Lançamentos</div>
-    <div class="nav-item" onclick="navegar('parceiros')"><span class="nav-icon">🤝</span> Parceiros</div>
-    <div class="sidebar-bottom">
-      <div class="user-info">👤 <span id="nome-usuario"></span></div>
-      <button class="logout-btn" onclick="sair()">Sair →</button>
+    <button class="toggle-btn" id="toggle-btn" onclick="toggleMenu()"><span id="toggle-icon">▲</span><span class="nav-label" id="toggle-label"> Recolher menu</span></button>
+    <div id="nav-section">
+      <div class="nav-item active" onclick="navegar('dashboard')"><span class="nav-icon">📊</span><span class="nav-label"> Dashboard</span></div>
+      <div class="nav-item" onclick="navegar('clientes')"><span class="nav-icon">👥</span><span class="nav-label"> Clientes</span></div>
+      <div class="nav-item" onclick="navegar('lancamentos')"><span class="nav-icon">➕</span><span class="nav-label"> Lançamentos</span></div>
+      <div class="nav-item" onclick="navegar('parceiros')"><span class="nav-icon">🤝</span><span class="nav-label"> Parceiros</span></div>
+      <div class="sidebar-bottom">
+        <div class="user-info">👤 <span id="nome-usuario"></span></div>
+        <button class="logout-btn" onclick="sair()">Sair →</button>
+      </div>
     </div>
   </div>
 
@@ -227,11 +242,6 @@
           </div>
         </div>
 
-        <div class="card" style="border-color:#7c3aed33">
-          <p class="chart-title">📅 Clientes Fechados por Mês</p>
-          <div class="cwb"><canvas id="graficoMensal"></canvas></div>
-        </div>
-
         <div class="card" style="border-color:#00e67633">
           <p style="font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">💰 Receita Recorrente</p>
           <div class="rg">
@@ -240,7 +250,13 @@
             <div class="rc"><p class="rl">Receita na Meta</p><p class="rv">R$ 80.880,00</p><p style="font-size:10px;color:#444;margin-top:2px">240 × R$ 337</p></div>
           </div>
         </div>
-        <p class="footer">Faço a Conta · Meta Comercial 2026</p>
+
+        <div class="card" style="border-color:#7c3aed33">
+          <p class="chart-title">📅 Clientes Fechados por Mês</p>
+          <div style="position:relative;width:100%;height:280px;"><canvas id="graficoMensal"></canvas></div>
+        </div>
+
+                <p class="footer">Faço a Conta · Meta Comercial 2026</p>
       </div>
 
       <!-- CLIENTES -->
@@ -796,7 +812,7 @@
     pizza1=new Chart(document.getElementById('graficoPizza1'),{type:'doughnut',data:{datasets:[{data:[0,240],backgroundColor:['#00e676','#2a2a2a'],borderWidth:0}]},options:{responsive:true,cutout:'70%',plugins:{legend:{display:false}}}});
     pizza2=new Chart(document.getElementById('graficoPizza2'),{type:'doughnut',data:{datasets:[{data:[1,1,0],backgroundColor:['#29b6f6','#ab47bc','#ff9800'],borderWidth:0}]},options:{responsive:true,cutout:'70%',plugins:{legend:{display:false}}}});
     barras=new Chart(document.getElementById('graficoBarras'),{type:'bar',data:{labels:['Mensal','Anual','Person.','Meta'],datasets:[{data:[0,0,0,240],backgroundColor:['#29b6f644','#ab47bc44','#ff980044','#5c6bc044'],borderColor:['#29b6f6','#ab47bc','#ff9800','#5c6bc0'],borderWidth:2,borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#ffffff11'},ticks:{color:'#888',font:{size:11}}},y:{grid:{color:'#ffffff11'},ticks:{color:'#888'},min:0,max:260}}}});
-    graficoMes=new Chart(document.getElementById('graficoMensal'),{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],datasets:[{label:'Clientes',data:Array(12).fill(0),backgroundColor:'#7c3aed55',borderColor:'#a855f7',borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#ffffff11'},ticks:{color:'#888',font:{size:11}}},y:{grid:{color:'#ffffff11'},ticks:{color:'#888'},precision:0,min:0}}}});
+    graficoMes=new Chart(document.getElementById('graficoMensal'),{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],datasets:[{label:'Clientes',data:Array(12).fill(0),backgroundColor:'#7c3aed55',borderColor:'#a855f7',borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#ffffff11'},ticks:{color:'#888',font:{size:12}}},y:{grid:{color:'#ffffff11'},ticks:{color:'#888'},precision:0,min:0}}}});
   }
 
   function updateCharts(m,a,ce,total,rM,rA,rC) {
@@ -818,6 +834,18 @@
   }
 
   // API
+  // TOGGLE MENU
+  let menuAberto = true;
+  function toggleMenu() {
+    menuAberto = !menuAberto;
+    const nav   = document.getElementById('nav-section');
+    const icon  = document.getElementById('toggle-icon');
+    const label = document.getElementById('toggle-label');
+    nav.style.display = menuAberto ? 'block' : 'none';
+    icon.textContent  = menuAberto ? '▲' : '▼';
+    label.textContent = menuAberto ? ' Recolher menu' : ' Expandir menu';
+  }
+
   async function load() {
     badge('⏳ Carregando...','#ffca2822','#ffca28');
     try {
