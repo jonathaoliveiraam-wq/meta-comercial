@@ -514,7 +514,9 @@
         <div class="cli-sub">${l.segmento} · 📱 ${l.whats}${l.obs?' · '+l.obs:''}</div>
       </div>
       <span class="cli-badge badge-lead">📋 Lead</span>
-      <span style="font-size:11px;color:#555;">${l.data?l.data.split('-').reverse().join('/'):'—'}</span>
+      <span style="font-size:11px;color:#555;white-space:nowrap;">${l.data?l.data.split('-').reverse().join('/'):'—'}</span>
+      <button class="lead-btn" onclick="editarLead('${l.id}')">✏️</button>
+      <button class="lead-btn del" onclick="excluirLead('${l.id}')">🗑</button>
     </div>`;
   }
 
@@ -553,6 +555,55 @@
     } catch(e){msg.style.color='#f44336';msg.textContent='⚠️ Erro ao enviar. Tente novamente.';}
   }
 
+  // EDITAR / EXCLUIR LEAD
+  let editLeadId = null;
+
+  function editarLead(id) {
+    const lead = (dadosGlobais.leads||[]).find(l=>l.id===id);
+    if(!lead) return;
+    editLeadId = id;
+    document.getElementById('edit-nome').value     = lead.nome;
+    document.getElementById('edit-whats').value    = lead.whats;
+    document.getElementById('edit-segmento').value = lead.segmento;
+    document.getElementById('edit-obs').value      = lead.obs||'';
+    document.getElementById('edit-msg').textContent = '';
+    document.getElementById('modal-lead').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('modal-lead').style.display = 'none';
+    editLeadId = null;
+  }
+
+  async function salvarEdicaoLead() {
+    const nome     = document.getElementById('edit-nome').value.trim();
+    const whats    = document.getElementById('edit-whats').value.trim();
+    const segmento = document.getElementById('edit-segmento').value;
+    const obs      = document.getElementById('edit-obs').value.trim();
+    const msg      = document.getElementById('edit-msg');
+    if(!nome||!whats){ msg.style.color='#f44336'; msg.textContent='⚠️ Preencha nome e WhatsApp!'; return; }
+    msg.style.color='#ffca28'; msg.textContent='⏳ Salvando...';
+    const idx = dadosGlobais.leads.findIndex(l=>l.id===editLeadId);
+    if(idx>=0){
+      dadosGlobais.leads[idx] = {...dadosGlobais.leads[idx], nome, whats, segmento, obs};
+    }
+    try {
+      await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+      msg.style.color='#00e676'; msg.textContent='✅ Salvo!';
+      setTimeout(()=>{ fecharModal(); renderTodosClientes(filtroAtivo); }, 800);
+    } catch(e){ msg.style.color='#f44336'; msg.textContent='⚠️ Erro ao salvar.'; }
+  }
+
+  async function excluirLead(id) {
+    if(!confirm('Cancelar esta indicação?')) return;
+    dadosGlobais.leads = (dadosGlobais.leads||[]).filter(l=>l.id!==id);
+    try {
+      await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+      renderTodosClientes(filtroAtivo);
+      renderDashboard();
+    } catch(e){ alert('Erro ao excluir. Tente novamente.'); }
+  }
+
   // PARTICLES
   function iniciarParticulas() {
     const c=document.getElementById('particles');if(!c)return;
@@ -568,5 +619,29 @@
     window.addEventListener('resize',()=>{resize();init();});resize();init();draw();
   }
 </script>
+<!-- MODAL EDITAR LEAD -->
+<div id="modal-lead" style="display:none;position:fixed;inset:0;background:#000000aa;z-index:100;align-items:center;justify-content:center;">
+  <div style="background:#1a1a1a;border:1px solid #00e67644;border-radius:16px;padding:28px;width:100%;max-width:460px;margin:20px;">
+    <p style="font-size:15px;font-weight:700;color:#00e676;margin-bottom:16px;">✏️ Editar Indicação</p>
+    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Nome do empresário / empresa</p>
+    <input class="linput" type="text" id="edit-nome" style="margin-bottom:12px;"/>
+    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">WhatsApp</p>
+    <input class="linput" type="text" id="edit-whats" style="margin-bottom:12px;"/>
+    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Segmento</p>
+    <select class="linput" id="edit-segmento" style="margin-bottom:12px;">
+      <option>Comércio</option><option>Serviços</option><option>Indústria</option>
+      <option>Agronegócio</option><option>Saúde</option><option>Educação</option>
+      <option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option>
+    </select>
+    <p class="lbl" style="font-size:11px;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Observação</p>
+    <textarea class="linput" id="edit-obs" rows="3" style="resize:vertical;margin-bottom:16px;"></textarea>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModal()" style="flex:1;background:#333;border:none;border-radius:8px;color:#888;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">Cancelar</button>
+      <button onclick="salvarEdicaoLead()" style="flex:2;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:11px;cursor:pointer;">Salvar</button>
+    </div>
+    <p id="edit-msg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px;"></p>
+  </div>
+</div>
+
 </body>
 </html>
