@@ -141,7 +141,7 @@
     <div class="stat-item"><div class="sv" id="st-total">0</div><div class="sl">Total leads</div></div>
     <div class="stat-item"><div class="sv" style="color:#29b6f6" id="st-reuniao">0</div><div class="sl">Em reunião</div></div>
     <div class="stat-item"><div class="sv" style="color:#ff9800" id="st-proposta">0</div><div class="sl">Em proposta</div></div>
-    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Fechados</div></div>
+    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Total fechado</div></div>
     <div class="stat-item"><div class="sv" style="color:#ffca28" id="st-onboarding">0</div><div class="sl">Onboarding</div></div>
     <div class="stat-item"><div class="sv" style="color:#00e676" id="st-lancado">R$ 0</div><div class="sl">Total lançado</div></div>
     <div class="stat-item"><div class="sv" style="color:#a78bfa" id="st-taxa">0%</div><div class="sl">Conversão</div></div>
@@ -177,17 +177,22 @@
     <div class="modal-field">
       <p class="modal-label">Plano</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="np-mensal" onclick="selecionarPlanoNovo('mensal')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">📅 Mensal<br><span style="font-size:10px;">R$ 337/mês</span></button>
-        <button id="np-anual" onclick="selecionarPlanoNovo('anual')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">🏆 Anual<br><span style="font-size:10px;">R$ 3.639,60</span></button>
-        <button id="np-personalizado" onclick="selecionarPlanoNovo('personalizado')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">⭐ Person.<br><span style="font-size:10px;">Valor livre</span></button>
+        <button id="np-mensal" onclick="selecionarPlanoNovo('mensal')" style="flex:1;min-width:70px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">📅 Mensal<br><span style="font-size:10px;">R$ 337/mês</span></button>
+        <button id="np-anual" onclick="selecionarPlanoNovo('anual')" style="flex:1;min-width:70px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">🏆 Anual<br><span style="font-size:10px;">R$ 3.639,60</span></button>
+        <button id="np-personalizado" onclick="selecionarPlanoNovo('personalizado')" style="flex:1;min-width:70px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">⭐ Person.<br><span style="font-size:10px;">Valor livre</span></button>
+        <button id="np-servico" onclick="selecionarPlanoNovo('servico')" style="flex:1;min-width:70px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">🛠️ Serviço<br><span style="font-size:10px;">Avulso</span></button>
       </div>
     </div>
     <div id="novo-custom-fields" style="display:none;">
-      <div class="modal-field" style="margin-top:10px;">
+      <div class="modal-field" style="margin-top:10px;" id="novo-desc-wrap" style="display:none;">
+        <p class="modal-label">Descrição do serviço</p>
+        <input class="modal-input" type="text" id="novo-desc-servico" placeholder="Ex: Abertura de empresa, IRPF, Alteração..."/>
+      </div>
+      <div class="modal-field">
         <p class="modal-label">Valor (R$)</p>
         <input class="modal-input" type="number" id="novo-valor" placeholder="Ex: 6500"/>
       </div>
-      <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <div id="novo-tipo-wrap" style="display:flex;gap:6px;margin-bottom:8px;">
         <button id="novo-tipo-rec" onclick="setNovoTipo('recebido')" style="flex:1;background:#00e67622;border:1px solid #00e67655;color:#00e676;border-radius:6px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;">💰 Recebido</button>
         <button id="novo-tipo-seb" onclick="setNovoTipo('sebrae')" style="flex:1;background:#111;border:1px solid #333;color:#555;border-radius:6px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;">🏦 SEBRAE</button>
       </div>
@@ -350,15 +355,23 @@
 
   function selecionarPlanoNovo(plano) {
     novoPlanoSel = plano;
-    ['mensal','anual','personalizado'].forEach(p=>{
+    const cores = {mensal:'#29b6f6',anual:'#ab47bc',personalizado:'#ff9800',servico:'#00e676'};
+    ['mensal','anual','personalizado','servico'].forEach(p=>{
       const btn = document.getElementById('np-'+p);
-      const cores = {mensal:'#29b6f6',anual:'#ab47bc',personalizado:'#ff9800'};
+      if(!btn) return;
       const sel = p===plano;
-      btn.style.background = sel ? cores[p]+'22' : '#111';
+      btn.style.background  = sel ? cores[p]+'22' : '#111';
       btn.style.borderColor = sel ? cores[p]+'88' : '#333';
-      btn.style.color = sel ? cores[p] : '#555';
+      btn.style.color       = sel ? cores[p] : '#555';
     });
-    document.getElementById('novo-custom-fields').style.display = plano==='personalizado'?'block':'none';
+    const mostrarCustom = plano==='personalizado'||plano==='servico';
+    document.getElementById('novo-custom-fields').style.display = mostrarCustom?'block':'none';
+    // Mostrar campo descrição só para serviço
+    const descWrap = document.getElementById('novo-desc-wrap');
+    if(descWrap) descWrap.style.display = plano==='servico'?'block':'none';
+    // Ocultar tipo SEBRAE para serviço
+    const tipoWrap = document.getElementById('novo-tipo-wrap');
+    if(tipoWrap) tipoWrap.style.display = plano==='servico'?'none':'flex';
   }
 
   function setNovoTipo(tipo) {
@@ -432,7 +445,7 @@
     const proxLabel   = podeAvancar ? ETAPAS[etapaIdx+1].label : '';
     const btnClass    = `btn-avancar btn-avancar-${etapaIdx}`;
     const valorCard = c.valor||MENSAL;
-    const planoLabel = c.plano==='anual'?'🏆 Anual':c.plano==='personalizado'?'⭐ Person.':'📅 Mensal';
+    const planoLabel = c.plano==='anual'?'🏆 Anual':c.plano==='personalizado'?'⭐ Person.':c.plano==='servico'?'🛠️ '+(c.descServico||'Serviço'):'📅 Mensal';
     return `
       <div class="card" id="card-${c.id}">
         <div class="card-nome">${c.nome}</div>
@@ -556,6 +569,9 @@
     document.getElementById('novo-obs').value='';
     document.getElementById('novo-msg').textContent='';
     novoPlanoSel='mensal'; novoTipo='recebido';
+    document.getElementById('novo-valor').value='';
+    const dsc = document.getElementById('novo-desc-servico');
+    if(dsc) dsc.value='';
     selecionarPlanoNovo('mensal');
     setNovoTipo('recebido');
     document.getElementById('modal-novo').style.display='flex';
@@ -573,18 +589,26 @@
 
     const parceiro = (dadosGlobais.parceiros||[]).find(p=>p.id===parceiroId);
     let valorNovo = MENSAL;
-    if(novoPlanoSel==='anual') valorNovo = ANUAL;
-    else if(novoPlanoSel==='personalizado') {
+    let descServico = '';
+    if(novoPlanoSel==='anual') {
+      valorNovo = ANUAL;
+    } else if(novoPlanoSel==='personalizado') {
       const vInput = parseFloat(document.getElementById('novo-valor').value)||0;
       if(vInput<=0){ msg.style.color='#f44336'; msg.textContent='⚠️ Informe o valor!'; return; }
       valorNovo = novoTipo==='sebrae' ? vInput/0.3 : vInput;
+    } else if(novoPlanoSel==='servico') {
+      descServico = document.getElementById('novo-desc-servico').value.trim();
+      const vInput = parseFloat(document.getElementById('novo-valor').value)||0;
+      if(!descServico){ msg.style.color='#f44336'; msg.textContent='⚠️ Informe a descrição do serviço!'; return; }
+      if(vInput<=0){ msg.style.color='#f44336'; msg.textContent='⚠️ Informe o valor!'; return; }
+      valorNovo = vInput;
     }
     const novoCard = {
       id: 'crm_'+Date.now(), leadId: null,
       nome, whats, segmento, obs,
       parceiro: parceiroId, parceiroNome: parceiro?.nome||'',
       plano: novoPlanoSel, valor: valorNovo, tipoCustom: novoTipo,
-      etapa: 0, data: hoje(),
+      descServico, etapa: 0, data: hoje(),
       historico: [{ etapa:0, data:hoje(), user:usuarioAtual.nome }]
     };
     if(!dadosGlobais.crm) dadosGlobais.crm=[];
