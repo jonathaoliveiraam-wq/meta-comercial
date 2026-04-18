@@ -141,9 +141,9 @@
     <div class="stat-item"><div class="sv" id="st-total">0</div><div class="sl">Total leads</div></div>
     <div class="stat-item"><div class="sv" style="color:#29b6f6" id="st-reuniao">0</div><div class="sl">Em reunião</div></div>
     <div class="stat-item"><div class="sv" style="color:#ff9800" id="st-proposta">0</div><div class="sl">Em proposta</div></div>
-    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Total fechado</div></div>
+    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Qtd. fechados</div></div>
+    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-valor-fechado">R$ 0</div><div class="sl">Valor fechado</div></div>
     <div class="stat-item"><div class="sv" style="color:#ffca28" id="st-onboarding">0</div><div class="sl">Onboarding</div></div>
-    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-lancado">R$ 0</div><div class="sl">Total lançado</div></div>
     <div class="stat-item"><div class="sv" style="color:#a78bfa" id="st-taxa">0%</div><div class="sl">Conversão</div></div>
   </div>
 
@@ -218,8 +218,8 @@
 <!-- MODAL: AVANÇAR PARA PAGAMENTO -->
 <div class="modal-bg" id="modal-pagamento">
   <div class="modal-box">
-    <p class="modal-title">💳 Confirmar Pagamento</p>
-    <p style="font-size:13px;color:#666;margin-bottom:16px;">Selecione o plano contratado para lançar no Meta Comercial:</p>
+    <p class="modal-title">📝 Confirmar Contrato</p>
+    <p style="font-size:13px;color:#666;margin-bottom:16px;">Cliente pagou! Selecione o plano contratado para lançar no Meta Comercial:</p>
     <div class="pagamento-opt" id="opt-mensal" onclick="selecionarPlano('mensal')">
       <p>📅 Plano Mensal</p><span>R$ 337/mês</span>
     </div>
@@ -407,19 +407,19 @@
     const totalLeads    = crm.length;
     const emReuniao     = crm.filter(c=>c.etapa===1).length;
     const emProposta    = crm.filter(c=>c.etapa===2).length;
-    const fechados      = crm.filter(c=>c.etapa>=3);
+    const fechados      = crm.filter(c=>c.etapa>=4); // Contrato ou Onboarding = fechado
     const totalFechados = fechados.length;
+    const valorFechado  = fechados.reduce((s,c)=>s+(c.valor||MENSAL),0);
     const emOnboarding  = crm.filter(c=>c.etapa===5).length;
-    const totalLancado  = fechados.reduce((s,c)=>s+(c.valor||MENSAL),0);
-    const taxa          = totalLeads ? Math.round(totalFechados/totalLeads*100) : 0;
+    const taxa          = totalLeads ? Math.round(crm.filter(c=>c.etapa>=4).length/totalLeads*100) : 0;
 
-    document.getElementById('st-total').textContent      = totalLeads;
-    document.getElementById('st-reuniao').textContent    = emReuniao;
-    document.getElementById('st-proposta').textContent   = emProposta;
-    document.getElementById('st-fechados').textContent   = totalFechados;
-    document.getElementById('st-onboarding').textContent = emOnboarding;
-    document.getElementById('st-lancado').textContent    = fmt(totalLancado);
-    document.getElementById('st-taxa').textContent       = taxa+'%';
+    document.getElementById('st-total').textContent        = totalLeads;
+    document.getElementById('st-reuniao').textContent      = emReuniao;
+    document.getElementById('st-proposta').textContent     = emProposta;
+    document.getElementById('st-fechados').textContent     = totalFechados;
+    document.getElementById('st-valor-fechado').textContent= fmt(valorFechado);
+    document.getElementById('st-onboarding').textContent   = emOnboarding;
+    document.getElementById('st-taxa').textContent         = taxa+'%';
 
     ETAPAS.forEach((etapa, idx) => {
       const cards = crm.filter(c=>c.etapa===idx);
@@ -472,8 +472,8 @@
     const novaEtapa = crm[idx].etapa + delta;
     if(novaEtapa<0||novaEtapa>5) return;
 
-    // Se avançar para Pagamento, abre modal de confirmação
-    if(novaEtapa===3 && delta===1) {
+    // Se avançar para Contrato (etapa 4), abre modal de confirmação de pagamento
+    if(novaEtapa===4 && delta===1) {
       leadPagamentoAtual = id;
       planoSelecionado = null;
       pagTipo = 'recebido';
@@ -550,10 +550,10 @@
       const vp = parseFloat(document.getElementById('pag-valor').value)||0;
       valorFechado = pagTipo==='sebrae'?vp/0.3:vp;
     }
-    dadosGlobais.crm[crmIdx].etapa = 3;
+    dadosGlobais.crm[crmIdx].etapa = 4;
     dadosGlobais.crm[crmIdx].plano = planoSelecionado;
     dadosGlobais.crm[crmIdx].valor = valorFechado;
-    dadosGlobais.crm[crmIdx].historico.push({ etapa:3, data:hoje(), user:usuarioAtual.nome, plano:planoSelecionado });
+    dadosGlobais.crm[crmIdx].historico.push({ etapa:4, data:hoje(), user:usuarioAtual.nome, plano:planoSelecionado });
 
     await salvarDados();
     msg.style.color='#00e676'; msg.textContent='✅ Lançado com sucesso!';
@@ -623,7 +623,7 @@
     const card = (dadosGlobais.crm||[]).find(c=>c.id===id);
     if(!card) return;
 
-    const foiPago = card.etapa >= 3; // Pagamento, Contrato, Onboarding
+    const foiPago = card.etapa >= 4; // Contrato ou Onboarding = foi efetivamente fechado
     let confirmMsg = 'Excluir este lead do CRM?';
     if(foiPago) {
       confirmMsg = 'Este lead foi fechado e está no Meta Comercial.\nAo excluir ele será removido do CRM, do Meta Comercial e do portal do parceiro.\n\nConfirmar?';
