@@ -107,6 +107,25 @@
     .submit-btn{width:100%;background:linear-gradient(90deg,#00a844,#00e676);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:13px;cursor:pointer;margin-top:6px;}
     .submit-msg{font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
 
+    /* RECORRENCIA CARD */
+    .rec-card{border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;transition:all 0.4s ease;}
+    .rec-card.locked{background:#111;border:2px dashed #333;}
+    .rec-card.unlocked{background:linear-gradient(135deg,#1a1500,#2a2000);border:2px solid #ffca2888;}
+    .rec-lock-icon{font-size:32px;margin-bottom:8px;}
+    .rec-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+    .rec-card.locked .rec-title{color:#444;}
+    .rec-card.unlocked .rec-title{color:#ffca28;}
+    .rec-value{font-size:36px;font-weight:800;margin:10px 0;}
+    .rec-card.locked .rec-value{color:#2a2a2a;filter:blur(6px);user-select:none;}
+    .rec-card.unlocked .rec-value{color:#ffca28;}
+    .rec-sub{font-size:12px;}
+    .rec-card.locked .rec-sub{color:#333;}
+    .rec-card.unlocked .rec-sub{color:#ffca2888;}
+    .rec-progress{margin-top:12px;}
+    .rec-prog-bar{background:#1e1e1e;border-radius:999px;height:6px;overflow:hidden;margin-bottom:6px;}
+    .rec-prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#444,#666);transition:width 0.6s ease;}
+    .rec-prog-label{font-size:11px;color:#444;}
+
     /* ELITE */
     .elite-banner{background:linear-gradient(135deg,#1a1a00,#2a2000);border:1px solid #ffca2844;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;}
     .elite-icon{font-size:40px;margin-bottom:8px;}
@@ -187,7 +206,8 @@
 
     <!-- ABA: DASHBOARD -->
     <div id="aba-dashboard">
-      <div class="g4">
+      <!-- Stats linha 1: indicações e fechadas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
         <div class="stat-card">
           <div class="stat-val" id="stat-indicacoes">0</div>
           <div class="stat-label">Indicações</div>
@@ -196,6 +216,22 @@
           <div class="stat-val" style="color:#29b6f6;" id="stat-fechadas">0</div>
           <div class="stat-label">Fechadas</div>
         </div>
+      </div>
+
+      <!-- Card recorrência bloqueado/desbloqueado -->
+      <div class="rec-card locked" id="rec-card">
+        <div class="rec-lock-icon" id="rec-icon">🔒</div>
+        <div class="rec-title" id="rec-title">Renda Recorrente Mensal</div>
+        <div class="rec-value" id="rec-value">R$ 500</div>
+        <div class="rec-sub" id="rec-sub">Disponível após 10 indicações fechadas</div>
+        <div class="rec-progress" id="rec-progress">
+          <div class="rec-prog-bar"><div class="rec-prog-fill" id="rec-prog-fill" style="width:0%"></div></div>
+          <div class="rec-prog-label" id="rec-prog-label">0 de 10 indicações fechadas</div>
+        </div>
+      </div>
+
+      <!-- Stats linha 2: a receber e recebido -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
         <div class="stat-card">
           <div class="stat-val" style="color:#ff9800;" id="stat-areceber">R$ 0</div>
           <div class="stat-label">A receber</div>
@@ -435,6 +471,41 @@
     if(totalFechados>=10){
       document.getElementById('elite-banner').style.display='block';
       document.getElementById('stat-recorrencia').textContent=fmt(recorrencia)+'/mês';
+    }
+
+    // Card recorrência bloqueado/desbloqueado
+    const recCard     = document.getElementById('rec-card');
+    const recIcon     = document.getElementById('rec-icon');
+    const recTitle    = document.getElementById('rec-title');
+    const recValue    = document.getElementById('rec-value');
+    const recSub      = document.getElementById('rec-sub');
+    const recProgress = document.getElementById('rec-progress');
+    const recProgFill = document.getElementById('rec-prog-fill');
+    const recProgLbl  = document.getElementById('rec-prog-label');
+
+    if(totalFechados >= 10) {
+      // DESBLOQUEADO
+      recCard.className = 'rec-card unlocked';
+      recIcon.textContent = '🏆';
+      recTitle.textContent = 'Renda Recorrente Mensal — Clube Elite';
+      recValue.textContent = fmt(recorrencia) + '/mês';
+      recSub.textContent = totalFechados + ' clientes ativos × R$ 50 = ' + fmt(recorrencia) + '/mês';
+      recProgress.style.display = 'none';
+    } else {
+      // BLOQUEADO — mostra progresso
+      recCard.className = 'rec-card locked';
+      recIcon.textContent = '🔒';
+      recTitle.textContent = 'Renda Recorrente Mensal';
+      recValue.textContent = 'R$ 500';
+      const faltamRec = 10 - totalFechados;
+      recSub.textContent = 'Faltam ' + faltamRec + ' indicação(ões) para desbloquear';
+      recProgress.style.display = 'block';
+      const pct = Math.min(totalFechados / 10 * 100, 100);
+      recProgFill.style.width = pct + '%';
+      recProgFill.style.background = pct > 60
+        ? 'linear-gradient(90deg,#7c3aed,#a855f7)'
+        : 'linear-gradient(90deg,#444,#666)';
+      recProgLbl.textContent = totalFechados + ' de 10 indicações fechadas';
     }
 
     const faixaIdx = totalFechados<=3?0:totalFechados<=6?1:totalFechados<=10?2:3;
