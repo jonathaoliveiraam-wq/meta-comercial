@@ -110,6 +110,10 @@
       <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png"/>
       <p>CRM Comercial · Faço a Conta</p>
     </div>
+    <div style="background:#7c3aed11;border:1px solid #7c3aed33;border-radius:10px;padding:14px;margin-bottom:20px;text-align:center;">
+      <p style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:4px;">🎯 CRM Comercial</p>
+      <p style="font-size:12px;color:#555;line-height:1.6;">Gerencie seus leads e acompanhe cada etapa do funil — da indicação ao onboarding.</p>
+    </div>
     <p class="lbl">Usuário</p>
     <input class="linput" type="text" id="inp-user" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter')entrar()"/>
     <p class="lbl">Senha</p>
@@ -137,9 +141,10 @@
     <div class="stat-item"><div class="sv" id="st-total">0</div><div class="sl">Total leads</div></div>
     <div class="stat-item"><div class="sv" style="color:#29b6f6" id="st-reuniao">0</div><div class="sl">Em reunião</div></div>
     <div class="stat-item"><div class="sv" style="color:#ff9800" id="st-proposta">0</div><div class="sl">Em proposta</div></div>
-    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-pagamento">0</div><div class="sl">Pagamento</div></div>
+    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Fechados</div></div>
     <div class="stat-item"><div class="sv" style="color:#ffca28" id="st-onboarding">0</div><div class="sl">Onboarding</div></div>
-    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-taxa">0%</div><div class="sl">Taxa conversão</div></div>
+    <div class="stat-item"><div class="sv" style="color:#00e676" id="st-lancado">R$ 0</div><div class="sl">Total lançado</div></div>
+    <div class="stat-item"><div class="sv" style="color:#a78bfa" id="st-taxa">0%</div><div class="sl">Conversão</div></div>
   </div>
 
   <!-- KANBAN -->
@@ -170,6 +175,24 @@
       </select>
     </div>
     <div class="modal-field">
+      <p class="modal-label">Plano</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="np-mensal" onclick="selecionarPlanoNovo('mensal')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">📅 Mensal<br><span style="font-size:10px;">R$ 337/mês</span></button>
+        <button id="np-anual" onclick="selecionarPlanoNovo('anual')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">🏆 Anual<br><span style="font-size:10px;">R$ 3.639,60</span></button>
+        <button id="np-personalizado" onclick="selecionarPlanoNovo('personalizado')" style="flex:1;min-width:80px;background:#111;border:1px solid #333;color:#555;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">⭐ Person.<br><span style="font-size:10px;">Valor livre</span></button>
+      </div>
+    </div>
+    <div id="novo-custom-fields" style="display:none;">
+      <div class="modal-field" style="margin-top:10px;">
+        <p class="modal-label">Valor (R$)</p>
+        <input class="modal-input" type="number" id="novo-valor" placeholder="Ex: 6500"/>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button id="novo-tipo-rec" onclick="setNovoTipo('recebido')" style="flex:1;background:#00e67622;border:1px solid #00e67655;color:#00e676;border-radius:6px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;">💰 Recebido</button>
+        <button id="novo-tipo-seb" onclick="setNovoTipo('sebrae')" style="flex:1;background:#111;border:1px solid #333;color:#555;border-radius:6px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;">🏦 SEBRAE</button>
+      </div>
+    </div>
+    <div class="modal-field">
       <p class="modal-label">Parceiro indicador (opcional)</p>
       <select class="modal-input" id="novo-parceiro">
         <option value="">— Nenhum —</option>
@@ -177,7 +200,7 @@
     </div>
     <div class="modal-field">
       <p class="modal-label">Observação</p>
-      <textarea class="modal-input" id="novo-obs" rows="3" style="resize:vertical;" placeholder="Contexto, interesse, etc..."></textarea>
+      <textarea class="modal-input" id="novo-obs" rows="2" style="resize:vertical;" placeholder="Contexto, interesse, etc..."></textarea>
     </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="fecharModal('modal-novo')">Cancelar</button>
@@ -223,6 +246,9 @@
   const BIN_ID  = '69a83d79ae596e708f5eb480';
   const API_KEY = '$2a$10$RFRgtuGRGmuK1MO9At0wK.p8pi1POTd9uxAxTwANdU3msxd0DBeAi';
   const MENSAL  = 337, ANUAL = 337*12*0.9;
+  const fmt = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  let novoPlanoSel = 'mensal';
+  let novoTipo = 'recebido';
 
   const USUARIOS = [
     { user:'comercial',  senha:'123456',  nome:'Comercial'  },
@@ -311,6 +337,8 @@
           parceiro: l.parceiroId||'',
           parceiroNome: l.parceiroNome||'',
           etapa: 0,
+          plano: 'mensal',
+          valor: MENSAL,
           data: l.data||hoje(),
           historico: [{ etapa:0, data:hoje(), user: usuarioAtual?.nome||'Sistema' }]
         });
@@ -318,6 +346,27 @@
       }
     });
     if(importou) salvarDados();
+  }
+
+  function selecionarPlanoNovo(plano) {
+    novoPlanoSel = plano;
+    ['mensal','anual','personalizado'].forEach(p=>{
+      const btn = document.getElementById('np-'+p);
+      const cores = {mensal:'#29b6f6',anual:'#ab47bc',personalizado:'#ff9800'};
+      const sel = p===plano;
+      btn.style.background = sel ? cores[p]+'22' : '#111';
+      btn.style.borderColor = sel ? cores[p]+'88' : '#333';
+      btn.style.color = sel ? cores[p] : '#555';
+    });
+    document.getElementById('novo-custom-fields').style.display = plano==='personalizado'?'block':'none';
+  }
+
+  function setNovoTipo(tipo) {
+    novoTipo = tipo;
+    document.getElementById('novo-tipo-rec').style.background = tipo==='recebido'?'#00e67622':'#111';
+    document.getElementById('novo-tipo-rec').style.color      = tipo==='recebido'?'#00e676':'#555';
+    document.getElementById('novo-tipo-seb').style.background = tipo==='sebrae'?'#7c3aed22':'#111';
+    document.getElementById('novo-tipo-seb').style.color      = tipo==='sebrae'?'#a78bfa':'#555';
   }
 
   async function salvarDados() {
@@ -342,13 +391,22 @@
     kanban.innerHTML = '';
 
     // Stats
-    document.getElementById('st-total').textContent     = crm.length;
-    document.getElementById('st-reuniao').textContent   = crm.filter(c=>c.etapa===1).length;
-    document.getElementById('st-proposta').textContent  = crm.filter(c=>c.etapa===2).length;
-    document.getElementById('st-pagamento').textContent = crm.filter(c=>c.etapa===3).length;
-    document.getElementById('st-onboarding').textContent= crm.filter(c=>c.etapa===5).length;
-    const taxa = crm.length ? Math.round(crm.filter(c=>c.etapa>=3).length/crm.length*100) : 0;
-    document.getElementById('st-taxa').textContent = taxa+'%';
+    const totalLeads    = crm.length;
+    const emReuniao     = crm.filter(c=>c.etapa===1).length;
+    const emProposta    = crm.filter(c=>c.etapa===2).length;
+    const fechados      = crm.filter(c=>c.etapa>=3);
+    const totalFechados = fechados.length;
+    const emOnboarding  = crm.filter(c=>c.etapa===5).length;
+    const totalLancado  = fechados.reduce((s,c)=>s+(c.valor||MENSAL),0);
+    const taxa          = totalLeads ? Math.round(totalFechados/totalLeads*100) : 0;
+
+    document.getElementById('st-total').textContent      = totalLeads;
+    document.getElementById('st-reuniao').textContent    = emReuniao;
+    document.getElementById('st-proposta').textContent   = emProposta;
+    document.getElementById('st-fechados').textContent   = totalFechados;
+    document.getElementById('st-onboarding').textContent = emOnboarding;
+    document.getElementById('st-lancado').textContent    = fmt(totalLancado);
+    document.getElementById('st-taxa').textContent       = taxa+'%';
 
     ETAPAS.forEach((etapa, idx) => {
       const cards = crm.filter(c=>c.etapa===idx);
@@ -373,13 +431,18 @@
     const podeVoltar  = etapaIdx > 0;
     const proxLabel   = podeAvancar ? ETAPAS[etapaIdx+1].label : '';
     const btnClass    = `btn-avancar btn-avancar-${etapaIdx}`;
+    const valorCard = c.valor||MENSAL;
+    const planoLabel = c.plano==='anual'?'🏆 Anual':c.plano==='personalizado'?'⭐ Person.':'📅 Mensal';
     return `
       <div class="card" id="card-${c.id}">
         <div class="card-nome">${c.nome}</div>
         <div class="card-info">📱 ${c.whats}${c.segmento?' · '+c.segmento:''}</div>
         ${c.parceiroNome?`<div class="card-parceiro">🤝 ${c.parceiroNome}</div>`:''}
         ${c.obs?`<div class="card-info" style="color:#444;font-style:italic;">"${c.obs}"</div>`:''}
-        <div class="card-data">📅 ${fmtData(c.data)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <span class="card-data">📅 ${fmtData(c.data)}</span>
+          <span style="font-size:12px;font-weight:700;color:#00e676;">${fmt(valorCard)} <span style="font-size:10px;color:#555;">${planoLabel}</span></span>
+        </div>
         <div class="card-actions">
           ${podeVoltar?`<button class="btn-voltar" onclick="moverLead('${c.id}',-1)">← Voltar</button>`:''}
           ${podeAvancar?`<button class="${btnClass}" onclick="moverLead('${c.id}',1)">→ ${proxLabel}</button>`:''}
@@ -467,8 +530,16 @@
       dadosGlobais.lancamentos.push({ qty:1, val, tipo:pagTipo, valorRec, recTotal, equiv, desc:lead.nome, data:hoje(), parceiro:lead.parceiro||'' });
     }
 
-    // Avança etapa no CRM
+    // Salva plano/valor no card CRM e avança etapa
+    let valorFechado = MENSAL;
+    if(planoSelecionado==='anual') valorFechado = ANUAL;
+    else if(planoSelecionado==='personalizado'){
+      const vp = parseFloat(document.getElementById('pag-valor').value)||0;
+      valorFechado = pagTipo==='sebrae'?vp/0.3:vp;
+    }
     dadosGlobais.crm[crmIdx].etapa = 3;
+    dadosGlobais.crm[crmIdx].plano = planoSelecionado;
+    dadosGlobais.crm[crmIdx].valor = valorFechado;
     dadosGlobais.crm[crmIdx].historico.push({ etapa:3, data:hoje(), user:usuarioAtual.nome, plano:planoSelecionado });
 
     await salvarDados();
@@ -484,6 +555,9 @@
     document.getElementById('novo-parceiro').value='';
     document.getElementById('novo-obs').value='';
     document.getElementById('novo-msg').textContent='';
+    novoPlanoSel='mensal'; novoTipo='recebido';
+    selecionarPlanoNovo('mensal');
+    setNovoTipo('recebido');
     document.getElementById('modal-novo').style.display='flex';
   }
 
@@ -498,10 +572,18 @@
     msg.style.color='#ffca28'; msg.textContent='⏳ Salvando...';
 
     const parceiro = (dadosGlobais.parceiros||[]).find(p=>p.id===parceiroId);
+    let valorNovo = MENSAL;
+    if(novoPlanoSel==='anual') valorNovo = ANUAL;
+    else if(novoPlanoSel==='personalizado') {
+      const vInput = parseFloat(document.getElementById('novo-valor').value)||0;
+      if(vInput<=0){ msg.style.color='#f44336'; msg.textContent='⚠️ Informe o valor!'; return; }
+      valorNovo = novoTipo==='sebrae' ? vInput/0.3 : vInput;
+    }
     const novoCard = {
       id: 'crm_'+Date.now(), leadId: null,
       nome, whats, segmento, obs,
       parceiro: parceiroId, parceiroNome: parceiro?.nome||'',
+      plano: novoPlanoSel, valor: valorNovo, tipoCustom: novoTipo,
       etapa: 0, data: hoje(),
       historico: [{ etapa:0, data:hoje(), user:usuarioAtual.nome }]
     };
@@ -514,7 +596,44 @@
 
   // EXCLUIR
   async function excluirLead(id) {
-    if(!confirm('Excluir este lead do CRM?')) return;
+    const card = (dadosGlobais.crm||[]).find(c=>c.id===id);
+    if(!card) return;
+
+    const foiPago = card.etapa >= 3; // Pagamento, Contrato, Onboarding
+    let confirmMsg = 'Excluir este lead do CRM?';
+    if(foiPago) {
+      confirmMsg = 'Este lead foi fechado e está no Meta Comercial.\nAo excluir ele será removido do CRM, do Meta Comercial e do portal do parceiro.\n\nConfirmar?';
+    } else if(card.leadId) {
+      confirmMsg = 'Excluir este lead do CRM e do portal do parceiro?';
+    }
+    if(!confirm(confirmMsg)) return;
+
+    // Busca dados frescos antes de salvar
+    try {
+      const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const j=await r.json(); dadosGlobais=j.record||dadosGlobais;
+    } catch(e){}
+
+    // Se chegou no Pagamento → remove do Meta Comercial
+    if(foiPago) {
+      const nome = card.nome;
+      if(card.plano==='mensal') {
+        dadosGlobais.clientesMensais = (dadosGlobais.clientesMensais||[]).filter(c=>c.desc!==nome);
+        dadosGlobais.mensais = dadosGlobais.clientesMensais.length;
+      } else if(card.plano==='anual') {
+        dadosGlobais.clientesAnuais = (dadosGlobais.clientesAnuais||[]).filter(c=>c.desc!==nome);
+        dadosGlobais.anuais = dadosGlobais.clientesAnuais.length;
+      } else if(card.plano==='personalizado') {
+        dadosGlobais.lancamentos = (dadosGlobais.lancamentos||[]).filter(c=>c.desc!==nome);
+      }
+    }
+
+    // Sempre remove do portal do parceiro (leads) se veio do portal
+    if(card.leadId) {
+      dadosGlobais.leads = (dadosGlobais.leads||[]).filter(l=>l.id!==card.leadId);
+    }
+
+    // Remove do CRM
     dadosGlobais.crm = (dadosGlobais.crm||[]).filter(c=>c.id!==id);
     await salvarDados();
     renderKanban();
@@ -525,8 +644,10 @@
     document.getElementById(id).style.display='none';
   }
   // Fecha modal clicando fora
-  document.querySelectorAll('.modal-bg').forEach(m=>{
-    m.addEventListener('click', e=>{ if(e.target===m) m.style.display='none'; });
+  window.addEventListener('click', e=>{
+    document.querySelectorAll('.modal-bg').forEach(m=>{
+      if(e.target===m) m.style.display='none';
+    });
   });
 </script>
 </body>
