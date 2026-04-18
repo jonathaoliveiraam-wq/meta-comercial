@@ -116,7 +116,8 @@
     .rec-card.locked .rec-title{color:#444;}
     .rec-card.unlocked .rec-title{color:#ffca28;}
     .rec-value{font-size:36px;font-weight:800;margin:10px 0;}
-    .rec-card.locked .rec-value{color:#2a2a2a;filter:blur(6px);user-select:none;}
+    .rec-card.locked .rec-value{color:#2a2a2a;filter:blur(6px);user-select:none;transition:filter 0.3s ease,color 0.3s ease;}
+    .rec-card.locked:hover .rec-value,.rec-card.locked.revealed .rec-value{filter:blur(0px);color:#ffca28;}
     .rec-card.unlocked .rec-value{color:#ffca28;}
     .rec-sub{font-size:12px;}
     .rec-card.locked .rec-sub{color:#333;}
@@ -219,7 +220,7 @@
       </div>
 
       <!-- Card recorrência bloqueado/desbloqueado -->
-      <div class="rec-card locked" id="rec-card">
+      <div class="rec-card locked" id="rec-card" onclick="this.classList.toggle('revealed')">
         <div class="rec-lock-icon" id="rec-icon">🔒</div>
         <div class="rec-title" id="rec-title">Renda Recorrente Mensal</div>
         <div class="rec-value" id="rec-value">R$ 500</div>
