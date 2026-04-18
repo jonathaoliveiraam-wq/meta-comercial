@@ -530,23 +530,54 @@
   }
 
   // ENVIAR LEAD
+  let enviandoLead = false;
   async function enviarLead() {
+    if(enviandoLead) return;
     const nome     = document.getElementById('lead-nome').value.trim();
     const whats    = document.getElementById('lead-whats').value.trim();
     const segmento = document.getElementById('lead-segmento').value;
     const obs      = document.getElementById('lead-obs').value.trim();
     const msg      = document.getElementById('lead-msg');
     if(!nome||!whats||!segmento){msg.style.color='#f44336';msg.textContent='⚠️ Preencha nome, WhatsApp e segmento!';return;}
-    msg.style.color='#ffca28';msg.textContent='⏳ Enviando indicação...';
 
-    // Salva lead no JSONBin
-    if(!dadosGlobais.leads) dadosGlobais.leads=[];
-    dadosGlobais.leads.push({ id:'l_'+Date.now(), parceiroId:parceiro.id, parceiroNome:parceiro.nome, nome, whats, segmento, obs, data:hoje() });
+    enviandoLead = true;
+    msg.style.color='#ffca28';msg.textContent='⏳ Salvando indicação...';
+
+    const novoLead = { id:'l_'+Date.now(), parceiroId:parceiro.id, parceiroNome:parceiro.nome, nome, whats, segmento, obs, data:hoje() };
+
+    // 1. Busca dados frescos do JSONBin (evita sobrescrever dado de outro parceiro)
     try {
-      await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+      const rFresh = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const jFresh = await rFresh.json();
+      dadosGlobais = jFresh.record||dadosGlobais;
     } catch(e){}
 
-    // Telegram
+    // 2. Adiciona o lead e salva
+    if(!dadosGlobais.leads) dadosGlobais.leads=[];
+    dadosGlobais.leads.push(novoLead);
+
+    let salvou = false;
+    try {
+      const rSave = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+      if(rSave.ok) salvou = true;
+    } catch(e){}
+
+    if(!salvou) {
+      msg.style.color='#f44336';msg.textContent='⚠️ Erro ao salvar. Tente novamente.';
+      dadosGlobais.leads.pop();
+      enviandoLead = false;
+      return;
+    }
+
+    // 3. Atualiza tela imediatamente (não espera Telegram)
+    document.getElementById('lead-nome').value='';
+    document.getElementById('lead-whats').value='';
+    document.getElementById('lead-segmento').value='';
+    document.getElementById('lead-obs').value='';
+    msg.style.color='#00e676';msg.textContent='✅ Indicação salva com sucesso!';
+    renderDashboard();
+
+    // 4. Telegram em background (não bloqueia a tela)
     const texto = '🤝 <b>Nova Indicação de Parceiro!</b>\n'
       +'👤 Parceiro: <b>'+parceiro.nome+'</b>\n\n'
       +'🏢 Empresa/Empresário: <b>'+nome+'</b>\n'
@@ -554,14 +585,9 @@
       +'🏷️ Segmento: <b>'+segmento+'</b>\n'
       +(obs?'📝 Obs: '+obs+'\n':'')
       +'\n💡 Entre em contato para fechar!';
-    try {
-      await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHATID,text:texto,parse_mode:'HTML'})});
-      msg.style.color='#00e676';msg.textContent='✅ Indicação enviada com sucesso!';
-      document.getElementById('lead-nome').value='';
-      document.getElementById('lead-whats').value='';
-      document.getElementById('lead-segmento').value='';
-      document.getElementById('lead-obs').value='';
-    } catch(e){msg.style.color='#f44336';msg.textContent='⚠️ Erro ao enviar. Tente novamente.';}
+    fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHATID,text:texto,parse_mode:'HTML'})}).catch(()=>{});
+
+    enviandoLead = false;
   }
 
   // EDITAR / EXCLUIR LEAD
@@ -592,19 +618,29 @@
     const msg      = document.getElementById('edit-msg');
     if(!nome||!whats){ msg.style.color='#f44336'; msg.textContent='⚠️ Preencha nome e WhatsApp!'; return; }
     msg.style.color='#ffca28'; msg.textContent='⏳ Salvando...';
-    const idx = dadosGlobais.leads.findIndex(l=>l.id===editLeadId);
+    // Busca dados frescos antes de salvar
+    try {
+      const rF=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const jF=await rF.json(); dadosGlobais=jF.record||dadosGlobais;
+    } catch(e){}
+    const idx = (dadosGlobais.leads||[]).findIndex(l=>l.id===editLeadId);
     if(idx>=0){
       dadosGlobais.leads[idx] = {...dadosGlobais.leads[idx], nome, whats, segmento, obs};
     }
     try {
       await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
       msg.style.color='#00e676'; msg.textContent='✅ Salvo!';
-      setTimeout(()=>{ fecharModal(); renderTodosClientes(filtroAtivo); }, 800);
+      setTimeout(()=>{ fecharModal(); renderTodosClientes(filtroAtivo); }, 600);
     } catch(e){ msg.style.color='#f44336'; msg.textContent='⚠️ Erro ao salvar.'; }
   }
 
   async function excluirLead(id) {
     if(!confirm('Cancelar esta indicação?')) return;
+    // Busca dados frescos antes de salvar
+    try {
+      const rF=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const jF=await rF.json(); dadosGlobais=jF.record||dadosGlobais;
+    } catch(e){}
     dadosGlobais.leads = (dadosGlobais.leads||[]).filter(l=>l.id!==id);
     try {
       await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
