@@ -220,7 +220,7 @@
       </div>
 
       <!-- Card recorrência bloqueado/desbloqueado -->
-      <div class="rec-card locked" id="rec-card" onclick="this.classList.toggle('revealed')">
+      <div class="rec-card locked" id="rec-card" onclick="revelarRecorrencia()">
         <div class="rec-lock-icon" id="rec-icon">🔒</div>
         <div class="rec-title" id="rec-title">Renda Recorrente Mensal</div>
         <div class="rec-value" id="rec-value">R$ 500</div>
@@ -719,6 +719,16 @@
       renderTodosClientes(filtroAtivo);
       renderDashboard();
     } catch(e){ alert('Erro ao excluir. Tente novamente.'); }
+  }
+
+  // REVELAR RECORRENCIA
+  let recTimer = null;
+  function revelarRecorrencia() {
+    const card = document.getElementById('rec-card');
+    if(card.classList.contains('unlocked')) return;
+    card.classList.add('revealed');
+    clearTimeout(recTimer);
+    recTimer = setTimeout(()=>{ card.classList.remove('revealed'); }, 2000);
   }
 
   // PARTICLES
