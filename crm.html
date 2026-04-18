@@ -95,10 +95,10 @@
     .add-lead-btn:hover{border-color:#7c3aed55;color:#a78bfa;}
 
     /* STATS BAR */
-    .stats-bar{display:flex;gap:10px;padding:10px 20px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;overflow-x:auto;}
-    .stat-item{background:#111;border-radius:8px;padding:8px 14px;text-align:center;white-space:nowrap;flex-shrink:0;}
-    .stat-item .sv{font-size:18px;font-weight:800;color:#a78bfa;}
-    .stat-item .sl{font-size:10px;color:#444;margin-top:2px;}
+    .stats-bar{display:flex;gap:12px;padding:16px 20px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;overflow-x:auto;}
+    .stat-item{background:#111;border-radius:10px;padding:14px 20px;text-align:center;white-space:nowrap;flex-shrink:0;flex:1;min-width:120px;}
+    .stat-item .sv{font-size:32px;font-weight:800;color:#a78bfa;}
+    .stat-item .sl{font-size:12px;color:#555;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}
   </style>
 </head>
 <body>
@@ -139,6 +139,7 @@
   <!-- STATS -->
   <div class="stats-bar">
     <div class="stat-item"><div class="sv" id="st-total">0</div><div class="sl">Total leads</div></div>
+    <div class="stat-item"><div class="sv" style="color:#a78bfa" id="st-lancado">R$ 0</div><div class="sl">Total lançado</div></div>
     <div class="stat-item"><div class="sv" style="color:#29b6f6" id="st-reuniao">0</div><div class="sl">Em reunião</div></div>
     <div class="stat-item"><div class="sv" style="color:#ff9800" id="st-proposta">0</div><div class="sl">Em proposta</div></div>
     <div class="stat-item"><div class="sv" style="color:#00e676" id="st-fechados">0</div><div class="sl">Qtd. fechados</div></div>
@@ -405,15 +406,17 @@
 
     // Stats
     const totalLeads    = crm.length;
+    const totalLancado  = crm.reduce((s,c)=>s+(c.valor||MENSAL),0); // todos os leads
     const emReuniao     = crm.filter(c=>c.etapa===1).length;
     const emProposta    = crm.filter(c=>c.etapa===2).length;
     const fechados      = crm.filter(c=>c.etapa>=4); // Contrato ou Onboarding = fechado
     const totalFechados = fechados.length;
     const valorFechado  = fechados.reduce((s,c)=>s+(c.valor||MENSAL),0);
     const emOnboarding  = crm.filter(c=>c.etapa===5).length;
-    const taxa          = totalLeads ? Math.round(crm.filter(c=>c.etapa>=4).length/totalLeads*100) : 0;
+    const taxa          = totalLeads ? Math.round(totalFechados/totalLeads*100) : 0;
 
     document.getElementById('st-total').textContent        = totalLeads;
+    document.getElementById('st-lancado').textContent      = fmt(totalLancado);
     document.getElementById('st-reuniao').textContent      = emReuniao;
     document.getElementById('st-proposta').textContent     = emProposta;
     document.getElementById('st-fechados').textContent     = totalFechados;
