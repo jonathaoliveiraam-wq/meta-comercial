@@ -705,21 +705,27 @@
       dadosGlobais = jFresh.record||dadosGlobais;
     } catch(e){}
 
-    // 2. Adiciona o lead e salva
+    // 2. Adiciona o lead e salva com retry automático (3 tentativas)
     if(!dadosGlobais.leads) dadosGlobais.leads=[];
     dadosGlobais.leads.push(novoLead);
 
     let salvou = false;
-    try {
-      const rSave = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
-      if(rSave.ok) salvou = true;
-    } catch(e){}
+    for(let tentativa=1; tentativa<=3; tentativa++) {
+      try {
+        if(tentativa>1) {
+          msg.style.color='#ffca28';
+          msg.textContent='⏳ Tentativa '+tentativa+'/3...';
+          await new Promise(r=>setTimeout(r,1500));
+        }
+        const rSave = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+        if(rSave.ok){ salvou=true; break; }
+      } catch(e){}
+    }
 
     if(!salvou) {
-      msg.style.color='#f44336';msg.textContent='⚠️ Erro ao salvar. Tente novamente.';
-      dadosGlobais.leads.pop();
-      enviandoLead = false;
-      return;
+      msg.style.color='#f87171';
+      msg.textContent='⚠️ Falha ao salvar no sistema. Sua indicação chegou via Telegram ao comercial — entre em contato para confirmar.';
+      // Não bloqueia — Telegram vai disparar mesmo assim
     }
 
     // 3. Atualiza tela imediatamente (não espera Telegram)
