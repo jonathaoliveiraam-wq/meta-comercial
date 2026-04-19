@@ -131,6 +131,7 @@
       <span class="topbar-title">CRM Comercial</span>
     </div>
     <div class="topbar-right">
+      <button onclick="sincronizar()" style="background:#7c3aed22;border:1px solid #7c3aed55;color:#a78bfa;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;" id="btn-sync">🔄 Sincronizar</button>
       <span class="user-chip">👤 <span id="nome-user"></span></span>
       <button class="logout-btn" onclick="sair()">Sair →</button>
     </div>
@@ -327,14 +328,14 @@
     } catch(e) { console.error(e); }
   }
 
-  function importarLeadsPortal() {
+  function importarLeadsPortal(silencioso=true) {
     const leads = dadosGlobais.leads||[];
     const crmIds = new Set((dadosGlobais.crm||[]).map(c=>c.leadId));
-    let importou = false;
+    let novos = 0;
     leads.forEach(l=>{
       if(!crmIds.has(l.id)){
         dadosGlobais.crm.push({
-          id: 'crm_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+          id: 'crm_'+l.id,
           leadId: l.id,
           nome: l.nome,
           whats: l.whats,
@@ -348,10 +349,30 @@
           data: l.data||hoje(),
           historico: [{ etapa:0, data:hoje(), user: usuarioAtual?.nome||'Sistema' }]
         });
-        importou = true;
+        novos++;
       }
     });
-    if(importou) salvarDados();
+    if(novos > 0) salvarDados();
+    return novos;
+  }
+
+  async function sincronizar() {
+    const btn = document.getElementById('btn-sync');
+    btn.textContent = '⏳ Sincronizando...';
+    btn.style.opacity = '0.6';
+    try {
+      const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const j = await r.json();
+      dadosGlobais = j.record||{};
+      if(!dadosGlobais.crm) dadosGlobais.crm=[];
+      const novos = importarLeadsPortal(false);
+      renderKanban();
+      btn.textContent = novos > 0 ? `✅ ${novos} novo(s) importado(s)` : '✅ Tudo atualizado';
+    } catch(e) {
+      btn.textContent = '⚠️ Erro ao sincronizar';
+    }
+    btn.style.opacity = '1';
+    setTimeout(()=>{ btn.textContent = '🔄 Sincronizar'; }, 3000);
   }
 
   function selecionarPlanoNovo(plano) {
