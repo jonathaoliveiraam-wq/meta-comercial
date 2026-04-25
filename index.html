@@ -379,7 +379,7 @@
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <input type="text" id="inp-p-nome" placeholder="Nome do parceiro" style="flex:2;min-width:140px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;outline:none;"/>
             <input type="text" id="inp-p-user" placeholder="Usuário (login)" style="flex:1;min-width:120px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;outline:none;"/>
-            <input type="password" id="inp-p-senha" placeholder="Senha" style="flex:1;min-width:120px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;outline:none;"/>
+<span style="font-size:11px;color:#555;padding:8px;">🔑 Senha padrão automática</span>
             <button onclick="cadastrarParceiro()" style="background:linear-gradient(90deg,#7c3aed,#a855f7);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:8px 18px;cursor:pointer;">Cadastrar</button>
           </div>
           <p id="parceiro-msg" style="font-size:12px;color:#aaa;margin-top:8px;min-height:16px;"></p>
@@ -636,16 +636,15 @@
   function cadastrarParceiro() {
     const nome  = document.getElementById('inp-p-nome').value.trim();
     const user  = document.getElementById('inp-p-user').value.trim().toLowerCase();
-    const senha = document.getElementById('inp-p-senha').value.trim();
+    const senha = 'Parceiro@2026';
     const msg   = document.getElementById('parceiro-msg');
-    if(!nome||!user||!senha){ msg.style.color='#f44336'; msg.textContent='⚠️ Preencha todos os campos!'; return; }
+    if(!nome||!user){ msg.style.color='#f44336'; msg.textContent='⚠️ Preencha nome e usuário!'; return; }
     if(data.parceiros.find(p=>p.user===user)){ msg.style.color='#f44336'; msg.textContent='⚠️ Usuário já existe!'; return; }
     const id = 'p_'+Date.now();
     data.parceiros.push({ id, nome, user, senha });
     document.getElementById('inp-p-nome').value='';
     document.getElementById('inp-p-user').value='';
-    document.getElementById('inp-p-senha').value='';
-    msg.style.color='#00e676'; msg.textContent='✅ Parceiro '+nome+' cadastrado!';
+    msg.style.color='#00e676'; msg.textContent='✅ '+nome+' cadastrado! Senha padrão: Parceiro@2026';
     save(); popularSelectsParceiros(); renderParceiroAdmin();
   }
 
@@ -668,6 +667,17 @@
     lista[idx].pago = true;
     lista[idx].valorPago = valorComissao;
     save(); renderParceiroAdmin();
+  }
+
+  async function resetarSenhaParceiro(id) {
+    if(!confirm('Resetar a senha deste parceiro para Parceiro@2026?')) return;
+    const idx = data.parceiros.findIndex(p=>p.id===id);
+    if(idx<0) return;
+    data.parceiros[idx].senha = 'Parceiro@2026';
+    data.parceiros[idx].termoAceito = false; // força passar pelo fluxo novamente
+    await save();
+    renderParceiroAdmin();
+    alert('✅ Senha resetada! O parceiro deve logar com: Parceiro@2026');
   }
 
   function excluirParceiro(id) {
@@ -701,7 +711,10 @@
             <p class="parceiro-nome">🤝 ${p.nome}</p>
             <p style="font-size:11px;color:#555;margin-top:2px;">@${p.user} · Faixa atual: <span style="color:#a78bfa;font-weight:700">R$ ${faixaVals[faixaIdx]}/cliente</span></p>
           </div>
-          <button onclick="excluirParceiro('${p.id}')" style="background:#f4433611;border:1px solid #f4433633;color:#f44336;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;">🗑 Excluir</button>
+          <div style="display:flex;gap:6px;">
+            <button onclick="resetarSenhaParceiro('${p.id}')" style="background:#ffca2811;border:1px solid #ffca2833;color:#ffca28;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;">🔑 Resetar senha</button>
+            <button onclick="excluirParceiro('${p.id}')" style="background:#f4433611;border:1px solid #f4433633;color:#f44336;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;">🗑 Excluir</button>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
           <div style="background:#111;border-radius:8px;padding:8px 10px;">
@@ -887,8 +900,23 @@
 
   async function save() {
     badge('⏳ Salvando...','#ffca2822','#ffca28');
+    // Merge atômico: preserva campos que outros usuários possam ter alterado
     try {
-      await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(data)});
+      const rFresh = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+      const jFresh = await rFresh.json();
+      const dadosFrescos = jFresh.record || {};
+      // Preserva leads e parceiros que podem ter sido alterados por outros
+      // Sobrescreve só os campos que o meta comercial controla
+      const payload = {
+        ...dadosFrescos,
+        mensais: data.mensais,
+        anuais: data.anuais,
+        clientesMensais: data.clientesMensais,
+        clientesAnuais: data.clientesAnuais,
+        lancamentos: data.lancamentos,
+        parceiros: data.parceiros,
+      };
+      await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(payload)});
       badge('✅ Salvo','#1b5e2022','#00e676');
     } catch(e){badge('⚠️ Erro ao salvar','#f4433622','#f44336');}
   }
