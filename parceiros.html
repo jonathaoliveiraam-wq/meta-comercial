@@ -189,6 +189,9 @@
       <input class="linput" type="password" id="inp-senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()"/>
       <button class="lbtn" onclick="entrar()">Entrar →</button>
       <p class="lerror" id="login-error"></p>
+      <p style="text-align:center;margin-top:16px;">
+        <span onclick="esqueceuSenha()" style="font-size:12px;color:#555;cursor:pointer;text-decoration:underline;">Esqueceu a senha? Fale com o suporte</span>
+      </p>
     </div>
   </div>
 </div>
@@ -375,6 +378,16 @@
 
   function obterLeads(parceiroId, dados) {
     return (dados.leads||[]).filter(l=>l.parceiroId===parceiroId).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  }
+
+  // ESQUECEU SENHA
+  function esqueceuSenha() {
+    const user = document.getElementById('inp-user').value.trim();
+    const texto = user
+      ? `Olá! Sou parceiro da Faço a Conta e esqueci minha senha. Meu usuário é: *${user}*. Poderia redefinir minha senha por favor?`
+      : `Olá! Sou parceiro da Faço a Conta e esqueci minha senha. Poderia me ajudar?`;
+    const url = 'https://wa.me/5592981260273?text='+encodeURIComponent(texto);
+    window.open(url, '_blank');
   }
 
   // AUTH
@@ -698,34 +711,41 @@
 
     const novoLead = { id:'l_'+Date.now(), parceiroId:parceiro.id, parceiroNome:parceiro.nome, nome, whats, segmento, obs, data:hoje() };
 
-    // 1. Busca dados frescos do JSONBin (evita sobrescrever dado de outro parceiro)
-    try {
-      const rFresh = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
-      const jFresh = await rFresh.json();
-      dadosGlobais = jFresh.record||dadosGlobais;
-    } catch(e){}
-
-    // 2. Adiciona o lead e salva com retry automático (3 tentativas)
-    if(!dadosGlobais.leads) dadosGlobais.leads=[];
-    dadosGlobais.leads.push(novoLead);
-
+    // MERGE ATÔMICO: busca dados frescos, adiciona só o novo lead, salva
+    // Evita sobrescrever leads de outros parceiros
     let salvou = false;
     for(let tentativa=1; tentativa<=3; tentativa++) {
       try {
         if(tentativa>1) {
           msg.style.color='#ffca28';
           msg.textContent='⏳ Tentativa '+tentativa+'/3...';
-          await new Promise(r=>setTimeout(r,1500));
+          await new Promise(r=>setTimeout(r,2000));
         }
-        const rSave = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
+        // Sempre busca o estado mais recente do banco
+        const rFresh = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+        const jFresh = await rFresh.json();
+        const dadosFrescos = jFresh.record || {};
+
+        // Verifica se este lead já foi salvo (evita duplicata em retry)
+        if(!dadosFrescos.leads) dadosFrescos.leads = [];
+        const jaExiste = dadosFrescos.leads.some(l=>l.id===novoLead.id);
+        if(!jaExiste) dadosFrescos.leads.push(novoLead);
+
+        // Atualiza dadosGlobais com dados frescos + novo lead
+        dadosGlobais = dadosFrescos;
+
+        const rSave = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{
+          method:'PUT',
+          headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+          body:JSON.stringify(dadosGlobais)
+        });
         if(rSave.ok){ salvou=true; break; }
-      } catch(e){}
+      } catch(e){ console.error('Tentativa '+tentativa+' falhou:',e); }
     }
 
     if(!salvou) {
       msg.style.color='#f87171';
-      msg.textContent='⚠️ Falha ao salvar no sistema. Sua indicação chegou via Telegram ao comercial — entre em contato para confirmar.';
-      // Não bloqueia — Telegram vai disparar mesmo assim
+      msg.textContent='⚠️ Falha ao salvar. Sua indicação chegou via Telegram ao comercial — entre em contato para confirmar.';
     }
 
     // 3. Atualiza tela imediatamente (não espera Telegram)
@@ -777,7 +797,7 @@
     const msg      = document.getElementById('edit-msg');
     if(!nome||!whats){ msg.style.color='#f44336'; msg.textContent='⚠️ Preencha nome e WhatsApp!'; return; }
     msg.style.color='#ffca28'; msg.textContent='⏳ Salvando...';
-    // Busca dados frescos antes de salvar
+    // Merge atômico: busca dados frescos antes de editar
     try {
       const rF=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
       const jF=await rF.json(); dadosGlobais=jF.record||dadosGlobais;
@@ -795,13 +815,12 @@
 
   async function excluirLead(id) {
     if(!confirm('Cancelar esta indicação?')) return;
-    // Busca dados frescos antes de salvar
     try {
+      // Merge atômico: busca dados frescos antes de excluir
       const rF=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
-      const jF=await rF.json(); dadosGlobais=jF.record||dadosGlobais;
-    } catch(e){}
-    dadosGlobais.leads = (dadosGlobais.leads||[]).filter(l=>l.id!==id);
-    try {
+      const jF=await rF.json();
+      dadosGlobais = jF.record||dadosGlobais;
+      dadosGlobais.leads = (dadosGlobais.leads||[]).filter(l=>l.id!==id);
       await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(dadosGlobais)});
       renderTodosClientes(filtroAtivo);
       renderDashboard();
