@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Playbook — Realizadores do Improvável · Faço a Conta</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --navy:#0d0d1a;
+      --navy2:#111128;
+      --card:#1a1a2e;
+      --border:#7c3aed33;
+      --purple:#7c3aed;
+      --purple-l:#a78bfa;
+      --purple-ll:#c4b5fd;
+      --green:#00e676;
+      --yellow:#ffca28;
+      --red:#f44336;
+      --blue:#29b6f6;
+      --orange:#ff9800;
+    }
+    html{scroll-behavior:smooth;}
+    body{background:var(--navy);color:#fff;font-family:'Segoe UI',sans-serif;line-height:1.6;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;background:#0a0a18ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+    .nav-brand{display:flex;align-items:center;gap:10px;}
+    .nav-brand img{max-height:24px;}
+    .nav-brand span{font-size:12px;color:var(--purple-l);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+    .nav-links{display:flex;gap:4px;}
+    .nav-links a{color:#555;font-size:11px;font-weight:600;padding:6px 10px;border-radius:6px;text-decoration:none;transition:all 0.15s;text-transform:uppercase;letter-spacing:0.5px;}
+    .nav-links a:hover{color:var(--purple-l);background:var(--border);}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px 60px;background:radial-gradient(ellipse at 50% 0%, #7c3aed18 0%, transparent 70%);}
+    .hero-badge{display:inline-block;background:var(--border);border:1px solid var(--purple);border-radius:999px;color:var(--purple-l);font-size:11px;font-weight:700;padding:6px 16px;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
+    .hero h1{font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.1;margin-bottom:20px;}
+    .hero h1 span{background:linear-gradient(135deg,var(--purple),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-sub{font-size:18px;color:#888;max-width:640px;margin:0 auto 40px;}
+    .hero-stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:20px;}
+    .hero-stat{text-align:center;}
+    .hero-stat .n{font-size:40px;font-weight:800;color:var(--purple-l);}
+    .hero-stat .l{font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1px;}
+
+    /* SECTIONS */
+    section{padding:80px 40px;max-width:1100px;margin:0 auto;}
+    .section-label{font-size:11px;color:var(--purple-l);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:10px;}
+    .section-title{font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:12px;line-height:1.2;}
+    .section-desc{font-size:16px;color:#666;max-width:700px;margin-bottom:40px;}
+
+    /* CARDS GRID */
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
+    .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+    .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+
+    .card{background:var(--card);border:1px solid #222;border-radius:16px;padding:24px;}
+    .card-accent{border-top:3px solid var(--purple);}
+    .card-green{border-top:3px solid var(--green);}
+    .card-yellow{border-top:3px solid var(--yellow);}
+    .card-blue{border-top:3px solid var(--blue);}
+    .card-orange{border-top:3px solid var(--orange);}
+    .card-red{border-left:4px solid var(--red);}
+
+    .card-icon{font-size:28px;margin-bottom:12px;}
+    .card h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+    .card p{font-size:13px;color:#666;line-height:1.6;}
+    .card .tag{display:inline-block;background:var(--border);color:var(--purple-l);border-radius:999px;font-size:10px;font-weight:700;padding:2px 10px;margin-top:10px;}
+
+    /* STAT CARDS */
+    .stat-card{background:var(--card);border:1px solid #222;border-radius:16px;padding:28px;text-align:center;}
+    .stat-card .sv{font-size:48px;font-weight:800;color:var(--purple-l);margin-bottom:4px;}
+    .stat-card .sl{font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1px;}
+    .stat-card .sd{font-size:13px;color:#444;margin-top:8px;}
+
+    /* TABLE */
+    .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #222;}
+    table{width:100%;border-collapse:collapse;background:var(--card);}
+    thead{background:#111128;}
+    th{padding:14px 20px;font-size:12px;font-weight:700;color:var(--purple-l);text-transform:uppercase;letter-spacing:1px;text-align:left;border-bottom:1px solid #222;}
+    td{padding:14px 20px;font-size:13px;color:#aaa;border-bottom:1px solid #1a1a2e;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#ffffff04;}
+    td:first-child{color:#fff;font-weight:600;}
+    .check{color:var(--green);font-weight:700;}
+    .cross{color:#333;}
+    .price-col{color:var(--purple-l);font-weight:700;}
+
+    /* HIGHLIGHT BOX */
+    .highlight{background:linear-gradient(135deg,#7c3aed15,#7c3aed08);border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin:24px 0;}
+    .highlight h3{color:var(--purple-l);font-size:18px;margin-bottom:10px;}
+    .highlight p{color:#888;font-size:14px;line-height:1.7;}
+
+    /* WARNING BOX */
+    .warn-box{background:#ff980011;border:1px solid #ff980044;border-radius:12px;padding:20px 24px;margin:16px 0;display:flex;gap:14px;align-items:flex-start;}
+    .warn-box .wi{font-size:20px;flex-shrink:0;margin-top:2px;}
+    .warn-box p{font-size:13px;color:#ff9800;line-height:1.6;}
+
+    .tip-box{background:#00e67611;border:1px solid #00e67644;border-radius:12px;padding:20px 24px;margin:16px 0;display:flex;gap:14px;align-items:flex-start;}
+    .tip-box .wi{font-size:20px;flex-shrink:0;margin-top:2px;}
+    .tip-box p{font-size:13px;color:#00e676;line-height:1.6;}
+
+    /* STEPS */
+    .steps{display:flex;flex-direction:column;gap:0;}
+    .step{display:flex;gap:24px;padding:28px 0;border-bottom:1px solid #1a1a2e;position:relative;}
+    .step:last-child{border-bottom:none;}
+    .step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#a855f7);color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:4px;}
+    .step-body h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+    .step-body p{font-size:13px;color:#666;line-height:1.6;}
+    .step-body .script{background:#0d0d0d;border:1px solid #222;border-radius:10px;padding:16px 20px;margin-top:12px;font-size:13px;color:#bbb;font-style:italic;line-height:1.7;}
+    .step-body .script strong{color:var(--purple-l);font-style:normal;}
+
+    /* OBJECTIONS */
+    .objection{background:var(--card);border:1px solid #222;border-radius:14px;padding:22px 24px;margin-bottom:14px;border-left:4px solid var(--red);}
+    .objection .obj-q{font-size:14px;font-weight:700;color:#f44336;margin-bottom:10px;}
+    .objection .obj-a{font-size:13px;color:#888;line-height:1.7;}
+    .objection .obj-script{background:#0d0d0d;border-radius:8px;padding:12px 16px;margin-top:10px;font-size:12px;color:var(--purple-ll);font-style:italic;line-height:1.6;}
+
+    /* RULES */
+    .rule{display:flex;gap:16px;align-items:flex-start;padding:18px 0;border-bottom:1px solid #1a1a1a;}
+    .rule:last-child{border-bottom:none;}
+    .rule-num{font-size:24px;font-weight:800;color:var(--purple);width:40px;flex-shrink:0;}
+    .rule-body h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+    .rule-body p{font-size:13px;color:#666;}
+
+    /* ECONOMY CALC */
+    .economy-wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+    .economy-item{background:var(--card);border:1px solid #222;border-radius:14px;padding:24px;text-align:center;}
+    .economy-item.bad{border-top:3px solid var(--red);}
+    .economy-item.good{border-top:3px solid var(--green);}
+    .economy-item.save{border-top:3px solid var(--yellow);background:linear-gradient(135deg,#ffca2811,transparent);}
+    .economy-item .ev{font-size:32px;font-weight:800;margin-bottom:4px;}
+    .economy-item .el{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;}
+    .economy-item .ed{font-size:12px;color:#444;margin-top:6px;}
+
+    /* BADGES */
+    .badge{display:inline-block;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;}
+    .badge-green{background:#00e67622;color:var(--green);border:1px solid #00e67644;}
+    .badge-purple{background:var(--border);color:var(--purple-l);}
+    .badge-yellow{background:#ffca2822;color:var(--yellow);}
+    .badge-red{background:#f4433622;color:var(--red);}
+
+    /* DIVIDER */
+    .divider{height:1px;background:linear-gradient(90deg,transparent,#222,transparent);margin:0 40px;}
+
+    /* FOOTER */
+    footer{text-align:center;padding:60px 40px;color:#333;font-size:12px;border-top:1px solid #1a1a1a;}
+    footer strong{color:var(--purple-l);}
+
+    /* PRINT */
+    @media print{nav{display:none;}.hero{min-height:auto;}}
+    @media(max-width:768px){.economy-wrap{grid-template-columns:1fr;}.nav-links{display:none;}section{padding:60px 20px;}}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png"/>
+    <span>Realizadores do Improvável</span>
+  </div>
+  <div class="nav-links">
+    <a href="#missao">Missão</a>
+    <a href="#produto">Produto</a>
+    <a href="#publico">Público</a>
+    <a href="#precos">Planos</a>
+    <a href="#script">Script</a>
+    <a href="#objecoes">Objeções</a>
+    <a href="#funil">Funil</a>
+    <a href="#regras">Regras</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Playbook Comercial · Versão 2025</div>
+  <h1>O Guia do<br/><span>Realizador do Improvável</span></h1>
+  <p class="hero-sub">Tudo que você precisa saber para vender, convencer e transformar a vida de pequenos empresários com a Faço a Conta.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="n">+260</div><div class="l">Clientes</div></div>
+    <div class="hero-stat"><div class="n">R$2mi</div><div class="l">Economia gerada</div></div>
+    <div class="hero-stat"><div class="n">R$5.556</div><div class="l">Economia/cliente/ano</div></div>
+    <div class="hero-stat"><div class="n">4</div><div class="l">Estados</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 1. MISSÃO -->
+<section id="missao">
+  <div class="section-label">01 · Missão</div>
+  <h2 class="section-title">Por Que Você Está Aqui</h2>
+  <p class="section-desc">Você não é um vendedor. Você é um realizador do improvável — alguém que salva negócios que seriam fechados por falta de gestão fiscal e financeira.</p>
+
+  <div class="highlight">
+    <h3>Nossa razão de existir</h3>
+    <p>95% das empresas brasileiras pagam impostos a mais do que deveriam. 59% operam sem gestão financeira. 38,6% fecham em 5 anos.<br/><br/>
+    A Faço a Conta existe para mudar isso. E você é o elo entre essa tecnologia e o empresário que precisa dela.</p>
+  </div>
+
+  <div class="grid-3" style="margin-top:32px;">
+    <div class="card card-accent">
+      <div class="card-icon">🎯</div>
+      <h3>Sua missão</h3>
+      <p>Encontrar empresários do Simples Nacional que estão perdendo dinheiro e mostrar que existe uma saída.</p>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">💡</div>
+      <h3>Sua mentalidade</h3>
+      <p>Você não vende contabilidade. Você oferece redução de custo real — até R$ 5.556 por ano no bolso do cliente.</p>
+    </div>
+    <div class="card card-yellow">
+      <div class="card-icon">🚀</div>
+      <h3>Seu diferencial</h3>
+      <p>Tecnologia da Amazônia para fortalecer negócios no Brasil. A conta é nossa. O crescimento é deles.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 2. PRODUTO -->
+<section id="produto">
+  <div class="section-label">02 · O Produto</div>
+  <h2 class="section-title">O Que É a Faço a Conta</h2>
+  <p class="section-desc">Uma plataforma completa de inteligência fiscal e gestão para pequenas empresas — tudo que o empresário precisa em um só lugar.</p>
+
+  <div class="grid-2">
+    <div class="card card-accent">
+      <div class="card-icon">🧾</div>
+      <h3>Inteligência Tributária</h3>
+      <p>Enviamos todos os impostos automaticamente — Simples Nacional, FGTS, INSS — e evitamos o pagamento de tributos indevidos. O empresário nunca paga a mais.</p>
+    </div>
+    <div class="card card-blue">
+      <div class="card-icon">📊</div>
+      <h3>Gestão Financeira</h3>
+      <p>Controle de estoque, vendas e finanças na palma da mão. Visão completa do negócio sem precisar de contador separado.</p>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">📄</div>
+      <h3>Emissor de Nota Fiscal</h3>
+      <p>Emissão ilimitada de NF-e e NFC-e sem complicação. Disponível nos planos MEI, Essencial e Anual.</p>
+    </div>
+    <div class="card card-orange">
+      <div class="card-icon">🖥️</div>
+      <h3>PDV Online</h3>
+      <p>Frente de caixa integrada ao negócio. Diferencial exclusivo — concorrentes não têm.</p>
+    </div>
+    <div class="card card-yellow">
+      <div class="card-icon">🤖</div>
+      <h3>IA Assistente</h3>
+      <p>Tecnologia exclusiva com inteligência artificial para apoiar a gestão do negócio. Diferencial único no mercado.</p>
+    </div>
+    <div class="card card-accent">
+      <div class="card-icon">🏢</div>
+      <h3>Abertura de CNPJ</h3>
+      <p>Gratuita. Só nós oferecemos isso. Concorrentes cobram separado ou não oferecem o serviço.</p>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:32px;">
+    <h3>Como funciona na prática</h3>
+    <p>Nossa plataforma processa e gera todos os impostos com inteligência fiscal — recuperando créditos tributários e garantindo que o empresário nunca pague a mais. É tecnologia trabalhando para o bolso do cliente enquanto ele foca no que importa: seu negócio.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 3. PÚBLICO -->
+<section id="publico">
+  <div class="section-label">03 · Público-alvo</div>
+  <h2 class="section-title">Com Quem Você Fala</h2>
+  <p class="section-desc">Foco total em ME e EPP optantes pelo Simples Nacional — nos regimes SIMEI e Simples Nacional.</p>
+
+  <div class="grid-3">
+    <div class="stat-card">
+      <div class="sv" style="color:#f44336;">95%</div>
+      <div class="sl">Imposto Indevido</div>
+      <div class="sd">Das empresas pagam mais imposto do que deveriam. São seus clientes.</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:#ff9800;">38,6%</div>
+      <div class="sl">Fecham em 5 anos</div>
+      <div class="sd">Das microempresas não sobrevivem. Falta de gestão é a causa #1.</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--yellow);">59%</div>
+      <div class="sl">Sem Gestão</div>
+      <div class="sd">Das empresas operam no escuro, sem controle financeiro nenhum.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:28px;">
+    <div class="card card-green">
+      <h3>✅ Cliente ideal (ICP)</h3>
+      <p style="margin-bottom:12px;color:#aaa;">Foque aqui para fechar mais rápido:</p>
+      <ul style="color:#666;font-size:13px;line-height:2;padding-left:16px;">
+        <li>MEI, ME ou EPP no Simples Nacional</li>
+        <li>Paga contabilidade tradicional (R$ 600–1.200/mês)</li>
+        <li>Tem funcionários registrados</li>
+        <li>Emite nota fiscal regularmente</li>
+        <li>Comércio, serviços, alimentação, saúde, construção</li>
+        <li>Reclama de burocracia ou de não entender impostos</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid #f44336;">
+      <h3 style="color:#f44336;">❌ Fora do perfil</h3>
+      <p style="margin-bottom:12px;color:#aaa;">Não perca tempo com:</p>
+      <ul style="color:#666;font-size:13px;line-height:2;padding-left:16px;">
+        <li>Empresas no Lucro Presumido ou Real</li>
+        <li>S/A ou grandes empresas</li>
+        <li>Negócios sem CNPJ (informais)</li>
+        <li>Segmentos não atendidos pela plataforma</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 4. PREÇOS -->
+<section id="precos">
+  <div class="section-label">04 · Planos e Preços</div>
+  <h2 class="section-title">Planos Sem Pegadinhas</h2>
+  <p class="section-desc">Conheça cada plano de cor. Você precisa saber indicar o plano certo para cada cliente sem hesitar.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Recurso</th>
+          <th class="price-col">MEI · R$ 97/mês</th>
+          <th class="price-col">Controle · R$ 227/mês</th>
+          <th class="price-col">Essencial · R$ 337/mês</th>
+          <th class="price-col">Anual · R$ 303/mês</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Atendimento WhatsApp</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Fechamento Fiscal</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Funcionários</td><td>Até 1</td><td>Até 2</td><td>Até 5</td><td>Até 5</td></tr>
+        <tr><td>Emissor NF Ilimitado</td><td class="check">✓</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Gestão Financeira</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Regime</td><td>SIMEI</td><td>Simples Nacional</td><td>Simples Nacional</td><td>Simples Nacional</td></tr>
+        <tr><td>Valor anual</td><td>R$ 1.164/ano</td><td>R$ 2.724/ano</td><td>R$ 4.044/ano</td><td class="check">R$ 3.639,60/ano</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip-box" style="margin-top:20px;">
+    <div class="wi">💡</div>
+    <p><strong>Dica de venda:</strong> Sempre apresente o Essencial primeiro. Se o cliente tiver MEI, vá direto pro plano MEI. O Anual tem desconto de 10% — use como fechamento: "você paga 2 meses e não paga por todo o ano".</p>
+  </div>
+
+  <!-- ECONOMIA -->
+  <h3 style="margin-top:48px;margin-bottom:20px;font-size:22px;">Como Apresentar a Economia</h3>
+  <div class="economy-wrap">
+    <div class="economy-item bad">
+      <div class="ev" style="color:#f44336;">R$ 9.600</div>
+      <div class="el">Contabilidade Tradicional</div>
+      <div class="ed">Média de R$ 800/mês × 12</div>
+    </div>
+    <div class="economy-item good">
+      <div class="ev" style="color:var(--green);">R$ 4.044</div>
+      <div class="el">Faço a Conta — Essencial</div>
+      <div class="ed">R$ 337/mês × 12</div>
+    </div>
+    <div class="economy-item save">
+      <div class="ev" style="color:var(--yellow);">R$ 5.556</div>
+      <div class="el">Economia por ano</div>
+      <div class="ed">No bolso do cliente. Todo. Ano.</div>
+    </div>
+  </div>
+
+  <div class="warn-box" style="margin-top:20px;">
+    <div class="wi">⚠️</div>
+    <p><strong>Memorize este número: R$ 5.556.</strong> Essa é a âncora da sua conversa. Antes de falar em preço, mostre o quanto o cliente está perdendo. Quem recusa economia de quase R$ 6.000 por ano?</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 5. DIFERENCIAIS -->
+<section id="diferenciais">
+  <div class="section-label">05 · Diferenciais</div>
+  <h2 class="section-title">Por Que a FAC é a Melhor Escolha</h2>
+  <p class="section-desc">Quando o cliente perguntar "por que vocês?", você precisa responder sem titubear.</p>
+
+  <div class="grid-3">
+    <div class="card card-accent">
+      <div class="card-icon">🏢</div>
+      <h3>Abertura de CNPJ grátis</h3>
+      <p>Só nós oferecemos gratuitamente. Concorrentes cobram separado ou nem têm o serviço.</p>
+      <span class="tag">Exclusivo FAC</span>
+    </div>
+    <div class="card card-blue">
+      <div class="card-icon">🖥️</div>
+      <h3>PDV Integrado</h3>
+      <p>Frente de caixa dentro da plataforma. Concorrentes não têm. Valor enorme para comércio e alimentação.</p>
+      <span class="tag">Exclusivo FAC</span>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">🤖</div>
+      <h3>IA Assistente</h3>
+      <p>Tecnologia de inteligência artificial exclusiva para apoiar a gestão do negócio do cliente.</p>
+      <span class="tag">Exclusivo FAC</span>
+    </div>
+    <div class="card card-yellow">
+      <div class="card-icon">📊</div>
+      <h3>Gestão Financeira</h3>
+      <p>Estoque, vendas e finanças integrados. Concorrentes só fazem contabilidade — nós fazemos gestão completa.</p>
+      <span class="tag">Completo</span>
+    </div>
+    <div class="card card-orange">
+      <div class="card-icon">🧾</div>
+      <h3>NF Ilimitado</h3>
+      <p>Emissão de NF-e e NFC-e sem limite e sem custo adicional. Tudo dentro da plataforma.</p>
+      <span class="tag">Incluído</span>
+    </div>
+    <div class="card card-accent">
+      <div class="card-icon">🌎</div>
+      <h3>Tecnologia da Amazônia</h3>
+      <p>Startup reconhecida nacional e internacionalmente. Top 1000 SEBRAE, Inovativa Brasil, Samsung Ocean.</p>
+      <span class="tag">Premiada</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 6. SCRIPT -->
+<section id="script">
+  <div class="section-label">06 · Script de Venda</div>
+  <h2 class="section-title">Como Conduzir a Conversa</h2>
+  <p class="section-desc">Siga esse roteiro como base. Adapte ao perfil de cada cliente, mas nunca pule etapas.</p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Abertura — Gere curiosidade</h3>
+        <p>Não abra com "vender". Abra com uma pergunta que faz o cliente parar e pensar.</p>
+        <div class="script">
+          <strong>Script:</strong> "Oi [nome], tudo bem? Me chamo [seu nome] da Faço a Conta. Quero te fazer uma pergunta rápida: você sabe exatamente quanto de imposto sua empresa pagou esse mês — e se você pagou tudo certo, sem pagar a mais?"
+        </div>
+        <div class="tip-box" style="margin-top:12px;">
+          <div class="wi">💡</div>
+          <p>Se ele disser "não sei" ou "acho que sim" — você abriu a porta. Siga para a dor.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>A Dor — Mostre a realidade</h3>
+        <p>Use os dados reais da apresentação. Números grandes criam urgência.</p>
+        <div class="script">
+          <strong>Script:</strong> "Pois é. 95% das empresas brasileiras pagam impostos a mais do que deveriam — e a maioria não sabe. Isso representa em média quase R$ 6.000 por ano saindo do bolso do empresário sem necessidade. Você quer saber se isso está acontecendo com você?"
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>A Comparação — Âncora de preço</h3>
+        <p>Compare antes de falar o preço da FAC. Deixe o valor tradicional na cabeça dele primeiro.</p>
+        <div class="script">
+          <strong>Script:</strong> "Hoje você paga quanto de contabilidade? [Escute] A média do mercado é R$ 800 por mês — R$ 9.600 por ano. A Faço a Conta resolve tudo isso por R$ 337 por mês. São R$ 5.556 por ano que ficam no seu bolso. Além de ter nota fiscal ilimitada, gestão financeira e PDV integrado — coisas que seu contador atual não te dá."
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Os Diferenciais — Empilhe valor</h3>
+        <p>Nunca fale de preço sem antes ter empilhado valor suficiente. Use os 3 exclusivos.</p>
+        <div class="script">
+          <strong>Script:</strong> "Diferente dos concorrentes, a gente oferece: abertura de CNPJ gratuita, PDV integrado — frente de caixa dentro do sistema — e IA para te ajudar na gestão. Tudo em uma única plataforma, sem precisar de 3 sistemas diferentes."
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>A Credibilidade — Prove que somos reais</h3>
+        <p>Use os números de trajetória para quebrar ceticismo.</p>
+        <div class="script">
+          <strong>Script:</strong> "A Faço a Conta já gerou mais de R$ 2 milhões de economia para mais de 260 clientes em 4 estados. Somos Top 1000 SEBRAE, passamos pela Samsung Ocean e somos parceiros oficiais do SEBRAE. Não somos uma startup de garagem — somos tecnologia séria da Amazônia."
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>O Fechamento — Provoque a decisão</h3>
+        <p>Não pergunte "o que você acha?". Facilite a decisão com uma escolha binária.</p>
+        <div class="script">
+          <strong>Script:</strong> "Você prefere começar pelo plano mensal — R$ 337/mês — ou aproveitar o anual que sai R$ 303/mês e você já garante o ano todo com desconto? Posso te passar o link agora mesmo para você formalizar."
+        </div>
+        <div class="warn-box" style="margin-top:12px;">
+          <div class="wi">⚠️</div>
+          <p>Depois de oferecer o fechamento, <strong>fique em silêncio</strong>. Quem fala primeiro perde. Deixe o cliente responder.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 7. OBJEÇÕES -->
+<section id="objecoes">
+  <div class="section-label">07 · Objeções</div>
+  <h2 class="section-title">As 8 Objeções Mais Comuns</h2>
+  <p class="section-desc">Cada objeção é uma oportunidade disfarçada de "não". Treine as respostas até sair no automático.</p>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Já tenho contador e estou satisfeito."</div>
+    <div class="obj-a">Ótimo! Mas satisfeito não significa que você não está pagando a mais. 95% das empresas pagam impostos indevidos — inclusive clientes de bons contadores. A questão não é substituir, é saber se você está economizando tudo que poderia.</div>
+    <div class="obj-script">"Então me responde uma coisa: seu contador te mostra exatamente quais créditos tributários você recuperou esse mês? A gente faz isso automaticamente."</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Está muito caro."</div>
+    <div class="obj-a">Antes de falar caro, compare. Caro em relação a quê? Se o cliente paga R$ 800/mês de contabilidade tradicional, a FAC é 58% mais barata. Se ele acha R$ 337 caro, ainda não entendeu a economia.</div>
+    <div class="obj-script">"Caro comparado com o quê? Se você pagar hoje R$ 337/mês e economizar R$ 5.556 no ano, você está ganhando R$ 4.500 líquido — só no primeiro ano. Isso parece caro?"</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Preciso pensar."</div>
+    <div class="obj-a">Geralmente significa que falta informação ou segurança. Descubra o que está faltando antes de deixar o cliente "pensar sozinho".</div>
+    <div class="obj-script">"Claro! O que especificamente você quer pensar? É sobre o preço, sobre migrar do contador atual, ou tem alguma dúvida que eu não esclareci bem? Me ajuda a entender."</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Não conheço vocês, como sei que posso confiar?"</div>
+    <div class="obj-a">Use a credibilidade: 260+ clientes, R$ 2mi de economia gerada, Samsung Ocean, Top 1000 SEBRAE, parceiro SEBRAE, 4 estados atendidos, mais de 5 anos de operação.</div>
+    <div class="obj-script">"Entendo a preocupação. Somos uma empresa que tem mais de 5 anos de mercado, parceiros oficiais do SEBRAE, passamos pelo programa da Samsung, e já geramos R$ 2 milhões de economia para mais de 260 clientes. Posso te mostrar depoimentos de clientes da sua cidade se quiser."</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Não sei mexer com tecnologia."</div>
+    <div class="obj-a">A plataforma foi feita para quem não é técnico. E temos suporte via WhatsApp incluído em todos os planos.</div>
+    <div class="obj-script">"Por isso mesmo que vai gostar. A plataforma foi criada para o empresário que não é técnico. E você tem suporte direto no WhatsApp sempre que precisar — isso está incluído no plano."</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Meu negócio é pequeno demais para isso."</div>
+    <div class="obj-a">Quanto menor o negócio, mais cada real importa. MEI paga R$ 97/mês — menos de R$ 3,20 por dia.</div>
+    <div class="obj-script">"Na verdade, é exatamente porque é pequeno que faz mais sentido. No plano MEI você paga menos de R$ 3,20 por dia e tem fechamento fiscal, NF ilimitada e suporte — tudo certo com a Receita. Quanto você gasta por dia com café?"</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Vou falar com meu sócio/esposa primeiro."</div>
+    <div class="obj-a">Eles precisam das mesmas informações. Ofereça estar presente nessa conversa.</div>
+    <div class="obj-script">"Faz sentido! Você consegue chamar ele/ela agora por 5 minutos? Prefiro explicar direto pra não ter ruído de tradução — e a decisão fica mais fácil com tudo claro."</div>
+  </div>
+
+  <div class="objection">
+    <div class="obj-q">❌ "Quero testar antes de assinar."</div>
+    <div class="obj-a">Não existe teste porque não existe risco real. Use a prova social e os números para substituir o teste.</div>
+    <div class="obj-script">"Entendo! 260 clientes já testaram por você. O que eu posso te mostrar é o depoimento de quem já usa e estava exatamente na sua situação. O que te preocupa especificamente que um teste resolveria?"</div>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- 8. FUNIL -->
+<section id="funil">
+  <div class="section-label">08 · Processo de Venda</div>
+  <h2 class="section-title">O Funil do Realizador</h2>
+  <p class="section-desc">Cada etapa do funil tem uma ação clara. Não pule etapas — cada uma existe por um motivo.</p>
+
+  <div class="grid-2" style="margin-bottom:32px;">
+    <div class="card card-accent">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>📋 Indicação</h3>
+        <span class="badge badge-purple">Entrada</span>
+      </div>
+      <p style="color:#666;">Lead chega via indicação de parceiro, prospecção ativa ou canal digital.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#a78bfa;">Sua ação:</strong> Qualificar. Empresa é ME/EPP no Simples? Tem CNPJ ativo? Se sim, agende reunião.</p>
+    </div>
+    <div class="card card-blue">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>📞 Reunião</h3>
+        <span class="badge" style="background:#29b6f622;color:#29b6f6;border:1px solid #29b6f644;">Qualificação</span>
+      </div>
+      <p style="color:#666;">Primeira conversa — diagnóstico da dor do cliente. Entenda como ele está hoje.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#29b6f6;">Sua ação:</strong> Escute mais do que fale. Descubra quanto paga hoje, qual regime, quantos funcionários.</p>
+    </div>
+    <div class="card card-orange">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>📄 Proposta</h3>
+        <span class="badge" style="background:#ff980022;color:#ff9800;border:1px solid #ff980044;">Apresentação</span>
+      </div>
+      <p style="color:#666;">Apresente o plano indicado, a economia calculada e os diferenciais exclusivos.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#ff9800;">Sua ação:</strong> Use os números: "Você paga X hoje, vai pagar Y — e ainda tem [diferenciais]."</p>
+    </div>
+    <div class="card card-green">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>💳 Pagamento</h3>
+        <span class="badge badge-green">Fechamento</span>
+      </div>
+      <p style="color:#666;">Cliente decide, assina e realiza o pagamento do plano escolhido.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#00e676;">Sua ação:</strong> Ofereça o anual como fechamento. "Quer pagar mensal ou garantir o desconto anual?"</p>
+    </div>
+    <div class="card card-accent">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>📝 Contrato</h3>
+        <span class="badge badge-purple">Formalização</span>
+      </div>
+      <p style="color:#666;">Contrato assinado, dados coletados, integração com a plataforma iniciada.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#a78bfa;">Sua ação:</strong> Passe para o time de Sucesso do Cliente. Seu trabalho aqui está feito.</p>
+    </div>
+    <div class="card card-yellow">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3>🚀 Onboarding</h3>
+        <span class="badge badge-yellow">Ativação</span>
+      </div>
+      <p style="color:#666;">Cliente ativo, integrado e usando a plataforma. Meta: encantá-lo nos primeiros 30 dias.</p>
+      <p style="color:#555;font-size:12px;margin-top:10px;"><strong style="color:#ffca28;">Sua ação:</strong> Peça indicação. Cliente feliz no onboarding é sua melhor fonte de novos leads.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>Regra de ouro do funil</h3>
+    <p>Um lead que foi para "Reunião" e não avançou não é um "não" — é um "ainda não". Defina o próximo contato antes de encerrar qualquer conversa. "Quando posso te ligar para você me passar uma resposta?" é obrigatório.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 9. CREDIBILIDADE -->
+<section id="credibilidade">
+  <div class="section-label">09 · Credibilidade</div>
+  <h2 class="section-title">Nossos Selos de Validação</h2>
+  <p class="section-desc">Use quando o cliente questionar "quem são vocês?". Cada selo tem um propósito.</p>
+
+  <div class="grid-4">
+    <div class="card card-accent" style="text-align:center;">
+      <div class="card-icon">🏆</div>
+      <h3>Top 1000 SEBRAE</h3>
+      <p>Entre as mil melhores startups do Brasil, selecionadas pelo SEBRAE.</p>
+    </div>
+    <div class="card card-blue" style="text-align:center;">
+      <div class="card-icon">🌊</div>
+      <h3>Samsung Ocean</h3>
+      <p>Pré-incubação pela Samsung — validação tecnológica de alto nível.</p>
+    </div>
+    <div class="card card-green" style="text-align:center;">
+      <div class="card-icon">🇧🇷</div>
+      <h3>Inovativa Brasil</h3>
+      <p>Programa nacional de aceleração para startups inovadoras.</p>
+    </div>
+    <div class="card card-orange" style="text-align:center;">
+      <div class="card-icon">🤝</div>
+      <h3>Parceiro SEBRAE</h3>
+      <p>Parceria oficial com o maior órgão de apoio ao empreendedorismo do Brasil.</p>
+    </div>
+    <div class="card card-yellow" style="text-align:center;">
+      <div class="card-icon">💡</div>
+      <h3>VIBRA + Osten Invest</h3>
+      <p>Investimento institucional — prova de viabilidade e tração do negócio.</p>
+    </div>
+    <div class="card card-accent" style="text-align:center;">
+      <div class="card-icon">🚀</div>
+      <h3>Top 10 Revelação</h3>
+      <p>Top 10 startup revelação por 2 anos consecutivos.</p>
+    </div>
+    <div class="card card-green" style="text-align:center;">
+      <div class="card-icon">👥</div>
+      <h3>+260 Clientes</h3>
+      <p>Prova social real. Base ativa em 4 estados.</p>
+    </div>
+    <div class="card card-blue" style="text-align:center;">
+      <div class="card-icon">💰</div>
+      <h3>R$ 2mi Economizados</h3>
+      <p>Resultado concreto gerado para clientes reais.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 10. REGRAS -->
+<section id="regras">
+  <div class="section-label">10 · As Regras</div>
+  <h2 class="section-title">O Código do Realizador</h2>
+  <p class="section-desc">Essas são as regras inegociáveis de quem faz parte deste time.</p>
+
+  <div style="background:var(--card);border:1px solid #222;border-radius:16px;padding:32px;">
+    <div class="rule">
+      <div class="rule-num">01</div>
+      <div class="rule-body">
+        <h4>Você vende economia, não contabilidade</h4>
+        <p>Nunca abra uma conversa falando "somos uma contabilidade digital". Abra falando em redução de custo e imposto indevido.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">02</div>
+      <div class="rule-body">
+        <h4>R$ 5.556 é o seu argumento principal</h4>
+        <p>Esse número precisa aparecer em toda conversa de venda. É a âncora. É o que faz o cliente parar e prestar atenção.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">03</div>
+      <div class="rule-body">
+        <h4>Qualifique antes de apresentar</h4>
+        <p>Não apresente o produto para quem não é perfil. Desperdício de tempo é o maior inimigo do realizador.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">04</div>
+      <div class="rule-body">
+        <h4>Nunca encerre sem definir o próximo passo</h4>
+        <p>Toda conversa termina com uma data e horário marcados — seja para reunião, resposta ou fechamento.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">05</div>
+      <div class="rule-body">
+        <h4>Objeção é pedido de informação disfarçado</h4>
+        <p>Quando o cliente diz "não", ele está dizendo "me convença melhor". Nunca aceite a primeira negativa como final.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">06</div>
+      <div class="rule-body">
+        <h4>Empilhe valor antes de falar em preço</h4>
+        <p>O preço só é apresentado depois de o cliente já ter entendido tudo que está recebendo. Preço sem valor é caro. Preço com valor é barato.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">07</div>
+      <div class="rule-body">
+        <h4>Cliente fechado é fonte de indicação</h4>
+        <p>Toda conta fechada precisa gerar ao menos um nome novo. "Você conhece mais alguém que paga muito de contador?" é obrigatório no onboarding.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">08</div>
+      <div class="rule-body">
+        <h4>Atualize o CRM em tempo real</h4>
+        <p>Lead não registrado no funil não existe. Mantenha o status de cada lead atualizado após cada contato.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 11. CONTATO -->
+<section style="text-align:center;padding:80px 40px;">
+  <div class="section-label" style="justify-content:center;display:block;">11 · Contato</div>
+  <h2 class="section-title">Precisa de Apoio?</h2>
+  <p class="section-desc" style="margin:0 auto 40px;">Dúvidas sobre um cliente, uma objeção que não sabe responder ou uma proposta complicada? Aciona o CEO.</p>
+
+  <div style="background:linear-gradient(135deg,#7c3aed22,#7c3aed08);border:1px solid var(--border);border-radius:20px;padding:40px;display:inline-block;min-width:320px;">
+    <div style="font-size:48px;margin-bottom:16px;">📱</div>
+    <p style="font-size:24px;font-weight:800;margin-bottom:4px;">92 98159-0598</p>
+    <p style="color:var(--purple-l);font-size:14px;font-weight:600;">Jonatha Oliveira — CEO</p>
+    <p style="color:#444;font-size:12px;margin-top:16px;">WhatsApp · Direto com o dono</p>
+  </div>
+
+  <div style="margin-top:48px;">
+    <p style="font-size:22px;font-weight:800;color:var(--purple-l);">"A conta é nossa. O crescimento é seu."</p>
+    <p style="color:#444;font-size:13px;margin-top:8px;">#FAC · Faço a Conta</p>
+  </div>
+</section>
+
+<footer>
+  <strong>Playbook dos Realizadores do Improvável</strong> · Faço a Conta · Versão 2025<br/>
+  Documento confidencial. Uso interno.
+</footer>
+
+</body>
+</html>
