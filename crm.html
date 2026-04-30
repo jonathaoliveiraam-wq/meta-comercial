@@ -87,14 +87,12 @@
     .ren-col-1 .col-title{color:#ff9800;} .ren-col-1{border-top:3px solid #ff9800;}
     .ren-col-2 .col-title{color:#ab47bc;} .ren-col-2{border-top:3px solid #ab47bc;}
     .ren-col-3 .col-title{color:#00e676;} .ren-col-3{border-top:3px solid #00e676;}
-    .ren-col-4 .col-title{color:#29b6f6;} .ren-col-4{border-top:3px solid #29b6f6;}
-    .ren-col-5 .col-title{color:#ffca28;} .ren-col-5{border-top:3px solid #ffca28;}
+    .ren-col-4 .col-title{color:#ffca28;} .ren-col-4{border-top:3px solid #ffca28;}
 
     .btn-avancar-ren-0{background:#7c3aed22;border-color:#7c3aed55;color:#a78bfa;}
     .btn-avancar-ren-1{background:#ff980022;border-color:#ff980055;color:#ff9800;}
     .btn-avancar-ren-2{background:#ab47bc22;border-color:#ab47bc55;color:#ab47bc;}
     .btn-avancar-ren-3{background:#00e67622;border-color:#00e67655;color:#00e676;}
-    .btn-avancar-ren-4{background:#29b6f622;border-color:#29b6f655;color:#29b6f6;}
 
     /* MODAL */
     .modal-bg{display:none;position:fixed;inset:0;background:#000000cc;z-index:100;align-items:center;justify-content:center;}
@@ -836,7 +834,6 @@
     { id:'proposta',   label:'📄 Proposta',   cor:'#ff9800' },
     { id:'contrato',   label:'📝 Contrato',   cor:'#ab47bc' },
     { id:'pagamento',  label:'💳 Pagamento',  cor:'#00e676' },
-    { id:'ultimo',     label:'⏱️ Último',     cor:'#29b6f6' },
     { id:'finalizado', label:'✅ Finalizado', cor:'#ffca28' },
   ];
 
@@ -868,7 +865,7 @@
     const emProposta  = ren.filter(c=>c.etapa===1).length;
     const emContrato  = ren.filter(c=>c.etapa===2).length;
     const pagos       = ren.filter(c=>c.etapa>=3);
-    const finalizados = ren.filter(c=>c.etapa===5).length;
+    const finalizados = ren.filter(c=>c.etapa===4).length;
     const valorTotal  = pagos.reduce((s,c)=>s+(c.valor||MENSAL),0);
 
     document.getElementById('rn-total').textContent      = total;
@@ -900,7 +897,7 @@
   }
 
   function cardRenovacaoHTML(c, etapaIdx) {
-    const podeAvancar = etapaIdx < 5;
+    const podeAvancar = etapaIdx < 4;
     const podeVoltar  = etapaIdx > 0;
     const proxLabel   = podeAvancar ? ETAPAS_REN[etapaIdx+1].label : '';
     const btnClass    = `btn-avancar btn-avancar-ren-${etapaIdx}`;
@@ -929,7 +926,7 @@
     const idx = ren.findIndex(c=>c.id===id);
     if(idx<0) return;
     const novaEtapa = ren[idx].etapa + delta;
-    if(novaEtapa<0||novaEtapa>5) return;
+    if(novaEtapa<0||novaEtapa>4) return;
 
     // Abre modal de confirmação ao avançar para Pagamento (etapa 3)
     if(novaEtapa===3 && delta===1) {
