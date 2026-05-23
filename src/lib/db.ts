@@ -9,6 +9,7 @@ function dbConfig() {
     database: process.env.DB_NAME || 'postgres',
     user: process.env.DB_USER || '',
     password: process.env.DB_PASSWORD || '',
+    ssl: { rejectUnauthorized: false },
   }
 }
 
