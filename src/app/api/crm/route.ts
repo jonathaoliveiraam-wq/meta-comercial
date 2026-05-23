@@ -1,22 +1,25 @@
-import { initSchema, getDb } from '@/lib/db'
+import { initSchema, query, queryRow } from '@/lib/db'
 
 const MENSAL = 337
 const ANUAL = 337 * 12 * 0.9
 
 export async function GET() {
-  initSchema()
-  const db = getDb()
+  await initSchema()
 
-  const crm = db.prepare('SELECT * FROM crm_leads').all()
-  const crmRenovacao = db.prepare('SELECT * FROM crm_renovacoes').all()
-  const parceiros = db.prepare('SELECT id, nome FROM parceiros').all()
-  const leads = db.prepare('SELECT * FROM leads_portal').all()
+  const [crmRows, crmRenRows, parceiros, leads] = await Promise.all([
+    query('SELECT * FROM crm_leads'),
+    query('SELECT * FROM crm_renovacoes'),
+    query('SELECT id, nome FROM parceiros'),
+    query('SELECT * FROM leads_portal'),
+  ])
+  const crm: any[] = crmRows.rows
+  const crmRenovacao: any[] = crmRenRows.rows
 
-  const parsed = (crm as any[]).map(c => ({
+  const parsed = crm.map((c: any) => ({
     ...c,
     historico: JSON.parse(c.historico || '[]'),
   }))
-  const parsedRen = (crmRenovacao as any[]).map(c => ({
+  const parsedRen = crmRenovacao.map((c: any) => ({
     ...c,
     historico: JSON.parse(c.historico || '[]'),
   }))
@@ -25,26 +28,21 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  initSchema()
+  await initSchema()
   const body = await request.json()
-  const db = getDb()
 
   if (body.action === 'moverLead') {
-    db.prepare('UPDATE crm_leads SET etapa = ?, historico = ? WHERE id = ?').run(
-      body.etapa, JSON.stringify(body.historico), body.id
-    )
+    await query('UPDATE crm_leads SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
     return Response.json({ ok: true })
   }
 
   if (body.action === 'moverRenovacao') {
-    db.prepare('UPDATE crm_renovacoes SET etapa = ?, historico = ? WHERE id = ?').run(
-      body.etapa, JSON.stringify(body.historico), body.id
-    )
+    await query('UPDATE crm_renovacoes SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
     return Response.json({ ok: true })
   }
 
   if (body.action === 'confirmarPagamento') {
-    const lead = db.prepare('SELECT * FROM crm_leads WHERE id = ?').get(body.id) as any
+    const lead = await queryRow('SELECT * FROM crm_leads WHERE id = $1', [body.id])
     if (!lead) return Response.json({ error: 'Lead não encontrado' }, { status: 404 })
 
     let valorFechado = MENSAL
@@ -54,22 +52,18 @@ export async function PUT(request: Request) {
     }
 
     if (body.plano === 'mensal') {
-      db.prepare('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES (?, ?, ?)').run(lead.nome, body.data, lead.parceiro || '')
+      await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [lead.nome, body.data, lead.parceiro || ''])
     } else if (body.plano === 'anual') {
-      db.prepare('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES (?, ?, ?)').run(lead.nome, body.data, lead.parceiro || '')
+      await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [lead.nome, body.data, lead.parceiro || ''])
     } else if (body.plano === 'personalizado') {
       const recTotal = valorFechado
       const equiv = recTotal / ANUAL
-      db.prepare('INSERT INTO lancamentos (qty, val, tipo, valorRec, recTotal, equiv, descricao, data, parceiro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
-        1, body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, lead.nome, body.data, lead.parceiro || ''
-      )
+      await query('INSERT INTO lancamentos (qty, val, tipo, valorRec, recTotal, equiv, descricao, data, parceiro) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [1, body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, lead.nome, body.data, lead.parceiro || ''])
     }
 
     const historico = JSON.parse(lead.historico || '[]')
     historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema', plano: body.plano })
-    db.prepare('UPDATE crm_leads SET etapa = 4, plano = ?, valor = ?, historico = ? WHERE id = ?').run(
-      body.plano, valorFechado, JSON.stringify(historico), body.id
-    )
+    await query('UPDATE crm_leads SET etapa = 4, plano = $1, valor = $2, historico = $3 WHERE id = $4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
 
     return Response.json({ ok: true })
   }
@@ -90,15 +84,12 @@ export async function PUT(request: Request) {
       data: body.data || new Date().toISOString().split('T')[0],
       historico: JSON.stringify([{ etapa: 0, data: body.data || new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }]),
     }
-    db.prepare(`INSERT INTO crm_leads (id, leadId, nome, whats, segmento, obs, parceiro, parceiroNome, etapa, plano, valor, data, historico) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      novoLead.id, novoLead.leadId, novoLead.nome, novoLead.whats, novoLead.segmento, novoLead.obs,
-      novoLead.parceiro, novoLead.parceiroNome, novoLead.etapa, novoLead.plano, novoLead.valor, novoLead.data, novoLead.historico
-    )
+    await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', [novoLead.id, novoLead.leadId, novoLead.nome, novoLead.whats, novoLead.segmento, novoLead.obs, novoLead.parceiro, novoLead.parceiroNome, novoLead.etapa, novoLead.plano, novoLead.valor, novoLead.data, novoLead.historico])
     return Response.json({ ok: true, id: novoLead.id })
   }
 
   if (body.action === 'excluirLead') {
-    db.prepare('DELETE FROM crm_leads WHERE id = ?').run(body.id)
+    await query('DELETE FROM crm_leads WHERE id = $1', [body.id])
     return Response.json({ ok: true })
   }
 

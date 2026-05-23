@@ -1,17 +1,14 @@
-import { initSchema, getDb } from './db'
+import { query, queryRow, initSchema } from './db'
 
-export function dbQuery(sql: string, params?: any[]) {
-  initSchema()
-  const db = getDb()
-  if (sql.trim().toUpperCase().startsWith('SELECT')) {
-    return db.prepare(sql).all(...(params || []))
-  }
-  return db.prepare(sql).run(...(params || []))
+export async function dbQuery(sql: string, params?: any[]) {
+  await initSchema()
+  const result = await query(sql, params)
+  return result.rows
 }
 
-export function dbGet(sql: string, params?: any[]) {
-  initSchema()
-  return getDb().prepare(sql).get(...(params || []))
+export async function dbGet(sql: string, params?: any[]) {
+  await initSchema()
+  return queryRow(sql, params)
 }
 
 export const MENSAL = 337
