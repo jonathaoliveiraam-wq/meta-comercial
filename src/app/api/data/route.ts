@@ -209,7 +209,7 @@ export async function POST(req: Request) {
       if (!p) return Response.json({ error: 'Usuário ou senha incorretos.' }, { status: 401 })
       const [crmLeads, leadsCount, mensaisCount, anuaisCount] = await Promise.all([
         queryRow('SELECT COUNT(*)::int as t FROM crm_leads WHERE parceiro = $1 AND etapa >= 4', [p.id]),
-        queryRow('SELECT COUNT(*)::int as t FROM leads_portal WHERE parceiroId = $1', [p.id]),
+        queryRow('SELECT COUNT(*)::int as t FROM leads_portal WHERE "parceiroId" = $1', [p.id]),
         queryRow('SELECT COUNT(*)::int as t FROM clientes_mensais WHERE parceiro = $1', [p.id]),
         queryRow('SELECT COUNT(*)::int as t FROM clientes_anuais WHERE parceiro = $1', [p.id]),
       ])
