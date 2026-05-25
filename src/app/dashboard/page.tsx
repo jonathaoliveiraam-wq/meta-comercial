@@ -181,7 +181,7 @@ export default function DashboardPage() {
         <div className="topbar">
           <span className="topbar-title">📊 Dashboard</span>
           <div className="topbar-right">
-            <span className="badge" style={{ background: '#1b5e2022', color: '#00e676' }}>✅ Dados locais</span>
+            <span className="badge" style={{ background: '#1b5e2022', color: '#00e676' }}>✅ Supabase</span>
             <span className="user-chip">👤 {nomeUsuario}</span>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
             <p className="chart-title">📅 Clientes Fechados por Mês</p>
             <div style={{ position: 'relative', width: '100%', height: 280 }}><canvas ref={mensalRef}></canvas></div>
           </div>
-          <p className="footer">Faço a Conta · Meta Comercial 2026 · Versão Local SQLite</p>
+          <p className="footer">Faço a Conta · Meta Comercial 2026 · Versão Supabase</p>
         </div>
       </div>
     </div>
