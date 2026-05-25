@@ -89,8 +89,12 @@ export default function DashboardPage() {
       chartsRef.current.push(b)
     }
 
-    if (mensalRef.current && data.clientesMensais.length + data.clientesAnuais.length > 0) {
-      const todos = [...data.clientesMensais.map((c: any) => ({ ...c, data: c.data })), ...data.clientesAnuais.map((c: any) => ({ ...c, data: c.data }))]
+    if (mensalRef.current && data.clientesMensais.length + data.clientesAnuais.length + data.lancamentos.length > 0) {
+      const todos = [
+        ...data.clientesMensais.map((c: any) => ({ data: c.data })),
+        ...data.clientesAnuais.map((c: any) => ({ data: c.data })),
+        ...data.lancamentos.map((l: any) => ({ data: l.data })),
+      ]
       const meses: Record<string, number> = {}
       todos.forEach(c => { const m = (c.data || '').slice(0, 7); if (m) meses[m] = (meses[m] || 0) + 1 })
       const labels = Object.keys(meses).sort()
