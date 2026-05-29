@@ -858,17 +858,17 @@
     <h2>📋 Complete seu cadastro</h2>
     <p>Precisamos de mais algumas informações para ativar sua conta.</p>
     <p class="lbl">Nova senha</p>
-    <input class="linput" type="password" id="perf-senha" placeholder="Mínimo 6 caracteres"/>
+    <input class="linput" type="password" id="perf-senha" placeholder="Mínimo 6 caracteres" required/>
     <p class="lbl">Confirmar senha</p>
-    <input class="linput" type="password" id="perf-conf" placeholder="Repita a senha"/>
+    <input class="linput" type="password" id="perf-conf" placeholder="Repita a senha" required/>
     <p class="lbl">WhatsApp / Telefone</p>
-    <input class="linput" type="text" id="perf-tel" placeholder="(92) 99999-9999"/>
+    <input class="linput" type="text" id="perf-tel" placeholder="(92) 99999-9999" required/>
     <p class="lbl">E-mail</p>
-    <input class="linput" type="email" id="perf-email" placeholder="seu@email.com"/>
+    <input class="linput" type="email" id="perf-email" placeholder="seu@email.com" required/>
     <p class="lbl">Data de nascimento</p>
-    <input class="linput" type="date" id="perf-nasc"/>
+    <input class="linput" type="date" id="perf-nasc" required/>
     <p class="lbl">Chave PIX para recebimento</p>
-    <input class="linput" type="text" id="perf-pix" placeholder="CPF, e-mail, telefone ou chave aleatória"/>
+    <input class="linput" type="text" id="perf-pix" placeholder="CPF, e-mail, telefone ou chave aleatória" required/>
     <p style="font-size:11px;color:#555;margin-top:-10px;margin-bottom:14px;">As comissões serão enviadas para esta chave PIX</p>
     <button class="lbtn" onclick="salvarPerfil()" style="margin-top:4px;">Salvar e entrar →</button>
     <p class="lerror" id="perf-error"></p>
