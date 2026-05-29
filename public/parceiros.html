@@ -385,6 +385,9 @@
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('termo-screen').style.display = 'flex';
         setTimeout(verificarScroll, 100);
+      } else if(!parceiro.whats || !parceiro.pix) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('perfil-screen').style.display = 'flex';
       } else {
         sessionStorage.setItem('parceiro', JSON.stringify({user:u, senha:s}));
         await carregarLeads();
@@ -448,17 +451,23 @@
     const pix   = document.getElementById('perf-pix').value.trim();
     const err   = document.getElementById('perf-error');
 
-    if(!senha || senha.length < 6) { err.textContent='⚠️ Senha deve ter no mínimo 6 caracteres.'; return; }
-    if(senha !== conf)              { err.textContent='⚠️ As senhas não coincidem.'; return; }
-    if(senha === SENHA_PADRAO)      { err.textContent='⚠️ Use uma senha diferente da padrão.'; return; }
-    if(!tel)                        { err.textContent='⚠️ Informe seu WhatsApp/telefone.'; return; }
-    if(!email)                      { err.textContent='⚠️ Informe seu e-mail.'; return; }
-    if(!nasc)                       { err.textContent='⚠️ Informe sua data de nascimento.'; return; }
-    if(!pix)                        { err.textContent='⚠️ Informe sua chave PIX.'; return; }
+    const perfilIncompleto = parceiro.termoAceito && (!parceiro.whats || !parceiro.pix);
+    if(perfilIncompleto) {
+      if(senha && senha.length < 6)  { err.textContent='⚠️ Senha deve ter no mínimo 6 caracteres.'; return; }
+      if(senha && senha !== conf)     { err.textContent='⚠️ As senhas não coincidem.'; return; }
+    } else {
+      if(!senha || senha.length < 6) { err.textContent='⚠️ Senha deve ter no mínimo 6 caracteres.'; return; }
+      if(senha !== conf)              { err.textContent='⚠️ As senhas não coincidem.'; return; }
+      if(senha === SENHA_PADRAO)      { err.textContent='⚠️ Use uma senha diferente da padrão.'; return; }
+    }
+    if(!tel)   { err.textContent='⚠️ Informe seu WhatsApp/telefone.'; return; }
+    if(!email) { err.textContent='⚠️ Informe seu e-mail.'; return; }
+    if(!nasc)  { err.textContent='⚠️ Informe sua data de nascimento.'; return; }
+    if(!pix)   { err.textContent='⚠️ Informe sua chave PIX.'; return; }
 
     err.textContent = '⏳ Salvando...'; err.style.color='#ffca28';
     try {
-      await apiPost('resetSenha', {id:parceiro.id, senha});
+      if(senha) await apiPost('resetSenha', {id:parceiro.id, senha});
       await apiPost('editarPerfilParceiro', {id:parceiro.id, nome:parceiro.nome, whats:tel, email, nascimento:nasc, pix});
       const newUser = parceiro.user;
       const j = await apiPost('loginParceiro', {user:newUser, senha});
@@ -856,7 +865,7 @@
 <div id="perfil-screen" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:#0d0d0d;padding:20px;">
   <div class="perfil-box">
     <h2>📋 Complete seu cadastro</h2>
-    <p>Precisamos de mais algumas informações para ativar sua conta.</p>
+    <p>Preencha seus dados para ativar o recebimento de comissões.</p>
     <p class="lbl">Nova senha</p>
     <input class="linput" type="password" id="perf-senha" placeholder="Mínimo 6 caracteres" required/>
     <p class="lbl">Confirmar senha</p>
