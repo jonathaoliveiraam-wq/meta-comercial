@@ -384,6 +384,7 @@
       if(parceiro.senha === SENHA_PADRAO || !parceiro.termoAceito) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('termo-screen').style.display = 'flex';
+        setTimeout(verificarScroll, 100);
       } else {
         sessionStorage.setItem('parceiro', JSON.stringify({user:u, senha:s}));
         await carregarLeads();
