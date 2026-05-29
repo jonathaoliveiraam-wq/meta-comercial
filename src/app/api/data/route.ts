@@ -230,7 +230,7 @@ export async function POST(req: Request) {
       })
     }
     if (action === 'aceitarTermo') {
-      await query('UPDATE parceiros SET termoAceito = 1, termoData = $1, termoVersao = $2, termoIp = $3 WHERE id = $4', [body.data, body.versao, body.ip, body.id])
+      await query('UPDATE parceiros SET "termoAceito" = 1, "termoData" = $1, "termoVersao" = $2, "termoIp" = $3 WHERE id = $4', [body.data, body.versao, body.ip, body.id])
       return Response.json({ ok: true })
     }
     if (action === 'editarPerfilParceiro') {
