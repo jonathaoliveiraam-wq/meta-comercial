@@ -113,7 +113,10 @@ export async function POST(req: Request) {
     }
     if (action === 'addLead') {
       const id = 'l_' + Date.now()
-      await query('INSERT INTO leads_portal (id, "parceiroId", "parceiroNome", nome, whats, segmento, obs, data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, body.parceiroId, body.parceiroNome, body.nome, body.whats, body.segmento || '', body.obs || '', body.data || new Date().toISOString().split('T')[0]])
+      const hoje = body.data || new Date().toISOString().split('T')[0]
+      await query('INSERT INTO leads_portal (id, "parceiroId", "parceiroNome", nome, whats, segmento, obs, data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, body.parceiroId, body.parceiroNome, body.nome, body.whats, body.segmento || '', body.obs || '', hoje])
+      const crmId = 'crm_' + id
+      await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12)', [crmId, id, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiroId || '', body.parceiroNome || '', 'mensal', MENSAL, hoje, JSON.stringify([{ etapa: 0, data: hoje, user: 'Portal Parceiro' }])])
       sendTelegram('📨 <b>Nova indicação de parceiro!</b>\nParceiro: ' + (body.parceiroNome || '—') + '\nCliente: ' + body.nome + '\nWhats: ' + body.whats)
       return Response.json({ ok: true, id })
     }
