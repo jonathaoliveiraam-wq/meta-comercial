@@ -230,6 +230,9 @@ select.form-input option{background:#111}
 .pb-highlight p{color:#888;font-size:14px;line-height:1.7}
 .pb-footer{text-align:center;padding:60px 40px;color:#333;font-size:12px;border-top:1px solid #1a1a1a}
 
+/* ===== TOAST ALERTS ===== */
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:700px){
   .sidebar{width:60px}

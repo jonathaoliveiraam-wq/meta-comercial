@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import {
   DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors,
   type DragEndEvent,
@@ -56,6 +56,14 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     return null
   })
   const [loginError, setLoginError] = useState('')
+  const [toasts, setToasts] = useState<{ id: number; msg: string; tipo: 'lead' | 'ok' }[]>([])
+  const crmCountRef = useRef<number | null>(null)
+
+  const addToast = useCallback((msg: string, tipo: 'lead' | 'ok' = 'lead') => {
+    const id = Date.now()
+    setToasts(t => [...t, { id, msg, tipo }])
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 6000)
+  }, [])
 
   const recarregar = useCallback(async () => {
     const [c, r] = await Promise.all([
@@ -64,6 +72,30 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     ])
     setCrm(c); setRen(r)
   }, [])
+
+  // Polling: verifica novos leads a cada 30s
+  useEffect(() => {
+    if (!user) return
+    const poll = async () => {
+      try {
+        const data = await fetch('/api/data?tipo=crm').then(r => r.json())
+        const novos: any[] = data
+        const count = novos.length
+        if (crmCountRef.current !== null && count > crmCountRef.current) {
+          const diff = count - crmCountRef.current
+          const recentes = novos.slice(0, diff)
+          recentes.forEach((l: any) => {
+            addToast(`🔔 Novo lead: ${l.parceiroNome ? l.parceiroNome + ' → ' : ''}${l.nome}`, 'lead')
+          })
+          setCrm(novos)
+        }
+        crmCountRef.current = count
+      } catch {}
+    }
+    poll()
+    const interval = setInterval(poll, 30000)
+    return () => clearInterval(interval)
+  }, [user, addToast])
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -252,15 +284,42 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   const Modal = ({ show, children }: { show: boolean; children: React.ReactNode }) =>
     show ? <div className="modal-bg" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false) } }}><div className="modal-box" onClick={e => e.stopPropagation()}>{children}</div></div> : null
 
+  const Toasts = () => (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {toasts.map(t => (
+        <div key={t.id} style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: t.tipo === 'lead' ? 'linear-gradient(135deg, rgba(79,70,229,0.95), rgba(124,58,237,0.95))' : 'rgba(16,185,129,0.95)',
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${t.tipo === 'lead' ? 'rgba(129,140,248,0.4)' : 'rgba(52,211,153,0.4)'}`,
+          borderRadius: 14, padding: '14px 18px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          color: '#fff', fontSize: 14, fontWeight: 600,
+          maxWidth: 360, animation: 'slideIn 0.3s ease',
+          cursor: 'pointer',
+        }} onClick={() => setToasts(ts => ts.filter(x => x.id !== t.id))}>
+          <span style={{ fontSize: 22, flexShrink: 0 }}>{t.tipo === 'lead' ? '🔔' : '✅'}</span>
+          <span style={{ lineHeight: 1.4 }}>{t.msg}</span>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div className="app-layout">
+      <Toasts />
       <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" />
 
       <div className="main-crm">
         <div className="topbar" style={{ background: '#0A0A18', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
             <span className="topbar-title" style={{ color: '#F1F5F9' }}>{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
-            {view==='novos' && <button className="badge" style={{ background:'rgba(99,102,241,0.1)',border:'1px solid rgba(99,102,241,0.3)',color:'#818CF8',cursor:'pointer',fontSize:11,fontWeight:600 }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); alert(r.novos?`${r.novos} lead(s) importado(s)`:'Nenhum novo lead') }}>🔄 Sincronizar</button>}
+            {view==='novos' && crm.filter(c => c.etapa === 0).length > 0 && (
+              <span style={{ background:'linear-gradient(90deg,#6366F1,#7C3AED)',color:'#fff',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700,boxShadow:'0 2px 8px rgba(99,102,241,0.4)' }}>
+                {crm.filter(c => c.etapa === 0).length} indicação{crm.filter(c => c.etapa === 0).length > 1 ? 'ões' : ''} nova{crm.filter(c => c.etapa === 0).length > 1 ? 's' : ''}
+              </span>
+            )}
+            {view==='novos' && <button className="badge" style={{ background:'rgba(99,102,241,0.1)',border:'1px solid rgba(99,102,241,0.3)',color:'#818CF8',cursor:'pointer',fontSize:11,fontWeight:600 }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); if(r.novos) addToast('✅ ' + r.novos + ' lead(s) importado(s)', 'ok'); else addToast('Nenhum novo lead para importar', 'ok') }}>🔄 Sincronizar</button>}
           </div>
           <div className="topbar-right"><span className="user-chip">👤 {user}</span></div>
         </div>
