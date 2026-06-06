@@ -207,7 +207,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
 
   if (!user) return (
     <div style={{ minHeight: '100vh', display: 'flex' }}>
-      <div style={{
+      <div className="crm-login-left" style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 45%, #7C3AED 100%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -240,7 +240,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
           </div>
         </div>
       </div>
-      <div style={{ width: 440, flexShrink: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+      <div className="crm-login-right" style={{ width: 440, flexShrink: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
         <div style={{ width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{ background: 'linear-gradient(135deg, #0F172A, #1E293B)', borderRadius: 14, padding: '14px 20px', display: 'inline-block', marginBottom: 16 }}>

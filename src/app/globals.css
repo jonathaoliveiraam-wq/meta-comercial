@@ -71,6 +71,23 @@ body{background:#0d0d0d;color:#fff;font-family:'Segoe UI',sans-serif;min-height:
 .logout-btn-small{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
 .main-crm{margin-left:190px;flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left 0.25s ease;background:#08081A}
 .main-crm.expanded{margin-left:60px}
+@media(max-width:768px){
+  .sidebar-crm{width:60px}
+  .sidebar-crm .sidebar-item span:not(.sidebar-item-icon){display:none}
+  .sidebar-crm .sidebar-item{justify-content:center;padding:10px 0}
+  .sidebar-crm .sidebar-section{display:none}
+  .sidebar-crm:not(.collapsed){width:190px;box-shadow:4px 0 32px rgba(0,0,0,0.6)}
+  .sidebar-crm:not(.collapsed) .sidebar-item span:not(.sidebar-item-icon){display:inline}
+  .sidebar-crm:not(.collapsed) .sidebar-item{justify-content:flex-start;padding:10px 12px}
+  .sidebar-crm:not(.collapsed) .sidebar-section{display:block}
+  .main-crm{margin-left:60px}
+  .crm-login-left{display:none}
+  .crm-login-right{width:100%!important}
+  .kanban-wrap{padding:10px 12px}
+  .stats-bar{gap:8px;padding:12px}
+  .stat-item{min-width:90px;padding:10px 12px}
+  .sv{font-size:24px!important}
+}
 
 /* ===== CARDS ===== */
 .card{background:#1a1a1a;border-radius:14px;padding:16px;border:1px solid #222;margin-bottom:14px}

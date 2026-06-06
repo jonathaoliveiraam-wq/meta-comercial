@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
@@ -22,41 +22,55 @@ interface Props {
 
 export default function Sidebar({ title, subtitle, items, bottomItems, user, variant = 'dashboard' }: Props) {
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    if (window.innerWidth <= 768) setCollapsed(true)
+  }, [])
 
   if (variant === 'crm') {
     return (
-      <div className={`sidebar-crm${collapsed ? ' collapsed' : ''}`}>
-        <div className="sidebar-section">Menu</div>
-        {items.map((item, i) => {
-          const isActive = item.href ? pathname.startsWith(item.href) : false
-          return (
-            <div
-              key={i}
-              className={`sidebar-item${isActive ? ' active' : ''}`}
-              onClick={() => { if (item.onClick) item.onClick() }}
-            >
-              {item.href ? (
-                <Link href={item.href} style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', color: 'inherit', width: '100%' }}>
-                  <span className="sidebar-item-icon">{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              ) : (
-                <>
-                  <span className="sidebar-item-icon">{item.icon}</span>
-                  <span>{item.label}</span>
-                </>
-              )}
-            </div>
-          )
-        })}
-        {bottomItems && (
-          <div style={{ marginTop: 'auto', borderTop: '1px solid #1e1e1e', paddingTop: 8 }}>
-            {bottomItems.map((item, i) => (
+      <>
+        {mobileOpen && (
+          <div
+            onClick={() => setMobileOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 19, backdropFilter: 'blur(2px)' }}
+          />
+        )}
+        <div className={`sidebar-crm${collapsed && !mobileOpen ? ' collapsed' : ''}`} style={mobileOpen ? { zIndex: 50, boxShadow: '4px 0 32px rgba(0,0,0,0.6)' } : {}}>
+          <button
+            onClick={() => {
+              if (window.innerWidth <= 768) {
+                setMobileOpen(!mobileOpen)
+              } else {
+                setCollapsed(!collapsed)
+              }
+            }}
+            style={{
+              width: '100%', background: 'none', border: 'none',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              color: 'rgba(255,255,255,0.35)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center',
+              justifyContent: (collapsed && !mobileOpen) ? 'center' : 'space-between',
+              padding: (collapsed && !mobileOpen) ? '12px 0' : '10px 14px',
+              marginBottom: 8, fontSize: 13, fontWeight: 600,
+            }}
+          >
+            {(!collapsed || mobileOpen) && <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Menu</span>}
+            <span style={{ fontSize: 18, lineHeight: 1 }}>{(collapsed && !mobileOpen) ? '☰' : '✕'}</span>
+          </button>
+
+          {items.map((item, i) => {
+            const isActive = item.href ? pathname.startsWith(item.href) : false
+            return (
               <div
                 key={i}
-                className="sidebar-item"
-                onClick={item.onClick}
+                className={`sidebar-item${isActive ? ' active' : ''}`}
+                onClick={() => {
+                  if (item.onClick) item.onClick()
+                  if (window.innerWidth <= 768) setMobileOpen(false)
+                }}
               >
                 {item.href ? (
                   <Link href={item.href} style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', color: 'inherit', width: '100%' }}>
@@ -70,10 +84,37 @@ export default function Sidebar({ title, subtitle, items, bottomItems, user, var
                   </>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            )
+          })}
+
+          {bottomItems && (
+            <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 }}>
+              {bottomItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="sidebar-item"
+                  onClick={() => {
+                    if (item.onClick) item.onClick()
+                    if (window.innerWidth <= 768) setMobileOpen(false)
+                  }}
+                >
+                  {item.href ? (
+                    <Link href={item.href} style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                      <span className="sidebar-item-icon">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  ) : (
+                    <>
+                      <span className="sidebar-item-icon">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </>
     )
   }
 
