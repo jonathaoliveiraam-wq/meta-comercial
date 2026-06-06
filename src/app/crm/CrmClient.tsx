@@ -13,19 +13,19 @@ import KanbanCardOverlay from './KanbanCardOverlay'
 
 const MENSAL = 337, ANUAL = 337 * 12 * 0.9
 const ETAPAS = [
-  { id: 'indicacao', label: '📋 Indicação', cor: '#7c3aed' },
-  { id: 'reuniao', label: '📞 Reunião', cor: '#29b6f6' },
-  { id: 'proposta', label: '📄 Proposta', cor: '#ff9800' },
-  { id: 'pagamento', label: '💳 Pagamento', cor: '#00e676' },
-  { id: 'contrato', label: '📝 Contrato', cor: '#ab47bc' },
-  { id: 'onboarding', label: '🚀 Onboarding', cor: '#ffca28' },
+  { id: 'indicacao', label: '📋 Indicação', cor: '#6366F1' },
+  { id: 'reuniao', label: '📞 Reunião', cor: '#38BDF8' },
+  { id: 'proposta', label: '📄 Proposta', cor: '#FBBF24' },
+  { id: 'pagamento', label: '💳 Pagamento', cor: '#34D399' },
+  { id: 'contrato', label: '📝 Contrato', cor: '#C084FC' },
+  { id: 'onboarding', label: '🚀 Onboarding', cor: '#FDE68A' },
 ]
 const ETAPAS_REN = [
-  { id: 'renovacao', label: '🔄 Renovação', cor: '#7c3aed' },
-  { id: 'proposta', label: '📄 Proposta', cor: '#ff9800' },
-  { id: 'contrato', label: '📝 Contrato', cor: '#ab47bc' },
-  { id: 'pagamento', label: '💳 Pagamento', cor: '#00e676' },
-  { id: 'finalizado', label: '✅ Finalizado', cor: '#ffca28' },
+  { id: 'renovacao', label: '🔄 Renovação', cor: '#6366F1' },
+  { id: 'proposta', label: '📄 Proposta', cor: '#FBBF24' },
+  { id: 'contrato', label: '📝 Contrato', cor: '#C084FC' },
+  { id: 'pagamento', label: '💳 Pagamento', cor: '#34D399' },
+  { id: 'finalizado', label: '✅ Finalizado', cor: '#FDE68A' },
 ]
 
 interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[] }
@@ -174,22 +174,73 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   }
 
   if (!user) return (
-    <div id="login-screen" style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <div className="login-box" style={{ maxWidth: 400 }}>
-        <div className="login-brand">
-          <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" style={{ maxWidth: 160 }} />
-          <p>CRM Comercial · Faço a Conta</p>
+    <div style={{ minHeight: '100vh', display: 'flex' }}>
+      <div style={{
+        flex: 1, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 45%, #7C3AED 100%)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: '60px 48px',
+      }}>
+        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', top: -150, left: -150, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: 380, height: 380, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', bottom: -100, right: -80, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', top: '38%', right: '8%', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', color: '#fff', maxWidth: 420 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 32 }}>
+            {['📊', '🤝', '🚀', '💳'].map((icon, i) => (
+              <div key={i} style={{ width: 54, height: 54, borderRadius: 16, background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>{icon}</div>
+            ))}
+          </div>
+          <h2 style={{ fontSize: 42, fontWeight: 800, marginBottom: 10, letterSpacing: -0.5, lineHeight: 1.1 }}>Bem-vindo ao CRM</h2>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 15, lineHeight: 1.6, marginBottom: 36 }}>
+            Plataforma de gestão de relacionamento com clientes, indicações e processos comerciais
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[
+              { icon: '🎯', text: 'Pipeline Kanban de vendas' },
+              { icon: '🤝', text: 'Gestão de parceiros e indicações' },
+              { icon: '💳', text: 'Confirmação de pagamentos e contratos' },
+            ].map(f => (
+              <div key={f.text} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: 12, padding: '11px 16px', border: '1px solid rgba(255,255,255,0.14)', textAlign: 'left' }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{f.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{ background:'#7c3aed11',border:'1px solid #7c3aed33',borderRadius:10,padding:14,marginBottom:20,textAlign:'center' }}>
-          <p style={{ fontSize:13,fontWeight:700,color:'#a78bfa',marginBottom:4 }}>🎯 CRM Comercial</p>
-          <p style={{ fontSize:12,color:'#555',lineHeight:1.6 }}>Gerencie seus leads — da indicação ao onboarding.</p>
+      </div>
+      <div style={{ width: 440, flexShrink: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+        <div style={{ width: '100%' }}>
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <div style={{ background: 'linear-gradient(135deg, #0F172A, #1E293B)', borderRadius: 14, padding: '14px 20px', display: 'inline-block', marginBottom: 16 }}>
+              <img src="https://www.facoaconta.com.br/wp-content/uploads/elementor/thumbs/facoaconta_logo_top-pwpeno0c3n15pf1y1eaflwuadbeeupdeipgq0gzk00.png" style={{ maxWidth: 140, display: 'block' }} />
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: '#1E293B', marginBottom: 4 }}>Entre na sua conta</h3>
+            <p style={{ color: '#94A3B8', fontSize: 14 }}>CRM Comercial · Faço a Conta</p>
+          </div>
+          <div style={{ background: 'linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06))', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: '12px 16px', marginBottom: 24, textAlign: 'center' }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#4F46E5', marginBottom: 2 }}>🎯 CRM Comercial</p>
+            <p style={{ fontSize: 12, color: '#64748B', lineHeight: 1.5 }}>Gerencie seus leads — da indicação ao onboarding.</p>
+          </div>
+          <p style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 600, marginBottom: 6 }}>Usuário</p>
+          <input type="text" id="login-user" placeholder="Digite seu usuário"
+            style={{ width: '100%', border: '1.5px solid #E2E8F0', borderRadius: 10, color: '#1E293B', fontSize: 15, padding: '12px 14px', marginBottom: 16, outline: 'none', background: '#F8FAFC', boxSizing: 'border-box', display: 'block' }}
+            onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
+            onBlur={e => (e.currentTarget.style.borderColor = '#E2E8F0')}
+            onKeyDown={e => e.key === 'Enter' && fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value, (document.getElementById('login-pass') as HTMLInputElement)?.value)}
+          />
+          <p style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 600, marginBottom: 6 }}>Senha</p>
+          <input type="password" id="login-pass" placeholder="Digite sua senha"
+            style={{ width: '100%', border: '1.5px solid #E2E8F0', borderRadius: 10, color: '#1E293B', fontSize: 15, padding: '12px 14px', marginBottom: 24, outline: 'none', background: '#F8FAFC', boxSizing: 'border-box', display: 'block' }}
+            onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
+            onBlur={e => (e.currentTarget.style.borderColor = '#E2E8F0')}
+            onKeyDown={e => e.key === 'Enter' && fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value, (document.getElementById('login-pass') as HTMLInputElement)?.value)}
+          />
+          <button
+            style={{ width: '100%', background: 'linear-gradient(90deg, #4F46E5, #7C3AED)', border: 'none', borderRadius: 12, color: '#fff', fontSize: 15, fontWeight: 700, padding: 14, cursor: 'pointer', boxShadow: '0 4px 20px rgba(79,70,229,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxSizing: 'border-box' }}
+            onClick={() => fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value, (document.getElementById('login-pass') as HTMLInputElement)?.value)}
+          >⚡ Entrar</button>
+          {loginError && <p style={{ color: '#EF4444', fontSize: 13, textAlign: 'center', marginTop: 12 }}>{loginError}</p>}
         </div>
-        <p className="lbl">Usuário</p>
-        <input className="linput" type="text" id="login-user" placeholder="Digite seu usuário" onKeyDown={e => e.key==='Enter' && fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value,(document.getElementById('login-pass') as HTMLInputElement)?.value)} />
-        <p className="lbl">Senha</p>
-        <input className="linput" type="password" id="login-pass" placeholder="Digite sua senha" onKeyDown={e => e.key==='Enter' && fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value,(document.getElementById('login-pass') as HTMLInputElement)?.value)} />
-        <button className="lbtn" onClick={() => fazerLogin((document.getElementById('login-user') as HTMLInputElement)?.value,(document.getElementById('login-pass') as HTMLInputElement)?.value)}>Entrar →</button>
-        <p className="lerror">{loginError}</p>
       </div>
     </div>
   )
@@ -206,30 +257,30 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
       <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" />
 
       <div className="main-crm">
-        <div className="topbar">
+        <div className="topbar" style={{ background: '#0A0A18', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
-            <span className="topbar-title">{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
-            {view==='novos' && <button className="badge" style={{ background:'#ffffff06',border:'1px dashed #333',color:'#444',cursor:'pointer',fontSize:11 }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); alert(r.novos?`${r.novos} lead(s) importado(s)`:'Nenhum novo lead') }}>🔄 Sincronizar</button>}
+            <span className="topbar-title" style={{ color: '#F1F5F9' }}>{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
+            {view==='novos' && <button className="badge" style={{ background:'rgba(99,102,241,0.1)',border:'1px solid rgba(99,102,241,0.3)',color:'#818CF8',cursor:'pointer',fontSize:11,fontWeight:600 }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); alert(r.novos?`${r.novos} lead(s) importado(s)`:'Nenhum novo lead') }}>🔄 Sincronizar</button>}
           </div>
           <div className="topbar-right"><span className="user-chip">👤 {user}</span></div>
         </div>
 
-        <div className="stats-bar">
+        <div className="stats-bar" style={{ background: '#06060F', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           {(view==='novos'?[
-            { label:'Total leads',value:totalLeads,cor:'#a78bfa' },
-            { label:'Em reunião',value:crm.filter(c=>c.etapa===1).length,cor:'#29b6f6' },
-            { label:'Em proposta',value:crm.filter(c=>c.etapa===2).length,cor:'#ff9800' },
-            { label:'Qtd. fechados',value:fechados.length,cor:'#00e676' },
-            { label:'Onboarding',value:crm.filter(c=>c.etapa===5).length,cor:'#ffca28' },
-            { label:'Conversão',value:taxa+'%',cor:'#a78bfa' },
+            { label:'Total leads',value:totalLeads,cor:'#818CF8' },
+            { label:'Em reunião',value:crm.filter(c=>c.etapa===1).length,cor:'#38BDF8' },
+            { label:'Em proposta',value:crm.filter(c=>c.etapa===2).length,cor:'#FBBF24' },
+            { label:'Qtd. fechados',value:fechados.length,cor:'#34D399' },
+            { label:'Onboarding',value:crm.filter(c=>c.etapa===5).length,cor:'#FDE68A' },
+            { label:'Conversão',value:taxa+'%',cor:'#818CF8' },
           ]:[
-            { label:'Total renovações',value:ren.length,cor:'#a78bfa' },
-            { label:'Em proposta',value:ren.filter(c=>c.etapa===1).length,cor:'#ff9800' },
-            { label:'Em contrato',value:ren.filter(c=>c.etapa===2).length,cor:'#ab47bc' },
-            { label:'Pagos',value:ren.filter(c=>c.etapa>=3).length,cor:'#00e676' },
-            { label:'Finalizados',value:ren.filter(c=>c.etapa===4).length,cor:'#ffca28' },
+            { label:'Total renovações',value:ren.length,cor:'#818CF8' },
+            { label:'Em proposta',value:ren.filter(c=>c.etapa===1).length,cor:'#FBBF24' },
+            { label:'Em contrato',value:ren.filter(c=>c.etapa===2).length,cor:'#C084FC' },
+            { label:'Pagos',value:ren.filter(c=>c.etapa>=3).length,cor:'#34D399' },
+            { label:'Finalizados',value:ren.filter(c=>c.etapa===4).length,cor:'#FDE68A' },
           ]).map(s => (
-            <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
+            <div key={s.label} className="stat-item" style={{ background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.07)',backdropFilter:'blur(8px)' }}><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
         </div>
 
@@ -245,15 +296,15 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                         {leads.map(card => (
                           <div key={card.id} style={{ position:'relative' }}>
                             <KanbanCard id={card.id} etapa={idx} nome={card.nome} whats={card.whats} segmento={card.segmento} parceiroNome={card.parceiroNome} obs={card.obs} data={card.data} valor={card.valor||MENSAL} plano={card.plano} />
-                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:4 }}>
-                              {idx>0 && <button className="btn-voltar" style={{ flex:1,background:'#ffffff08',border:'1px solid #333',color:'#555',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer' }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
+                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:7 }}>
+                              {idx>0 && <button className="btn-voltar" style={{ flex:1,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',borderRadius:8,padding:'5px 4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
-                                <button className={`btn-avancar btn-avancar-${idx}`} style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer' }} onClick={() => {
+                                <button className={`btn-avancar btn-avancar-${idx}`} style={{ flex:1,fontSize:10,padding:'5px 4px',cursor:'pointer',background:`${ETAPAS[idx+1].cor}18`,border:`1px solid ${ETAPAS[idx+1].cor}44`,color:ETAPAS[idx+1].cor,borderRadius:8,fontWeight:700 }} onClick={() => {
                                   if (idx+1 === 3) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
                                 }}>→ {ETAPAS[idx+1].label}</button>
                               )}
-                              <button className="btn-excluir" style={{ background:'#f4433611',border:'1px solid #f4433633',color:'#f44336',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
+                              <button className="btn-excluir" style={{ background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',color:'#EF4444',borderRadius:8,padding:'5px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
                             </div>
                           </div>
                         ))}
@@ -281,12 +332,12 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                         <div className="card-info">📱 {c.whats}</div>
                         <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6 }}>
                           <span className="card-data">📅 {c.data?.split('-').reverse().join('/')||'—'}</span>
-                          <span style={{ fontSize:12,fontWeight:700,color:'#00e676' }}>R$ {(c.valor||MENSAL).toLocaleString('pt-BR')}</span>
+                          <span style={{ fontSize:12,fontWeight:700,color:'#34D399' }}>R$ {(c.valor||MENSAL).toLocaleString('pt-BR')}</span>
                         </div>
-                        <div className="card-actions" style={{ display:'flex',gap:4,marginTop:6 }}>
-                          {idx>0 && <button className="btn-voltar" style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer' }} onClick={() => moverRenovacao(c.id, idx-1)}>← Voltar</button>}
+                        <div className="card-actions" style={{ display:'flex',gap:4,marginTop:7 }}>
+                          {idx>0 && <button className="btn-voltar" style={{ flex:1,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',borderRadius:8,padding:'5px 4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverRenovacao(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
-                            <button className={'btn-avancar btn-avancar-ren-' + idx} style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer' }} onClick={() => {
+                            <button className={'btn-avancar btn-avancar-ren-' + idx} style={{ flex:1,fontSize:10,padding:'5px 4px',cursor:'pointer',background:`${ETAPAS_REN[idx+1].cor}18`,border:`1px solid ${ETAPAS_REN[idx+1].cor}44`,color:ETAPAS_REN[idx+1].cor,borderRadius:8,fontWeight:700 }} onClick={() => {
                               if (idx+1 === 3) { setLeadPagId(c.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPagRen(true); return }
                               moverRenovacao(c.id, idx+1)
                             }}>→ {ETAPAS_REN[idx+1].label}</button>
@@ -311,10 +362,10 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
         <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="novo-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
         <div className="modal-field"><p className="modal-label">Plano</p><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
           {[
-            {id:'mensal',label:'📅 Mensal',sub:'R$ 337/mês',cor:'#29b6f6'},
-            {id:'anual',label:'🏆 Anual',sub:'R$ 3.639,60',cor:'#ab47bc'},
-            {id:'personalizado',label:'⭐ Person.',sub:'Valor livre',cor:'#ff9800'},
-            {id:'servico',label:'🛠️ Serviço',sub:'Avulso',cor:'#00e676'},
+            {id:'mensal',label:'📅 Mensal',sub:'R$ 337/mês',cor:'#38BDF8'},
+            {id:'anual',label:'🏆 Anual',sub:'R$ 3.639,60',cor:'#C084FC'},
+            {id:'personalizado',label:'⭐ Person.',sub:'Valor livre',cor:'#FBBF24'},
+            {id:'servico',label:'🛠️ Serviço',sub:'Avulso',cor:'#34D399'},
           ].map(p => (
             <button key={p.id} onClick={()=>setNovoPlano(p.id)} style={{flex:1,minWidth:70,background:novoPlano===p.id?p.cor+'22':'#111',border:'1px solid '+(novoPlano===p.id?p.cor+'88':'#333'),color:novoPlano===p.id?p.cor:'#555',borderRadius:8,padding:8,fontSize:11,fontWeight:700,cursor:'pointer'}}>{p.label}<br /><span style={{fontSize:10}}>{p.sub}</span></button>
           ))}

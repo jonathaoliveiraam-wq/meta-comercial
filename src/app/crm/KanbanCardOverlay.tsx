@@ -16,22 +16,23 @@ export default function KanbanCardOverlay({ id, crm }: Props) {
   return (
     <div
       style={{
-        background: '#1a1a1a',
-        borderRadius: 10,
-        padding: 12,
-        border: '2px solid #7c3aed',
-        boxShadow: '0 8px 32px rgba(124,58,237,0.3)',
-        width: 260,
+        background: 'rgba(15,12,36,0.96)',
+        backdropFilter: 'blur(16px)',
+        borderRadius: 14,
+        padding: '14px 16px',
+        border: '2px solid rgba(99,102,241,0.6)',
+        boxShadow: '0 12px 40px rgba(79,70,229,0.35)',
+        width: 268,
         rotate: '2deg',
       }}
     >
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{card.nome}</div>
-      <div style={{ fontSize: 11, color: '#555' }}>📱 {card.whats}</div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#00e676' }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9', marginBottom: 4 }}>{card.nome}</div>
+      <div style={{ fontSize: 11, color: '#64748B' }}>📱 {card.whats}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#34D399' }}>
           {fmt(card.valor || 337)}
         </span>
-        <span style={{ fontSize: 10, color: '#555' }}>{planoLabel}</span>
+        <span style={{ fontSize: 10, color: '#818CF8', fontWeight: 600 }}>{planoLabel}</span>
       </div>
     </div>
   )
