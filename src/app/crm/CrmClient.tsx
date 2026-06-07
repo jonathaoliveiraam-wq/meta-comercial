@@ -51,6 +51,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   const [novoTipo, setNovoTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [msg, setMsg] = useState('')
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [user, setUser] = useState<string | null>(() => {
     if (typeof window !== 'undefined') return sessionStorage.getItem('crm-user')
     return null
@@ -308,38 +309,39 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   return (
     <div className="app-layout">
       <Toasts />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" onCollapseChange={setSidebarCollapsed} />
 
-      <div className="main-crm">
-        <div className="topbar" style={{ background: '#0A0A18', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}>
+      <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
+        <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
-            <span className="topbar-title" style={{ color: '#F1F5F9' }}>{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
-            {view==='novos' && crm.filter(c => c.etapa === 0).length > 0 && (
-              <span style={{ background:'linear-gradient(90deg,#6366F1,#7C3AED)',color:'#fff',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700,boxShadow:'0 2px 8px rgba(99,102,241,0.4)' }}>
-                {crm.filter(c => c.etapa === 0).length} indicação{crm.filter(c => c.etapa === 0).length > 1 ? 'ões' : ''} nova{crm.filter(c => c.etapa === 0).length > 1 ? 's' : ''}
+            <button onClick={() => { setSidebarCollapsed(false); }} style={{ background:'none',border:'none',cursor:'pointer',color:'#6B7280',fontSize:20,lineHeight:1,padding:'2px 6px',display: sidebarCollapsed ? 'block' : 'none' }} title="Abrir menu">☰</button>
+            <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
+            {view==='novos' && crm.filter(c=>c.etapa===0).length > 0 && (
+              <span style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700 }}>
+                {crm.filter(c=>c.etapa===0).length} nova{crm.filter(c=>c.etapa===0).length>1?'s':''}
               </span>
             )}
-            {view==='novos' && <button className="badge" style={{ background:'rgba(99,102,241,0.1)',border:'1px solid rgba(99,102,241,0.3)',color:'#818CF8',cursor:'pointer',fontSize:11,fontWeight:600 }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); if(r.novos) addToast('✅ ' + r.novos + ' lead(s) importado(s)', 'ok'); else addToast('Nenhum novo lead para importar', 'ok') }}>🔄 Sincronizar</button>}
+            {view==='novos' && <button className="badge" style={{ background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',cursor:'pointer',fontSize:11,fontWeight:600,borderRadius:8,padding:'4px 10px' }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); if(r.novos) addToast('✅ '+r.novos+' lead(s) importado(s)','ok'); else addToast('Nenhum novo lead para importar','ok') }}>🔄 Sincronizar</button>}
           </div>
           <div className="topbar-right"><span className="user-chip">👤 {user}</span></div>
         </div>
 
-        <div className="stats-bar" style={{ background: '#06060F', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="stats-bar">
           {(view==='novos'?[
-            { label:'Total leads',value:totalLeads,cor:'#818CF8' },
-            { label:'Em reunião',value:crm.filter(c=>c.etapa===1).length,cor:'#38BDF8' },
-            { label:'Em proposta',value:crm.filter(c=>c.etapa===2).length,cor:'#FBBF24' },
-            { label:'Qtd. fechados',value:fechados.length,cor:'#34D399' },
-            { label:'Onboarding',value:crm.filter(c=>c.etapa===5).length,cor:'#FDE68A' },
-            { label:'Conversão',value:taxa+'%',cor:'#818CF8' },
+            { label:'Total leads',value:totalLeads,cor:'#6366F1' },
+            { label:'Em reunião',value:crm.filter(c=>c.etapa===1).length,cor:'#0EA5E9' },
+            { label:'Em proposta',value:crm.filter(c=>c.etapa===2).length,cor:'#F59E0B' },
+            { label:'Fechados',value:fechados.length,cor:'#059669' },
+            { label:'Onboarding',value:crm.filter(c=>c.etapa===5).length,cor:'#F97316' },
+            { label:'Conversão',value:taxa+'%',cor:'#6366F1' },
           ]:[
-            { label:'Total renovações',value:ren.length,cor:'#818CF8' },
-            { label:'Em proposta',value:ren.filter(c=>c.etapa===1).length,cor:'#FBBF24' },
-            { label:'Em contrato',value:ren.filter(c=>c.etapa===2).length,cor:'#C084FC' },
-            { label:'Pagos',value:ren.filter(c=>c.etapa>=3).length,cor:'#34D399' },
-            { label:'Finalizados',value:ren.filter(c=>c.etapa===4).length,cor:'#FDE68A' },
+            { label:'Total',value:ren.length,cor:'#6366F1' },
+            { label:'Em proposta',value:ren.filter(c=>c.etapa===1).length,cor:'#F59E0B' },
+            { label:'Em contrato',value:ren.filter(c=>c.etapa===2).length,cor:'#8B5CF6' },
+            { label:'Pagos',value:ren.filter(c=>c.etapa>=3).length,cor:'#059669' },
+            { label:'Finalizados',value:ren.filter(c=>c.etapa===4).length,cor:'#F97316' },
           ]).map(s => (
-            <div key={s.label} className="stat-item" style={{ background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.07)',backdropFilter:'blur(8px)' }}><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
+            <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
         </div>
 
@@ -355,15 +357,15 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                         {leads.map(card => (
                           <div key={card.id} style={{ position:'relative' }}>
                             <KanbanCard id={card.id} etapa={idx} nome={card.nome} whats={card.whats} segmento={card.segmento} parceiroNome={card.parceiroNome} obs={card.obs} data={card.data} valor={card.valor||MENSAL} plano={card.plano} />
-                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:7 }}>
-                              {idx>0 && <button className="btn-voltar" style={{ flex:1,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',borderRadius:8,padding:'5px 4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
+                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:8 }}>
+                              {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
-                                <button className={`btn-avancar btn-avancar-${idx}`} style={{ flex:1,fontSize:10,padding:'5px 4px',cursor:'pointer',background:`${ETAPAS[idx+1].cor}18`,border:`1px solid ${ETAPAS[idx+1].cor}44`,color:ETAPAS[idx+1].cor,borderRadius:8,fontWeight:700 }} onClick={() => {
+                                <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
                                   if (idx+1 === 3) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
                                 }}>→ {ETAPAS[idx+1].label}</button>
                               )}
-                              <button className="btn-excluir" style={{ background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',color:'#EF4444',borderRadius:8,padding:'5px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
+                              <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
                             </div>
                           </div>
                         ))}
@@ -393,10 +395,10 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                           <span className="card-data">📅 {c.data?.split('-').reverse().join('/')||'—'}</span>
                           <span style={{ fontSize:12,fontWeight:700,color:'#34D399' }}>R$ {(c.valor||MENSAL).toLocaleString('pt-BR')}</span>
                         </div>
-                        <div className="card-actions" style={{ display:'flex',gap:4,marginTop:7 }}>
-                          {idx>0 && <button className="btn-voltar" style={{ flex:1,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',borderRadius:8,padding:'5px 4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverRenovacao(c.id, idx-1)}>← Voltar</button>}
+                        <div className="card-actions" style={{ display:'flex',gap:4,marginTop:8 }}>
+                          {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverRenovacao(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
-                            <button className={'btn-avancar btn-avancar-ren-' + idx} style={{ flex:1,fontSize:10,padding:'5px 4px',cursor:'pointer',background:`${ETAPAS_REN[idx+1].cor}18`,border:`1px solid ${ETAPAS_REN[idx+1].cor}44`,color:ETAPAS_REN[idx+1].cor,borderRadius:8,fontWeight:700 }} onClick={() => {
+                            <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
                               if (idx+1 === 3) { setLeadPagId(c.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPagRen(true); return }
                               moverRenovacao(c.id, idx+1)
                             }}>→ {ETAPAS_REN[idx+1].label}</button>

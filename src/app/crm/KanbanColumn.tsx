@@ -12,40 +12,26 @@ interface Props {
 }
 
 export default function KanbanColumn({ id, etapa, label, cor, count, children }: Props) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `col-${id}`,
-    data: { etapa },
-  })
+  const { setNodeRef, isOver } = useDroppable({ id: `col-${id}`, data: { etapa } })
 
   return (
     <div
       ref={setNodeRef}
       style={{
-        width: 280,
-        flexShrink: 0,
-        background: isOver ? `${cor}08` : 'rgba(255,255,255,0.03)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: 16,
-        padding: '14px 12px',
+        width: 272, flexShrink: 0,
+        background: isOver ? '#F0F4FF' : '#F3F4F6',
+        borderRadius: 14, padding: '12px 10px',
+        border: `1px solid ${isOver ? '#BFDBFE' : '#E5E7EB'}`,
         borderTop: `3px solid ${cor}`,
-        border: `1px solid ${isOver ? cor + '44' : 'rgba(255,255,255,0.07)'}`,
-        borderTopColor: cor,
-        boxShadow: isOver ? `0 0 24px ${cor}18` : '0 4px 16px rgba(0,0,0,0.2)',
         transition: 'all 0.15s',
+        boxShadow: isOver ? `0 0 0 2px ${cor}22` : 'none',
       }}
     >
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: 12, paddingBottom: 10,
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: cor }}>{label}</span>
-        <span style={{
-          fontSize: 11, background: `${cor}20`, border: `1px solid ${cor}44`,
-          borderRadius: 999, padding: '2px 8px', color: cor, fontWeight: 700,
-        }}>{count}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #E5E7EB' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: cor, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
+        <span style={{ fontSize: 11, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 999, padding: '2px 8px', color: '#6B7280', fontWeight: 600 }}>{count}</span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 60 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, minHeight: 60 }}>
         {children}
       </div>
     </div>
