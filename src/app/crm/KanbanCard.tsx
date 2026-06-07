@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
@@ -13,6 +14,7 @@ const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDi
 const fmtData = (d: string) => d ? d.split('-').reverse().join('/') : '—'
 
 export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroNome, obs, data, valor, plano }: Props) {
+  const [hovered, setHovered] = useState(false)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, data: { etapa } })
 
   const planoColor = plano === 'anual' ? '#8B5CF6' : plano === 'personalizado' ? '#F59E0B' : '#0EA5E9'
@@ -22,12 +24,24 @@ export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroN
   return (
     <div
       ref={setNodeRef}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        transform: CSS.Transform.toString(transform), transition,
-        opacity: isDragging ? 0.4 : 1, cursor: 'grab',
-        background: '#fff', borderRadius: 10,
-        padding: '11px 13px', border: '1px solid #E5E7EB',
-        boxShadow: '0 1px 3px rgba(0,0,0,.06)',
+        transform: isDragging
+          ? CSS.Transform.toString(transform)
+          : hovered
+            ? `${CSS.Transform.toString(transform) || 'translate3d(0,0,0)'} translateY(-2px)`
+            : CSS.Transform.toString(transform),
+        transition: transition || 'all 0.18s ease',
+        opacity: isDragging ? 0.4 : 1,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        background: hovered ? '#FAFBFF' : '#fff',
+        borderRadius: 10,
+        padding: '11px 13px',
+        border: hovered ? '1px solid #BFDBFE' : '1px solid #E5E7EB',
+        boxShadow: hovered
+          ? '0 6px 16px rgba(37,99,235,.12), 0 2px 4px rgba(0,0,0,.04)'
+          : '0 1px 3px rgba(0,0,0,.06)',
         touchAction: 'none',
       }}
       {...attributes} {...listeners}

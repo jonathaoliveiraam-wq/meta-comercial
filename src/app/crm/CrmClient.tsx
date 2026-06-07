@@ -309,7 +309,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   return (
     <div className="app-layout">
       <Toasts />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" onCollapseChange={setSidebarCollapsed} />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/dashboard' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
         <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>
