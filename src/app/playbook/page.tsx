@@ -197,6 +197,109 @@ export default function PlaybookPage() {
             </div>
           </div>
 
+          {/* Como identificar oportunidade */}
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Como identificar uma oportunidade no perfil</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Antes de seguir, leia o perfil por 30 segundos. Esses sinais dizem se vale abordagem ou não.</p>
+          <div className="pb-grid-2" style={{ marginBottom: 16 }}>
+            <div style={cardStyle}>
+              <h3 style={{ color: '#86efac', fontSize: 13, fontWeight: 700, marginBottom: 10 }}>✓ Perfil que vale abordar</h3>
+              {[
+                { sinal: 'Bio menciona CNPJ, MEI, empresa, loja, serviço', ex: 'Ex: "Dono da Barbearia X", "Distribuidora Y", "Arquiteta autônoma"' },
+                { sinal: 'Posts mostram produto, serviço ou bastidor do negócio', ex: 'Fotos de obra, pratos, produtos, atendimento, equipe' },
+                { sinal: 'Postou sobre dificuldade financeira ou fiscal', ex: '"Imposto alto demais", "DAS atrasado", "Nota fiscal deu problema"' },
+                { sinal: 'Perfil tem cara de negócio real, não de influencer', ex: 'Poucos seguidores, posts do dia a dia, sem produção excessiva' },
+              ].map(s => (
+                <div key={s.sinal} style={{ marginBottom: 10, paddingLeft: 10, borderLeft: `2px solid #22c55e44` }}>
+                  <p style={{ fontSize: 12, color: TEXT, marginBottom: 2 }}>{s.sinal}</p>
+                  <p style={{ fontSize: 11, color: TEXTMUTED, fontStyle: 'italic' }}>{s.ex}</p>
+                </div>
+              ))}
+            </div>
+            <div style={cardStyle}>
+              <h3 style={{ color: '#fca5a5', fontSize: 13, fontWeight: 700, marginBottom: 10 }}>✗ Perfil que não vale agora</h3>
+              {[
+                { sinal: 'Bio genérica sem menção a negócio', ex: '"Vivendo a vida", "Mãe e esposa"' },
+                { sinal: 'Perfil focado em estilo de vida pessoal', ex: 'Fotos de viagem, academia, família — sem produto ou serviço' },
+                { sinal: 'Parece funcionário CLT', ex: 'Posts de empresa onde trabalha, nada de negócio próprio' },
+                { sinal: 'Muitos seguidores, poucos posts de negócio', ex: 'Influencer, criador de conteúdo — não é o público' },
+              ].map(s => (
+                <div key={s.sinal} style={{ marginBottom: 10, paddingLeft: 10, borderLeft: `2px solid #ef444444` }}>
+                  <p style={{ fontSize: 12, color: TEXT, marginBottom: 2 }}>{s.sinal}</p>
+                  <p style={{ fontSize: 11, color: TEXTMUTED, fontStyle: 'italic' }}>{s.ex}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Ganchos de conversa baseados no que a pessoa postou */}
+          <div style={{ ...cardStyle, marginBottom: 32 }}>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Ganchos — o que a pessoa postou vira abertura de conversa</h3>
+            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 14 }}>Não invente assunto. Use o que ela já postou como gancho natural. Isso parece atenção genuína, não abordagem de vendedor.</p>
+            {[
+              { postou: 'Foto do produto / serviço em funcionamento', gancho: 'Comentário: "Que trabalho bonito! Esse segmento tá crescendo muito aqui em Manaus." — depois DM natural a partir disso' },
+              { postou: 'Reclamação de imposto alto ou DAS', gancho: 'DM direta: "Vi seu post sobre imposto — isso é super comum, todo empresário passa por isso. Tenho uma dica que pode ajudar, se quiser eu te conto."' },
+              { postou: 'Foto de abertura de empresa ou nova fase do negócio', gancho: 'Comentário: "Parabéns! Começar um negócio exige coragem mesmo." — depois DM: "Vi que você abriu [segmento] — você já tá organizado na parte fiscal ou ainda tá no início nisso?"' },
+              { postou: 'Story ou post sobre perrengue financeiro', gancho: 'DM empática: "Vi seu story sobre [situação] — me identifiquei. Às vezes a parte financeira pesa mais do que o próprio negócio. Posso te dar uma dica rápida se quiser."' },
+              { postou: 'Post comemorando resultado ou cliente novo', gancho: 'Comentário animado, depois DM: "Que bom ver o negócio crescendo! À medida que escala, a parte contábil fica mais importante. Você já tem essa parte organizada?"' },
+            ].map(g => (
+              <div key={g.postou} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BORDER}` }}>
+                <div style={{ minWidth: 140, flexShrink: 0 }}>
+                  <p style={{ fontSize: 11, color: PBL, fontWeight: 700 }}>Se postou:</p>
+                  <p style={{ fontSize: 11, color: TEXTMUTED }}>{g.postou}</p>
+                </div>
+                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.7 }}>{g.gancho}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* SIMULAÇÃO DE CONVERSA */}
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Simulação de conversa completa</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Como uma abordagem real flui — do comentário até a reunião marcada. Estude o tom: curioso, humano, sem pressa.</p>
+
+          <div style={{ ...cardStyle, marginBottom: 20 }}>
+            <div style={{ ...tagStyle, marginBottom: 16 }}>Simulação 1 — Empresária sem contador</div>
+            {[
+              { lado: 'você', msg: '[ Comentou no post de foto do salão ] "Que ambiente lindo! Salão bem cuidado transmite confiança pro cliente. 🙌"' },
+              { lado: 'ela', msg: 'Respondin: "Muito obrigada! A gente se dedica muito aqui 😊"' },
+              { lado: 'você', msg: '[ DM no dia seguinte ] "Oi [Nome]! Comentei lá no seu post do salão — ficou incrível mesmo. Sou da equipe da Faço a Conta, uma contabilidade digital. Pergunta rápida: você tem contador hoje ou tá tocando a parte fiscal sozinha?"' },
+              { lado: 'ela', msg: '"Sozinha mesmo, to tentando entender o DAS e essas coisas, nunca tive contador não"' },
+              { lado: 'você', msg: '"Entendo! A maioria começa assim. Fica difícil, né? Principalmente na hora que vem guia e você não sabe se tá certo. O que mais te complica hoje nessa parte — prazo, emitir nota, ou entender o quanto tá pagando de imposto?"' },
+              { lado: 'ela', msg: '"Tudo isso na vdd rsrs principalmente nota fiscal, meu cliente pediu e eu não sabia emitir"' },
+              { lado: 'você', msg: '"Isso é muito comum, não precisa se sentir mal. A gente tem uma plataforma que já tem o emissor de NF integrado, com IA que te orienta. Funciona no celular mesmo. Posso te mostrar como é em 15 minutos? Sem compromisso — você vê e decide se faz sentido."' },
+              { lado: 'ela', msg: '"Ah pode ser sim! Qual dia você tem?"' },
+            ].map((m, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10, flexDirection: m.lado === 'você' ? 'row' : 'row-reverse' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: m.lado === 'você' ? PB : '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{m.lado === 'você' ? 'VC' : 'ELA'}</div>
+                <div style={{ background: m.lado === 'você' ? PB + '22' : '#1e293b', border: `1px solid ${m.lado === 'você' ? PB + '44' : '#334155'}`, borderRadius: 10, padding: '8px 12px', maxWidth: '80%' }}>
+                  <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.6 }}>{m.msg}</p>
+                </div>
+              </div>
+            ))}
+            <p style={{ fontSize: 11, color: '#22c55e', marginTop: 8, fontWeight: 600 }}>✓ Resultado: reunião marcada em 7 mensagens. Em nenhum momento pareceu venda forçada.</p>
+          </div>
+
+          <div style={{ ...cardStyle, marginBottom: 32 }}>
+            <div style={{ ...tagStyle, marginBottom: 16 }}>Simulação 2 — Empresário com contador mas insatisfeito</div>
+            {[
+              { lado: 'você', msg: '[ Comentou no post de loja ] "Que loja organizada! Esse tipo de apresentação faz diferença na hora de fechar com cliente maior."' },
+              { lado: 'ele', msg: '"Valeu! Tamo se preparando pra crescer esse ano"' },
+              { lado: 'você', msg: '[ DM ] "Oi [Nome]! Vi seu comentário sobre crescer esse ano — bacana demais. Sou da Faço a Conta, contabilidade digital. Quando o negócio cresce, a parte fiscal fica mais importante. Você já tem contador te apoiando nisso?"' },
+              { lado: 'ele', msg: '"Tenho sim, mas é difícil de falar com ele. Responde lento demais"' },
+              { lado: 'você', msg: '"Entendo, isso é uma reclamação muito comum. Quando o negócio tá crescendo você precisa de resposta rápida, não de esperar dias. Nossa plataforma tem IA que responde na hora, 24h. Como você usa hoje — só pra DAS e declaração, ou tá usando pra gestão financeira também?"' },
+              { lado: 'ele', msg: '"Só DAS mesmo, gestão financeira faço no papel ainda rsrs"' },
+              { lado: 'você', msg: '"Rsrs no papel ainda funciona, mas quando escala fica complicado. A gente tem controle de caixa, DRE, contas a pagar tudo junto com a contabilidade. Quer ver como é? 20 minutos e você já tem uma ideia clara se faz sentido pra sua fase agora."' },
+              { lado: 'ele', msg: '"Pode ser sim, me manda o link"' },
+            ].map((m, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10, flexDirection: m.lado === 'você' ? 'row' : 'row-reverse' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: m.lado === 'você' ? PB : '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{m.lado === 'você' ? 'VC' : 'ELE'}</div>
+                <div style={{ background: m.lado === 'você' ? PB + '22' : '#1e293b', border: `1px solid ${m.lado === 'você' ? PB + '44' : '#334155'}`, borderRadius: 10, padding: '8px 12px', maxWidth: '80%' }}>
+                  <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.6 }}>{m.msg}</p>
+                </div>
+              </div>
+            ))}
+            <p style={{ fontSize: 11, color: '#22c55e', marginTop: 8, fontWeight: 600 }}>✓ Resultado: reunião marcada. A dor foi descoberta pela conversa, não por script direto.</p>
+          </div>
+
           {/* Scripts DM */}
           <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Scripts de DM</h3>
           <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Sempre mencione a Faço a Conta desde o início. Isso filtra quem responde por interesse no serviço vs. interesse pessoal em você.</p>
