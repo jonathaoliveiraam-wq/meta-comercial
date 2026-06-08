@@ -142,45 +142,146 @@ export default function PlaybookPage() {
           <h2 style={h2Style}>Prospecção via DM — Instagram</h2>
           <p style={{ color: TEXTMUTED, fontSize: 14, marginBottom: 32 }}>Canal mais barato e eficaz de prospecção hoje. Sem ads, sem evento — só consistência diária no DM. Este processo funciona para qualquer pessoa do time comercial.</p>
 
-          {/* Aviso limite */}
-          <div style={{ background: '#7c3aed18', border: '1px solid #7c3aed44', borderRadius: 12, padding: '14px 18px', marginBottom: 32, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-            <div>
-              <p style={{ fontSize: 13, color: PBL, fontWeight: 700, marginBottom: 4 }}>Limite do Instagram</p>
-              <p style={{ fontSize: 12, color: TEXTMUTED, lineHeight: 1.7 }}>O Instagram pode bloquear temporariamente contas que enviam muitas DMs seguidas. Semana 1–2: máx. 20/dia. Semana 3–4: até 35/dia. A partir do mês 2: 50/dia. Nunca envie em rajada — distribua ao longo do dia.</p>
+          {/* META */}
+          <div style={{ background: PB + '22', border: `2px solid ${PB}66`, borderRadius: 14, padding: '16px 22px', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div style={{ textAlign: 'center', flexShrink: 0 }}>
+              <div style={{ fontSize: 36, fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>30</div>
+              <div style={{ fontSize: 11, color: PBL, fontWeight: 700, letterSpacing: '0.5px' }}>PESSOAS/DIA</div>
+            </div>
+            <div style={{ borderLeft: `1px solid ${PB}44`, paddingLeft: 20 }}>
+              <p style={{ fontSize: 13, color: '#f1f5f9', fontWeight: 600, marginBottom: 4 }}>Meta diária de prospecção</p>
+              <p style={{ fontSize: 12, color: TEXTMUTED, lineHeight: 1.6 }}>30 pessoas novas entram no ritual todo dia. Com o ciclo de 3 dias, em 30 dias você terá abordado 900 empresários. Mesmo com 3% de conversão em reunião, são 27 reuniões no mês.</p>
             </div>
           </div>
 
-          {/* O Ritual */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>O Ritual — 3 dias por prospecto</h3>
-          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Nunca envie DM como primeiro contato. A pessoa precisa te reconhecer antes. O ritual cria isso de forma natural.</p>
-          <div className="pb-grid-3" style={{ marginBottom: 16 }}>
-            {[
-              { dia: 'Dia 1', acao: 'Seguir + Curtir', detalhe: 'Siga o perfil e curta as 3 últimas fotos do feed. Não envie mensagem ainda. Deixe o algoritmo mostrar seu perfil para ela.' },
-              { dia: 'Dia 2', acao: 'Comentar', detalhe: 'Deixe um comentário genuíno em um post recente. Algo relacionado ao negócio dela — nunca elogio pessoal. Ex: "Que serviço diferenciado! Aqui em Manaus tá crescendo muito esse segmento"' },
-              { dia: 'Dia 3', acao: 'Enviar DM', detalhe: 'Agora sim. A pessoa já te viu 2 vezes. A DM não chega como spam — chega como continuação de uma conversa que já começou.' },
-            ].map(r => (
-              <div key={r.dia} style={cardStyle}>
-                <div style={{ fontSize: 10, color: PBL, fontWeight: 700, letterSpacing: '1px', marginBottom: 6 }}>{r.dia}</div>
-                <h3 style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 700, marginBottom: 8 }}>{r.acao}</h3>
-                <p style={{ fontSize: 12, color: TEXTMUTED, lineHeight: 1.6 }}>{r.detalhe}</p>
+          {/* FLUXO VISUAL */}
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>O Fluxo — passo a passo por pessoa</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 20 }}>Cada pessoa que você decide abordar passa por este fluxo. Nunca pule etapa.</p>
+
+          {/* Passo 1 */}
+          <div style={{ display: 'flex', gap: 0, flexDirection: 'column', marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: PB, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: '#fff' }}>1</div>
+                <div style={{ width: 2, height: 40, background: PB + '44', marginTop: 4 }} />
               </div>
-            ))}
+              <div style={{ ...cardStyle, flex: 1, marginBottom: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <h3 style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 700 }}>Dia 1 — Entrar no radar</h3>
+                  <span style={{ fontSize: 10, color: PBL, fontWeight: 700, background: PB + '22', padding: '3px 8px', borderRadius: 6 }}>30 pessoas/dia</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {[
+                    { icone: '➕', acao: 'Seguir o perfil' },
+                    { icone: '❤️', acao: 'Curtir os Stories ativos (se tiver)' },
+                    { icone: '❤️', acao: 'Curtir 2 fotos do feed' },
+                    { icone: '🚫', acao: 'NÃO enviar DM ainda — deixe o algoritmo trabalhar' },
+                  ].map(a => (
+                    <div key={a.acao} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 10px', background: '#0d0d1a', borderRadius: 7 }}>
+                      <span style={{ fontSize: 14, flexShrink: 0 }}>{a.icone}</span>
+                      <p style={{ fontSize: 12, color: a.icone === '🚫' ? TEXTMUTED : TEXT }}>{a.acao}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Passo 2 */}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: PB, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: '#fff' }}>2</div>
+                <div style={{ width: 2, height: 40, background: PB + '44', marginTop: 4 }} />
+              </div>
+              <div style={{ ...cardStyle, flex: 1, marginBottom: 0, marginTop: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <h3 style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 700 }}>Dia 2 — Comentar</h3>
+                  <span style={{ fontSize: 10, color: PBL, fontWeight: 700, background: PB + '22', padding: '3px 8px', borderRadius: 6 }}>quem entrou ontem</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {[
+                    { icone: '💬', acao: 'Comentar em 1 post recente do negócio' },
+                    { icone: '✅', acao: 'Falar sobre o negócio dela — nunca elogio pessoal' },
+                    { icone: '🚫', acao: 'NÃO enviar DM ainda' },
+                  ].map(a => (
+                    <div key={a.acao} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 10px', background: '#0d0d1a', borderRadius: 7 }}>
+                      <span style={{ fontSize: 14, flexShrink: 0 }}>{a.icone}</span>
+                      <p style={{ fontSize: 12, color: a.icone === '🚫' ? TEXTMUTED : TEXT }}>{a.acao}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 10, padding: '8px 12px', background: PB + '11', borderRadius: 8, borderLeft: `3px solid ${PB}` }}>
+                  <p style={{ fontSize: 11, color: TEXT, fontStyle: 'italic' }}>Exemplos de comentário: "Que serviço diferenciado! Esse segmento tá crescendo muito aqui em Manaus 🙌" / "Que trabalho caprichado! Faz tempo no ramo?"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Passo 3 */}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: PB, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: '#fff' }}>3</div>
+                <div style={{ width: 2, height: 40, background: PB + '44', marginTop: 4 }} />
+              </div>
+              <div style={{ ...cardStyle, flex: 1, marginBottom: 0, marginTop: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <h3 style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 700 }}>Dia 3 — Enviar DM</h3>
+                  <span style={{ fontSize: 10, color: PBL, fontWeight: 700, background: PB + '22', padding: '3px 8px', borderRadius: 6 }}>quem comentou ontem</span>
+                </div>
+                <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 8 }}>A pessoa já te viu 2 vezes. A DM chega como continuação natural, não como spam.</p>
+                <div style={{ padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, borderLeft: `3px solid ${PB}` }}>
+                  <p style={{ fontSize: 12, color: TEXT, fontStyle: 'italic', lineHeight: 1.7 }}>"Oi [Nome]! Comentei lá no seu post de [assunto] — bacana demais. Sou da equipe da Faço a Conta, contabilidade digital. Pergunta rápida: você tem contador hoje ou tá tocando a parte fiscal sozinho(a)?"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bifurcação — respondeu ou não */}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: '#fff' }}>?</div>
+              </div>
+              <div style={{ flex: 1, marginTop: 8, display: 'flex', gap: 12 }}>
+                {/* Respondeu */}
+                <div style={{ flex: 1, background: '#0f2d1a', border: '1px solid #22c55e44', borderTop: '3px solid #22c55e', borderRadius: 14, padding: '16px 18px' }}>
+                  <h3 style={{ color: '#86efac', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>✓ Respondeu</h3>
+                  <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 8 }}>Inicie a qualificação de forma natural. Use as perguntas da seção abaixo. Objetivo: chegar na reunião em até 5 mensagens.</p>
+                  <p style={{ fontSize: 11, color: '#86efac', fontWeight: 600 }}>→ Segue para o Script de Qualificação</p>
+                </div>
+                {/* Não respondeu */}
+                <div style={{ flex: 1, background: '#1a1014', border: '1px solid #ef444444', borderTop: '3px solid #ef4444', borderRadius: 14, padding: '16px 18px' }}>
+                  <h3 style={{ color: '#fca5a5', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>✗ Não respondeu</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {[
+                      'Aguardar 3 dias',
+                      'Curtir 1 Story novo se aparecer',
+                      'Tentar DM 2 com abordagem diferente',
+                      'Sem resposta na DM 2 → arquivar',
+                    ].map((s, i) => (
+                      <div key={s} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <span style={{ fontSize: 10, color: '#fca5a5', fontWeight: 700, flexShrink: 0 }}>D+{[3,4,4,7][i]}</span>
+                        <p style={{ fontSize: 11, color: TEXTMUTED }}>{s}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 10, padding: '8px 10px', background: '#0d0d1a', borderRadius: 7 }}>
+                    <p style={{ fontSize: 11, color: TEXT, fontStyle: 'italic' }}>DM 2: "Oi [Nome]! Só passando pra ver se você viu minha mensagem. Se não for o momento certo, sem problema — fico à disposição quando precisar de apoio contábil 🙂"</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Pipeline diário */}
-          <div style={{ ...cardStyle, marginBottom: 32 }}>
-            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Pipeline Diário — meta de 50 DMs/dia</h3>
-            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 12 }}>Com o ritual de 3 dias, você precisa ter prospectos em 3 estágios simultâneos todo dia:</p>
+          <div style={{ ...cardStyle, marginBottom: 32, marginTop: 16 }}>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Rotina diária — 3 estágios simultâneos</h3>
+            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 12 }}>Todo dia você executa os 3 passos ao mesmo tempo — cada leva de pessoas está num estágio diferente do fluxo.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { label: 'Seguir + Curtir hoje', qtd: '50 perfis', obs: 'Esses virarão DM em 3 dias' },
-                { label: 'Comentar hoje', qtd: '50 perfis', obs: 'Quem você seguiu anteontem' },
-                { label: 'Enviar DM hoje', qtd: '50 DMs', obs: 'Quem você comentou ontem' },
+                { step: 'Passo 1 hoje', qtd: '30 perfis novos', obs: 'Seguir + curtir Stories + curtir 2 fotos do feed', cor: PBL },
+                { step: 'Passo 2 hoje', qtd: '30 perfis',       obs: 'Comentar — quem você seguiu ontem', cor: PBL },
+                { step: 'Passo 3 hoje', qtd: '30 DMs',          obs: 'Enviar DM — quem você comentou ontem', cor: '#86efac' },
               ].map(p => (
-                <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, border: `1px solid ${BORDER}` }}>
-                  <span style={{ color: PBL, fontWeight: 800, fontSize: 13, minWidth: 60 }}>{p.qtd}</span>
-                  <span style={{ color: TEXT, fontSize: 12, flex: 1 }}>{p.label}</span>
+                <div key={p.step} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                  <span style={{ color: p.cor, fontWeight: 800, fontSize: 13, minWidth: 70 }}>{p.qtd}</span>
+                  <span style={{ color: '#f1f5f9', fontSize: 12, fontWeight: 600, minWidth: 90 }}>{p.step}</span>
                   <span style={{ color: TEXTMUTED, fontSize: 11 }}>{p.obs}</span>
                 </div>
               ))}
