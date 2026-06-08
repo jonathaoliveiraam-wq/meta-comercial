@@ -12,6 +12,7 @@ import KanbanCard from './KanbanCard'
 import KanbanCardOverlay from './KanbanCardOverlay'
 
 const MENSAL = 337, ANUAL = 337 * 12 * 0.9
+const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
 const ETAPAS = [
   { id: 'indicacao', label: '📋 Indicação', cor: '#6366F1' },
   { id: 'reuniao', label: '📞 Reunião', cor: '#38BDF8' },
@@ -28,7 +29,7 @@ const ETAPAS_REN = [
   { id: 'finalizado', label: '✅ Finalizado', cor: '#FDE68A' },
 ]
 
-interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[] }
+interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[]; responsavel: string | null }
 interface CrmRen { id: string; nome: string; whats: string; segmento: string; obs: string; plano: string; valor: number; tipoCustom: string; etapa: number; data: string; historico: any[] }
 
 interface Props { initialCrm: CrmLead[]; initialRenovacao: CrmRen[]; initialParceiros: any[] }
@@ -51,6 +52,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   const [novoTipo, setNovoTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [msg, setMsg] = useState('')
 
+  const [filtroResp, setFiltroResp] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [user, setUser] = useState<string | null>(() => {
     if (typeof window !== 'undefined') return sessionStorage.getItem('crm-user')
@@ -192,6 +194,11 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     setTimeout(() => { setModalNovaRen(false); recarregar() }, 600)
   }
 
+  const atribuirResponsavel = useCallback(async (id: string, responsavel: string | null) => {
+    setCrm(prev => prev.map(c => c.id === id ? { ...c, responsavel } : c))
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'atribuirResponsavel', id, responsavel }) })
+  }, [])
+
   const excluirLead = async (id: string) => {
     if (!confirm('Excluir este lead?')) return
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirCrmLead', id }) })
@@ -278,8 +285,9 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     </div>
   )
 
-  const totalLeads = crm.length
-  const fechados = crm.filter(c => c.etapa >= 4)
+  const crmFiltrado = filtroResp ? crm.filter(c => c.responsavel === filtroResp) : crm
+  const totalLeads = crmFiltrado.length
+  const fechados = crmFiltrado.filter(c => c.etapa >= 4)
   const taxa = totalLeads ? Math.round(fechados.length / totalLeads * 100) : 0
 
   const Modal = ({ show, children }: { show: boolean; children: React.ReactNode }) =>
@@ -322,6 +330,14 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
               </span>
             )}
             {view==='novos' && <button className="badge" style={{ background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',cursor:'pointer',fontSize:11,fontWeight:600,borderRadius:8,padding:'4px 10px' }} onClick={async()=>{ const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'importarLeads'})}).then(r=>r.json()); if(r.novos) addToast('✅ '+r.novos+' lead(s) importado(s)','ok'); else addToast('Nenhum novo lead para importar','ok') }}>🔄 Sincronizar</button>}
+            {view==='novos' && (
+              <div style={{ display:'flex',gap:4 }}>
+                <button onClick={() => setFiltroResp(null)} style={{ fontSize:10,fontWeight:700,borderRadius:20,padding:'3px 10px',cursor:'pointer',border:'1px solid',borderColor: filtroResp===null?'#2563EB':'#E5E7EB',background: filtroResp===null?'#EFF6FF':'#F9FAFB',color: filtroResp===null?'#2563EB':'#6B7280' }}>Todos</button>
+                {RESPONSAVEIS.map(r => (
+                  <button key={r} onClick={() => setFiltroResp(filtroResp===r?null:r)} style={{ fontSize:10,fontWeight:700,borderRadius:20,padding:'3px 10px',cursor:'pointer',border:'1px solid',borderColor: filtroResp===r?'#2563EB':'#E5E7EB',background: filtroResp===r?'#EFF6FF':'#F9FAFB',color: filtroResp===r?'#2563EB':'#6B7280' }}>{r}</button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="topbar-right"><span className="user-chip">👤 {user}</span></div>
         </div>
@@ -352,14 +368,22 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
             <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={e => setActiveId(e.active.id as string)} onDragEnd={handleDragEnd}>
               <div className="kanban">
                 {ETAPAS.map((etapa, idx) => {
-                  const leads = crm.filter(c => c.etapa === idx)
+                  const leads = crmFiltrado.filter(c => c.etapa === idx)
                   return (
                     <KanbanColumn key={etapa.id} id={etapa.id} etapa={idx} label={etapa.label} cor={etapa.cor} count={leads.length}>
                       <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
                         {leads.map(card => (
                           <div key={card.id} style={{ position:'relative' }}>
                             <KanbanCard id={card.id} etapa={idx} nome={card.nome} whats={card.whats} segmento={card.segmento} parceiroNome={card.parceiroNome} obs={card.obs} data={card.data} valor={card.valor||MENSAL} plano={card.plano} />
-                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:8 }}>
+                            <select
+                              value={card.responsavel || ''}
+                              onChange={e => atribuirResponsavel(card.id, e.target.value || null)}
+                              style={{ width:'100%',marginTop:6,fontSize:11,padding:'4px 6px',borderRadius:6,border:'1px solid #E5E7EB',background:'#F9FAFB',color: card.responsavel ? '#2563EB' : '#9CA3AF',fontWeight: card.responsavel ? 700 : 400,cursor:'pointer',outline:'none' }}
+                            >
+                              <option value="">— Sem responsável —</option>
+                              {RESPONSAVEIS.map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                            <div className="card-actions" style={{ display:'flex',gap:4,marginTop:6 }}>
                               {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {

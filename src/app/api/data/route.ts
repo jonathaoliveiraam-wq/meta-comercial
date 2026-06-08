@@ -139,6 +139,10 @@ export async function POST(req: Request) {
       await query('UPDATE crm_leads SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
       return Response.json({ ok: true })
     }
+    if (action === 'atribuirResponsavel') {
+      await query('UPDATE crm_leads SET responsavel = $1 WHERE id = $2', [body.responsavel || null, body.id])
+      return Response.json({ ok: true })
+    }
     if (action === 'confirmarPagamento') {
       const lead = await queryRow('SELECT * FROM crm_leads WHERE id = $1', [body.id])
       if (!lead) return Response.json({ error: 'Lead não encontrado' }, { status: 404 })
