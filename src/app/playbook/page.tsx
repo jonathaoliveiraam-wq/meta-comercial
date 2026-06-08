@@ -290,10 +290,25 @@ export default function PlaybookPage() {
 
           {/* Como encontrar */}
           <div style={{ ...cardStyle, marginBottom: 32 }}>
-            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Como encontrar prospectos em Manaus</h3>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {['#manaus', '#empresariodemanaus', '#meimanaus', '#negociosmanaus', '#empreendedormanaus', 'Seguidores de @aciamanaus', 'Seguidores de @sebrae_am', 'Posts: localização "Manaus, Amazonas"', 'Quem segue fornecedores locais'].map(h => (
-                <span key={h} style={{ background: PB + '18', border: `1px solid ${PB}33`, color: PBL, borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 600 }}>{h}</span>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Como encontrar prospectos em Manaus</h3>
+            <p style={{ fontSize: 11, color: TEXTMUTED, marginBottom: 14 }}>Hashtag não funciona bem — o alcance caiu muito. Essas fontes entregam listas mais quentes e qualificadas.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { fonte: 'Seguidores de concorrentes', como: 'Abra o perfil de outras contabilidades em Manaus e percorra quem as segue', quente: true },
+                { fonte: 'Seguidores de @sebrae_am, @aciamanaus, @cdlmanaus', como: 'Quem segue associações já é ou quer ser empresário — público altamente qualificado', quente: true },
+                { fonte: 'Quem curtiu/comentou posts sobre MEI, DAS, Simples', como: 'Engajou com o assunto = dor confirmada. Vá nos posts de notícias ou perfis de finanças', quente: true },
+                { fonte: 'Seguidores de apps: @contaazul, @omie.erp', como: 'Já usa ou busca solução contábil — lead muito quente', quente: true },
+                { fonte: 'Posts marcados em locais comerciais', como: '"Centro Comercial de Manaus", "Feira do Produtor AM", shoppings locais — negócio físico real', quente: false },
+                { fonte: 'Seguidores de fornecedores locais', como: 'Distribuidoras, gráficas, uniformes — quem segue tem negócio ativo e compra insumos', quente: false },
+                { fonte: 'Busca por bio no Instagram', como: 'Pesquise "MEI Manaus", "loja Manaus", "serviço Manaus" diretamente no campo de busca por pessoas', quente: false },
+              ].map(f => (
+                <div key={f.fonte} style={{ display: 'flex', gap: 12, padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, border: `1px solid ${f.quente ? '#22c55e33' : BORDER}`, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: f.quente ? '#86efac' : TEXTMUTED, flexShrink: 0, marginTop: 2 }}>{f.quente ? '🔥' : '•'}</span>
+                  <div>
+                    <p style={{ fontSize: 12, color: TEXT, fontWeight: 600, marginBottom: 2 }}>{f.fonte}</p>
+                    <p style={{ fontSize: 11, color: TEXTMUTED }}>{f.como}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -332,23 +347,23 @@ export default function PlaybookPage() {
             </div>
           </div>
 
-          {/* Ganchos de conversa baseados no que a pessoa postou */}
+          {/* Comentários no feed */}
           <div style={{ ...cardStyle, marginBottom: 32 }}>
-            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Ganchos — o que a pessoa postou vira abertura de conversa</h3>
-            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 14 }}>Não invente assunto. Use o que ela já postou como gancho natural. Isso parece atenção genuína, não abordagem de vendedor.</p>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Comentários no feed — Passo 2 do ritual</h3>
+            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 14 }}>O comentário posiciona você como empreendedor que entende o universo dela — não como vendedor. Fale sobre a realidade de empreender, não sobre o seu produto.</p>
             {[
-              { postou: 'Foto do produto / serviço em funcionamento', gancho: 'Comentário: "Que trabalho bonito! Esse segmento tá crescendo muito aqui em Manaus." — depois DM natural a partir disso' },
-              { postou: 'Reclamação de imposto alto ou DAS', gancho: 'DM direta: "Vi seu post sobre imposto — isso é super comum, todo empresário passa por isso. Tenho uma dica que pode ajudar, se quiser eu te conto."' },
-              { postou: 'Foto de abertura de empresa ou nova fase do negócio', gancho: 'Comentário: "Parabéns! Começar um negócio exige coragem mesmo." — depois DM: "Vi que você abriu [segmento] — você já tá organizado na parte fiscal ou ainda tá no início nisso?"' },
-              { postou: 'Story ou post sobre perrengue financeiro', gancho: 'DM empática: "Vi seu story sobre [situação] — me identifiquei. Às vezes a parte financeira pesa mais do que o próprio negócio. Posso te dar uma dica rápida se quiser."' },
-              { postou: 'Post comemorando resultado ou cliente novo', gancho: 'Comentário animado, depois DM: "Que bom ver o negócio crescendo! À medida que escala, a parte contábil fica mais importante. Você já tem essa parte organizada?"' },
+              { contexto: 'Post sobre crescimento do negócio', comentario: '"Crescer no Brasil exige coragem demais. O maior desafio não é nem vender — é manter a casa em ordem enquanto cresce. Você tá conseguindo?"' },
+              { contexto: 'Post sobre rotina pesada de empreendedor', comentario: '"Essa realidade é real demais. O empreendedor cuida de tudo: venda, entrega, financeiro... e ainda precisa entender de imposto. Sistema não facilita não."' },
+              { contexto: 'Post de desabafo ou dificuldade', comentario: '"Empreender em Manaus tem seus desafios específicos. Mas o que mais trava as pessoas aqui não é mercado — é burocracia. Conheço bem esse cenário."' },
+              { contexto: 'Foto do produto ou serviço', comentario: '"Que trabalho caprichado! Faz tempo no ramo?"' },
+              { contexto: 'Abertura de empresa ou nova fase', comentario: '"Parabéns! Começar um negócio exige coragem mesmo. Que segmento você escolheu?"' },
             ].map(g => (
-              <div key={g.postou} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BORDER}` }}>
-                <div style={{ minWidth: 140, flexShrink: 0 }}>
-                  <p style={{ fontSize: 11, color: PBL, fontWeight: 700 }}>Se postou:</p>
-                  <p style={{ fontSize: 11, color: TEXTMUTED }}>{g.postou}</p>
+              <div key={g.contexto} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BORDER}` }}>
+                <div style={{ minWidth: 150, flexShrink: 0 }}>
+                  <p style={{ fontSize: 10, color: PBL, fontWeight: 700, marginBottom: 2 }}>Contexto:</p>
+                  <p style={{ fontSize: 11, color: TEXTMUTED }}>{g.contexto}</p>
                 </div>
-                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.7 }}>{g.gancho}</p>
+                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.7, fontStyle: 'italic' }}>{g.comentario}</p>
               </div>
             ))}
           </div>
@@ -362,7 +377,7 @@ export default function PlaybookPage() {
             {[
               { lado: 'você', msg: '[ Comentou no post de foto do salão ] "Que ambiente lindo! Salão bem cuidado transmite confiança pro cliente. 🙌"' },
               { lado: 'ela', msg: 'Respondin: "Muito obrigada! A gente se dedica muito aqui 😊"' },
-              { lado: 'você', msg: '[ DM no dia seguinte ] "Oi [Nome]! Comentei lá no seu post do salão — ficou incrível mesmo. Sou da equipe da Faço a Conta, uma contabilidade digital. Pergunta rápida: você tem contador hoje ou tá tocando a parte fiscal sozinha?"' },
+              { lado: 'você', msg: '[ DM no dia seguinte ] "Oi [Nome]! Vi aqui seu salão — que trabalho caprichado.\nCuriosidade: a parte de nota fiscal e imposto você resolve sozinha ou tem alguém te ajudando com isso?\nPergunto porque a maioria dos empreendedores aqui em Manaus gasta tempo demais com isso — tempo que deveria tá no negócio."' },
               { lado: 'ela', msg: '"Sozinha mesmo, to tentando entender o DAS e essas coisas, nunca tive contador não"' },
               { lado: 'você', msg: '"Entendo! A maioria começa assim. Fica difícil, né? Principalmente na hora que vem guia e você não sabe se tá certo. O que mais te complica hoje nessa parte — prazo, emitir nota, ou entender o quanto tá pagando de imposto?"' },
               { lado: 'ela', msg: '"Tudo isso na vdd rsrs principalmente nota fiscal, meu cliente pediu e eu não sabia emitir"' },
@@ -384,7 +399,7 @@ export default function PlaybookPage() {
             {[
               { lado: 'você', msg: '[ Comentou no post de loja ] "Que loja organizada! Esse tipo de apresentação faz diferença na hora de fechar com cliente maior."' },
               { lado: 'ele', msg: '"Valeu! Tamo se preparando pra crescer esse ano"' },
-              { lado: 'você', msg: '[ DM ] "Oi [Nome]! Vi seu comentário sobre crescer esse ano — bacana demais. Sou da Faço a Conta, contabilidade digital. Quando o negócio cresce, a parte fiscal fica mais importante. Você já tem contador te apoiando nisso?"' },
+              { lado: 'você', msg: '[ DM ] "[Nome], fala sério — empreender no Brasil em 2025 tá pesado demais. Imposto, burocracia, nota fiscal... parece que o sistema foi feito pra travar quem quer crescer.\nComo tá sendo isso pra você? Você consegue focar no negócio ou fica apagando incêndio fiscal toda semana?"' },
               { lado: 'ele', msg: '"Tenho sim, mas é difícil de falar com ele. Responde lento demais"' },
               { lado: 'você', msg: '"Entendo, isso é uma reclamação muito comum. Quando o negócio tá crescendo você precisa de resposta rápida, não de esperar dias. Nossa plataforma tem IA que responde na hora, 24h. Como você usa hoje — só pra DAS e declaração, ou tá usando pra gestão financeira também?"' },
               { lado: 'ele', msg: '"Só DAS mesmo, gestão financeira faço no papel ainda rsrs"' },
@@ -402,19 +417,33 @@ export default function PlaybookPage() {
           </div>
 
           {/* Scripts DM */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Scripts de DM</h3>
-          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Sempre mencione a Faço a Conta desde o início. Isso filtra quem responde por interesse no serviço vs. interesse pessoal em você.</p>
-          <div className="pb-grid-2" style={{ marginBottom: 32 }}>
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Scripts de DM — Passo 3 do ritual</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Tom: empreendedor falando com empreendedor. Não apresente a empresa logo de cara — primeiro crie conexão pela dor compartilhada. Use no máximo 3–4 linhas.</p>
+          <div className="pb-grid-2" style={{ marginBottom: 16 }}>
             {[
-              { label: 'DM 1 — Padrão (após comentar no post)', texto: '"Oi [Nome]! Deixei um comentário lá no seu post sobre [assunto] — me identifiquei bastante. Trabalho na equipe comercial da Faço a Conta, uma contabilidade digital. A gente atende bastante MEI e pequena empresa aqui em Manaus. Não quero te vender nada agora — só curiosidade mesmo: você tem contador hoje ou tá tocando a parte fiscal sozinho?"' },
-              { label: 'DM 2 — Empresário sem contador visível', texto: '"Oi [Nome]! Vi aqui seu negócio de [segmento] — bacana demais. Sou da equipe da Faço a Conta, contabilidade digital. A gente usa IA pra ajudar MEI e pequena empresa a não perder prazo de imposto e emitir NF sem dor de cabeça. Me conta: você já tem suporte contábil hoje?"' },
-              { label: 'DM 3 — Empresário com dor explícita (postou sobre imposto/NF)', texto: '"Oi [Nome]! Vi que você postou sobre [DAS / NF / imposto] — isso é muito mais comum do que parece, todo empresário passa por isso. Sou da Faço a Conta. A gente tem IA fiscal 24h que resolve exatamente esse tipo de dúvida. Não precisa ser cliente — me fala o que tá acontecendo que eu te dou um direcionamento rápido."' },
+              { label: 'DM 1 — Dor do imposto pago a mais', texto: 'Ei [nome], tava vendo seu perfil aqui.\nVocê sabia que a maioria dos MEI e pequenas empresas paga mais imposto do que deveria? Muitas vezes por causa do enquadramento errado.\nPergunta honesta: você já teve alguém que revisou isso pra você de verdade?' },
+              { label: 'DM 2 — Dificuldade de empreender no Brasil', texto: '[nome], fala sério — empreender no Brasil em 2025 tá pesado demais.\nImposto, burocracia, nota fiscal... parece que o sistema foi feito pra travar quem quer crescer.\nComo tá sendo isso pra você? Você consegue focar no seu negócio ou fica apagando incêndio fiscal toda semana?' },
+              { label: 'DM 3 — NF e obrigações fiscais', texto: 'Oi [nome], vi que você tem o seu negócio aqui em Manaus.\nCuriosidade genuína: a parte de nota fiscal e obrigações do mês você resolve sozinho ou tem alguém que cuida disso?\nPergunto porque a maioria dos empreendedores aqui gasta tempo demais com isso — tempo que deveria tá no negócio.' },
+              { label: 'DM 4 — Contador que some', texto: '[nome], uma coisa que escuto muito de empreendedor aqui em Manaus:\n"Meu contador só aparece em março."\nVocê se identifica? Porque tem gente que paga por um serviço e fica no escuro o ano inteiro.' },
+              { label: 'DM 5 — Negócio crescendo sem controle', texto: 'Oi [nome], vi que seu negócio tá crescendo — parabéns, sério.\nMas deixa eu te perguntar uma coisa: quando o faturamento aumenta, você sente que o controle financeiro acompanha ou fica pra trás?\nÉ o ponto onde mais vejo empreendedor se perder — e geralmente é na parte contábil que o buraco aparece.' },
             ].map(d => (
               <div key={d.label} style={cardStyle}>
                 <div style={{ ...tagStyle, marginBottom: 10 }}>{d.label}</div>
-                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.8, fontStyle: 'italic' }}>{d.texto}</p>
+                <pre style={{ fontSize: 12, color: TEXT, lineHeight: 1.8, fontStyle: 'italic', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{d.texto}</pre>
               </div>
             ))}
+          </div>
+
+          {/* Quando fica na defensiva */}
+          <div style={{ ...cardStyle, marginBottom: 32, borderTop: `3px solid #f59e0b` }}>
+            <div style={{ ...tagStyle, background: '#f59e0b22', border: '1px solid #f59e0b44', color: '#fbbf24', marginBottom: 10 }}>Se perguntar "o que você vende?" ou "isso é propaganda?"</div>
+            <pre style={{ fontSize: 12, color: TEXT, lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontStyle: 'italic' }}>{`Não, propaganda não — mas entendo a desconfiança, todo mundo manda coisa aleatória na DM.
+
+Deixa eu ser direto: eu ajudo empreendedores com contabilidade digital. MEI, pequenas empresas, esse perfil.
+
+O motivo de ter falado foi genuíno — o que eu perguntei é exatamente o que vejo acontecer com muita gente. Se não for a sua realidade, sem problema nenhum.
+
+Mas se tiver mesmo pagando imposto a mais ou sem suporte contábil de verdade, aí vale uma conversa de 10 minutos. Sem pressão.`}</pre>
           </div>
 
           {/* Filtro de intenção */}
