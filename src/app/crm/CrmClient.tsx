@@ -205,12 +205,14 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     recarregar()
   }
 
-  const fazerLogin = (u: string, s: string) => {
-    if ((u === 'comercial' && s === '123456') || (u === 'financeiro' && s === 'F@c2026')) {
-      setUser(u === 'comercial' ? 'Comercial' : 'Financeiro')
-      sessionStorage.setItem('crm-user', u === 'comercial' ? 'Comercial' : 'Financeiro')
-      setLoginError('')
-    } else setLoginError('❌ Usuário ou senha incorretos.')
+  const fazerLogin = async (u: string, s: string) => {
+    if (!u || !s) { setLoginError('❌ Preencha usuário e senha.'); return }
+    const res = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: u, senha: s }) })
+    const data = await res.json()
+    if (!res.ok) { setLoginError(data.error || '❌ Usuário ou senha incorretos.'); return }
+    setUser(data.nome)
+    sessionStorage.setItem('crm-user', data.nome)
+    setLoginError('')
   }
 
   if (!user) return (
