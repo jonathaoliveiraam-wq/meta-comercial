@@ -139,43 +139,72 @@ export default function PlaybookPage() {
         {/* SOCIAL SELLER */}
         <div className="pb-section" id="social">
           <div style={tagStyle}>SOCIAL SELLER</div>
-          <h2 style={h2Style}>Rotina Instagram — Kamila</h2>
-          <p style={{ color: TEXTMUTED, fontSize: 14, marginBottom: 32 }}>Prospecção orgânica e gratuita no Instagram. 45 minutos por dia, consistência de 30 dias gera pipeline real.</p>
+          <h2 style={h2Style}>Prospecção via DM — Instagram</h2>
+          <p style={{ color: TEXTMUTED, fontSize: 14, marginBottom: 32 }}>Canal mais barato e eficaz de prospecção hoje. Sem ads, sem evento — só consistência diária no DM. Este processo funciona para qualquer pessoa do time comercial.</p>
 
-          {/* Rotina diária */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Rotina Diária</h3>
-          <div className="pb-grid-3" style={{ marginBottom: 40 }}>
+          {/* Aviso limite */}
+          <div style={{ background: '#7c3aed18', border: '1px solid #7c3aed44', borderRadius: 12, padding: '14px 18px', marginBottom: 32, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <div>
+              <p style={{ fontSize: 13, color: PBL, fontWeight: 700, marginBottom: 4 }}>Limite do Instagram</p>
+              <p style={{ fontSize: 12, color: TEXTMUTED, lineHeight: 1.7 }}>O Instagram pode bloquear temporariamente contas que enviam muitas DMs seguidas. Semana 1–2: máx. 20/dia. Semana 3–4: até 35/dia. A partir do mês 2: 50/dia. Nunca envie em rajada — distribua ao longo do dia.</p>
+            </div>
+          </div>
+
+          {/* O Ritual */}
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>O Ritual — 3 dias por prospecto</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Nunca envie DM como primeiro contato. A pessoa precisa te reconhecer antes. O ritual cria isso de forma natural.</p>
+          <div className="pb-grid-3" style={{ marginBottom: 16 }}>
             {[
-              { hora: '7h–8h · 20 min', titulo: 'Manhã', items: ['Responder DMs e Stories (5 min)', 'Publicar Story do dia (5 min)', 'Prospectar 5–10 perfis · interagir antes de enviar DM (10 min)'] },
-              { hora: '12h–13h · 15 min', titulo: 'Tarde', items: ['Acompanhar Stories de quem interagiu (5 min)', 'Enviar até 5 DMs por dia — só pra quem já interagiu (10 min)'] },
-              { hora: '20h–21h · 10 min', titulo: 'Noite', items: ['Publicar post no feed — Seg, Qua, Sex (10 min)', 'Responder comentários e agradecimentos'] },
-            ].map(t => (
-              <div key={t.titulo} style={cardStyle}>
-                <div style={{ fontSize: 10, color: PBL, fontWeight: 700, letterSpacing: '0.5px', marginBottom: 4 }}>{t.hora}</div>
-                <h3 style={{ color: '#f1f5f9', fontSize: 15, fontWeight: 700, marginBottom: 10 }}>{t.titulo}</h3>
-                {t.items.map(i => <p key={i} style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 6, paddingLeft: 10, borderLeft: `2px solid ${PB}44` }}>{i}</p>)}
+              { dia: 'Dia 1', acao: 'Seguir + Curtir', detalhe: 'Siga o perfil e curta as 3 últimas fotos do feed. Não envie mensagem ainda. Deixe o algoritmo mostrar seu perfil para ela.' },
+              { dia: 'Dia 2', acao: 'Comentar', detalhe: 'Deixe um comentário genuíno em um post recente. Algo relacionado ao negócio dela — nunca elogio pessoal. Ex: "Que serviço diferenciado! Aqui em Manaus tá crescendo muito esse segmento"' },
+              { dia: 'Dia 3', acao: 'Enviar DM', detalhe: 'Agora sim. A pessoa já te viu 2 vezes. A DM não chega como spam — chega como continuação de uma conversa que já começou.' },
+            ].map(r => (
+              <div key={r.dia} style={cardStyle}>
+                <div style={{ fontSize: 10, color: PBL, fontWeight: 700, letterSpacing: '1px', marginBottom: 6 }}>{r.dia}</div>
+                <h3 style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 700, marginBottom: 8 }}>{r.acao}</h3>
+                <p style={{ fontSize: 12, color: TEXTMUTED, lineHeight: 1.6 }}>{r.detalhe}</p>
               </div>
             ))}
           </div>
 
-          {/* Como encontrar empresários */}
-          <div style={{ ...cardStyle, marginBottom: 40 }}>
-            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Como encontrar empresários em Manaus</h3>
+          {/* Pipeline diário */}
+          <div style={{ ...cardStyle, marginBottom: 32 }}>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Pipeline Diário — meta de 50 DMs/dia</h3>
+            <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 12 }}>Com o ritual de 3 dias, você precisa ter prospectos em 3 estágios simultâneos todo dia:</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { label: 'Seguir + Curtir hoje', qtd: '50 perfis', obs: 'Esses virarão DM em 3 dias' },
+                { label: 'Comentar hoje', qtd: '50 perfis', obs: 'Quem você seguiu anteontem' },
+                { label: 'Enviar DM hoje', qtd: '50 DMs', obs: 'Quem você comentou ontem' },
+              ].map(p => (
+                <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                  <span style={{ color: PBL, fontWeight: 800, fontSize: 13, minWidth: 60 }}>{p.qtd}</span>
+                  <span style={{ color: TEXT, fontSize: 12, flex: 1 }}>{p.label}</span>
+                  <span style={{ color: TEXTMUTED, fontSize: 11 }}>{p.obs}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Como encontrar */}
+          <div style={{ ...cardStyle, marginBottom: 32 }}>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Como encontrar prospectos em Manaus</h3>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {['#manaus', '#empresariodemanaus', '#meimanaus', '#negociosmanaus', '#empreendedormanaus', 'Seguidores de @aciamanaus, @sebrae_am, @cdlmanaus', 'Posts com localização "Manaus, Amazonas"'].map(h => (
+              {['#manaus', '#empresariodemanaus', '#meimanaus', '#negociosmanaus', '#empreendedormanaus', 'Seguidores de @aciamanaus', 'Seguidores de @sebrae_am', 'Posts: localização "Manaus, Amazonas"', 'Quem segue fornecedores locais'].map(h => (
                 <span key={h} style={{ background: PB + '18', border: `1px solid ${PB}33`, color: PBL, borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 600 }}>{h}</span>
               ))}
             </div>
           </div>
 
           {/* Scripts DM */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Scripts de DM</h3>
-          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Regra de ouro: sempre interaja (curtir / comentar) antes de enviar DM. Nunca seja o primeiro contato.</p>
-          <div className="pb-grid-2" style={{ marginBottom: 40 }}>
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Scripts de DM</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Sempre mencione a Faço a Conta desde o início. Isso filtra quem responde por interesse no serviço vs. interesse pessoal em você.</p>
+          <div className="pb-grid-2" style={{ marginBottom: 32 }}>
             {[
-              { label: 'DM 1 — Após ver Story ou post', texto: '"Oi [Nome]! Vi aqui seu Story sobre [assunto] — adorei demais. Sou a Kamila, trabalho com a Faço a Conta, uma contabilidade digital. A gente usa IA pra ajudar empresários a não perder prazo de imposto, emitir nota fiscal, isso tudo. Não quero te vender nada agora — mas fico curiosa: você já tem contador ou tá tocando tudo sozinho ainda?"' },
-              { label: 'DM 2 — Após comentar no post', texto: '"Oi [Nome]! Deixei um comentário no seu post porque me identifiquei muito. Me chamo Kamila, ajudo empresários a organizar a parte contábil sem dor de cabeça. Me conta uma coisa, só por curiosidade: você tem algum suporte contábil hoje ou tá na raça ainda?"' },
-              { label: 'DM 3 — Empresário com dúvida sobre imposto', texto: '"Oi [Nome]! Vi que você postou sobre [DAS / nota fiscal / imposto] — isso é muito mais comum do que parece. Sou a Kamila, da Faço a Conta. A gente tem uma IA fiscal que avisa sobre prazo e ajuda com isso exatamente. Não precisa ser cliente pra eu te dar uma dica rápida — o que tá rolando aí?"' },
+              { label: 'DM 1 — Padrão (após comentar no post)', texto: '"Oi [Nome]! Deixei um comentário lá no seu post sobre [assunto] — me identifiquei bastante. Trabalho na equipe comercial da Faço a Conta, uma contabilidade digital. A gente atende bastante MEI e pequena empresa aqui em Manaus. Não quero te vender nada agora — só curiosidade mesmo: você tem contador hoje ou tá tocando a parte fiscal sozinho?"' },
+              { label: 'DM 2 — Empresário sem contador visível', texto: '"Oi [Nome]! Vi aqui seu negócio de [segmento] — bacana demais. Sou da equipe da Faço a Conta, contabilidade digital. A gente usa IA pra ajudar MEI e pequena empresa a não perder prazo de imposto e emitir NF sem dor de cabeça. Me conta: você já tem suporte contábil hoje?"' },
+              { label: 'DM 3 — Empresário com dor explícita (postou sobre imposto/NF)', texto: '"Oi [Nome]! Vi que você postou sobre [DAS / NF / imposto] — isso é muito mais comum do que parece, todo empresário passa por isso. Sou da Faço a Conta. A gente tem IA fiscal 24h que resolve exatamente esse tipo de dúvida. Não precisa ser cliente — me fala o que tá acontecendo que eu te dou um direcionamento rápido."' },
             ].map(d => (
               <div key={d.label} style={cardStyle}>
                 <div style={{ ...tagStyle, marginBottom: 10 }}>{d.label}</div>
@@ -184,82 +213,32 @@ export default function PlaybookPage() {
             ))}
           </div>
 
-          {/* Hooks para Reels */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>10 Hooks para Reels / Stories</h3>
-          <div className="pb-grid-2" style={{ marginBottom: 40 }}>
-            {[
-              '"Você sabe exatamente quanto pagou de imposto esse mês? Porque a maioria dos donos de negócio em Manaus não sabe — e tá perdendo dinheiro todo dia."',
-              '"Seu contador some quando você precisa? Então a gente precisa conversar."',
-              '"MEI pagando mais imposto do que deveria. Isso não é azar — é falta de informação. E tem solução."',
-              '"Você abre o negócio de manhã, atende cliente, resolve fornecedor, ainda emite nota fiscal — e no fim do dia não sabe se teve lucro ou prejuízo."',
-              '"Existe uma forma de emitir nota fiscal, controlar caixa e resolver imposto pelo celular, por menos do que você gasta de almoço por dia."',
-              '"R$ 337 por mês. Tudo que um pequeno empresário precisa pra não tomar susto com o Leão."',
-              '"Sou de Manaus, trabalho com donos de negócio daqui, e vou te contar o que a maioria dos contadores não fala."',
-              '"Notificação da Receita Federal chegando no e-mail sem você entender nada. Esse pesadelo é evitável."',
-              '"Contador caro não significa contador bom. Às vezes o problema é exatamente o contrário."',
-              '"Em 5 minutos eu te mostro se você tá pagando imposto certo ou jogando dinheiro fora."',
-            ].map((h, i) => (
-              <div key={i} style={{ ...cardStyle, display: 'flex', gap: 12 }}>
-                <span style={{ color: PBL, fontWeight: 800, fontSize: 18, flexShrink: 0 }}>#{i + 1}</span>
-                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.7, fontStyle: 'italic' }}>{h}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Stories Você Sabia */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>5 Stories "Você Sabia?"</h3>
-          <div className="pb-grid-2" style={{ marginBottom: 40 }}>
-            {[
-              { titulo: 'Limite MEI', texto: '95% dos MEIs pagam DAS todo mês sem saber se ainda estão no limite de faturamento correto. Quando passa de R$ 81k/ano sem atualizar o regime, a multa pode zerar o lucro do semestre. 👇 Me manda DM.' },
-              { titulo: 'NF Errada', texto: 'Emitir NF errada é motivo de autuação fiscal — mesmo sendo MEI. Campo errado, código de serviço equivocado... A Receita cruza isso automaticamente. Contabilidade digital evita isso com emissor integrado.' },
-              { titulo: 'Controle Financeiro', texto: 'Pequenas empresas que fazem conciliação financeira todo mês têm 3x mais chance de sobreviver 5 anos. Não é sobre ter muito dinheiro — é sobre saber exatamente onde ele vai.' },
-              { titulo: 'Segmento Importa', texto: 'O contador do seu vizinho pode não saber nada sobre o seu segmento. Contabilidade pra salão de beleza é diferente de contabilidade pra loja de roupas. Regime errado = imposto alto sem necessidade.' },
-              { titulo: 'IA Fiscal 24h', texto: 'Você pode ter uma IA fiscal funcionando 24h pra resolver dúvidas de imposto — inclusive domingo às 22h quando bate aquela dúvida. Isso já existe. Eu uso isso com meus clientes aqui em Manaus.' },
-            ].map(s => (
-              <div key={s.titulo} style={cardStyle}>
-                <div style={{ ...tagStyle }}>Story · {s.titulo}</div>
-                <p style={{ fontSize: 12, color: TEXT, lineHeight: 1.8 }}>{s.texto}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Posts Feed */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>3 Templates de Post no Feed</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40 }}>
-            {[
-              { label: 'Post 1 — Educativo (gera salvamentos)', legenda: '3 erros que todo MEI comete no primeiro ano (e como evitar)\n\nSe você abriu CNPJ nos últimos 2 anos, provavelmente já cometeu pelo menos um desses.\n\n1. Não separar conta pessoal da conta do negócio\nIsso complica tudo — do controle financeiro ao imposto. Abra uma conta PJ o quanto antes.\n\n2. Esquecer o DAS todo mês\nO DAS do MEI é baratinho, mas se atrasar, vira multa + juros. Automatize o débito.\n\n3. Achar que não precisa emitir nota fiscal\nSe você vende para empresa, nota fiscal não é opcional. E quem emite, fecha mais contratos.\n\nSalvou esse post? Manda pra um amigo empresário que precisa ver isso. 👇\n\n#MEI #CNPJ #EmpreendedorManaus #ContabilidadeDigital' },
-              { label: 'Post 2 — Prova Social (gera confiança)', legenda: '"Achei que contador era só pra empresa grande."\n\nEssa frase eu ouço pelo menos uma vez por semana.\n\nMas hoje o jogo mudou. MEI com faturamento de R$ 3.000/mês já precisa de suporte contábil. Não por obrigação — porque:\n\n— Não perder prazo de imposto economiza dinheiro\n— Emitir NF abre portas com outras empresas\n— Ter alguém do lado quando a Receita manda carta não tem preço\n\nSe quiser saber se faz sentido pro seu negócio, me chama no direct. Primeira conversa sem compromisso.\n\n#ContabilidadeDigital #MEIManaus #FaçoAConta' },
-              { label: 'Post 3 — Provocação (gera comentários)', legenda: 'Pergunta honesta: você sabe quanto pagou de imposto nos últimos 3 meses?\n\nFiz essa pergunta pra 10 empresários essa semana. Só 2 souberam responder de cabeça.\n\nNão é falta de inteligência — é falta de organização. E organização financeira não é talento, é ferramenta.\n\nVocê tá no grupo dos 2 ou dos 8? Conta aqui nos comentários 👇\n\n#GestãoFinanceira #EmpreendedorManaus #PequenaEmpresa #MEI' },
-            ].map(p => (
-              <div key={p.label} style={cardStyle}>
-                <div style={{ ...tagStyle, marginBottom: 12 }}>{p.label}</div>
-                <pre style={{ fontSize: 12, color: TEXT, lineHeight: 1.8, whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{p.legenda}</pre>
-              </div>
-            ))}
-          </div>
-
-          {/* Bio */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Bio do Instagram</h3>
-          <div className="pb-grid-2" style={{ marginBottom: 40 }}>
-            {[
-              { label: 'Opção A — Direta', bio: 'Kamila | Contabilidade Digital 📊\nAjudo MEI e pequenas empresas a pagar menos imposto (do jeito certo)\nNF • Gestão financeira • IA fiscal 24h\n📍 Manaus/AM • Top 1000 SEBRAE\n👇 Chama no direct' },
-              { label: 'Opção B — Com personalidade', bio: 'Kamila 👋 Falo de imposto sem enrolação\nSua contabilidade no celular, com suporte real\nMEI e pequenas empresas em Manaus\nNF • DAS • Gestão financeira\n💬 Me manda "quero organizar meu negócio"' },
-            ].map(b => (
-              <div key={b.label} style={cardStyle}>
-                <div style={{ ...tagStyle }}>{b.label}</div>
-                <pre style={{ fontSize: 12, color: TEXT, lineHeight: 1.8, whiteSpace: 'pre-wrap', fontFamily: 'inherit', marginTop: 8 }}>{b.bio}</pre>
-              </div>
-            ))}
+          {/* Filtro de intenção */}
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Filtro de Intenção</h3>
+          <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 16 }}>Nem toda resposta é uma oportunidade. Identifique rápido quem está interessado no serviço vs. quem só quer conversar.</p>
+          <div className="pb-grid-2" style={{ marginBottom: 32 }}>
+            <div style={{ ...cardStyle, borderTop: `3px solid #22c55e` }}>
+              <h3 style={{ color: '#86efac', fontSize: 13, fontWeight: 700, marginBottom: 10 }}>✓ Sinais positivos</h3>
+              {['Perguntou sobre preço ou planos', 'Mencionou algum problema fiscal', 'Disse que não tem contador', 'Perguntou "como funciona?"', 'Mencionou o CNPJ ou segmento', 'Quis marcar reunião'].map(s => (
+                <p key={s} style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 5, paddingLeft: 10, borderLeft: `2px solid #22c55e44` }}>{s}</p>
+              ))}
+            </div>
+            <div style={{ ...cardStyle, borderTop: `3px solid #ef4444` }}>
+              <h3 style={{ color: '#fca5a5', fontSize: 13, fontWeight: 700, marginBottom: 10 }}>✗ Red flags — encerre com elegância</h3>
+              {['Resposta só com emojis ou elogios pessoais', 'Não mencionou nada sobre negócio', 'Começou a perguntar sobre você pessoalmente', 'Não respondeu as perguntas de qualificação', 'Só quis "bater papo"'].map(s => (
+                <p key={s} style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 5, paddingLeft: 10, borderLeft: `2px solid #ef444444` }}>{s}</p>
+              ))}
+            </div>
           </div>
 
           {/* Qualificação */}
-          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Como Qualificar Antes de Marcar Reunião</h3>
+          <h3 style={{ color: PBL, fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Qualificação — 4 perguntas naturais</h3>
           <div className="pb-grid-2" style={{ marginBottom: 16 }}>
             {[
-              { num: '1', pergunta: 'Tem CNPJ ativo?', como: '"Você tem CNPJ aberto ou ainda tá atuando como pessoa física?"', obs: 'MEI, ME, EPP = segue em frente. Sem CNPJ = lead futuro.' },
-              { num: '2', pergunta: 'Tem contador hoje?', como: '"Você já tem alguém te ajudando com a parte contábil, ou tá tocando tudo na raça?"', obs: 'Sem contador = dor clara. Insatisfeito = oportunidade. Satisfeito = semente.' },
-              { num: '3', pergunta: 'Qual o faturamento?', como: '"Você trabalha mais com pessoa física ou jurídica? Tem nota fiscal mensal?"', obs: 'Não perguntar direto. Triangular pela emissão de NF.' },
-              { num: '4', pergunta: 'Qual é a dor hoje?', como: '"O que mais te incomoda nessa parte de contador, imposto, nota fiscal?"', obs: 'Respostas: "não entendo nada", "contador some", "não sei emitir nota" — cada dor tem resposta direta.' },
+              { num: '1', pergunta: 'Tem CNPJ ativo?', como: '"Você tem CNPJ aberto ou ainda tá como pessoa física?"', obs: 'MEI, ME, EPP = segue. Sem CNPJ = lead futuro, encerra com gentileza.' },
+              { num: '2', pergunta: 'Tem contador hoje?', como: '"Você já tem alguém te ajudando com a parte contábil, ou tá na raça?"', obs: 'Sem contador = dor clara. Insatisfeito = compare. Satisfeito = plante semente.' },
+              { num: '3', pergunta: 'Emite nota fiscal?', como: '"Você emite NF regularmente? Vende pra pessoa física, jurídica ou os dois?"', obs: 'Não perguntar faturamento direto. Emissão de NF triangula o volume.' },
+              { num: '4', pergunta: 'Qual é a dor hoje?', como: '"O que mais te dá dor de cabeça nessa parte fiscal — imposto, nota, prazo?"', obs: '"Contador some" / "Não entendo nada" / "Tenho medo de multa" = cada um tem resposta direta.' },
             ].map(q => (
               <div key={q.num} style={cardStyle}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -274,11 +253,17 @@ export default function PlaybookPage() {
             ))}
           </div>
 
-          {/* Transição para reunião */}
-          <div className="pb-highlight">
-            <h3 style={{ color: PBL, marginBottom: 8, fontSize: 14 }}>Quando marcar reunião?</h3>
-            <p style={{ color: TEXTMUTED, fontSize: 13, marginBottom: 12 }}>Tem CNPJ ativo + sem contador ou insatisfeito + demonstrou pelo menos uma dor.</p>
-            <p style={{ color: TEXT, fontSize: 13, fontStyle: 'italic', lineHeight: 1.8 }}>"Olha, pelo que você me contou, faz muito sentido a gente conversar uns 20 minutos. Não é reunião de vendas não — quero te mostrar como funciona na prática e você decide se faz sentido pro seu momento. Quando você tem um tempinho essa semana?"</p>
+          {/* Transição + Regra de ouro */}
+          <div className="pb-grid-2">
+            <div className="pb-highlight">
+              <h3 style={{ color: PBL, marginBottom: 8, fontSize: 14 }}>Quando marcar reunião</h3>
+              <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 12 }}>CNPJ ativo + sem contador ou insatisfeito + demonstrou pelo menos uma dor.</p>
+              <p style={{ color: TEXT, fontSize: 12, fontStyle: 'italic', lineHeight: 1.8 }}>"Olha, pelo que você me contou faz muito sentido a gente conversar 20 minutos. Não é reunião de vendas — quero te mostrar como funciona e você decide se faz sentido. Quando você tem um tempinho essa semana?"</p>
+            </div>
+            <div className="pb-highlight" style={{ borderLeft: `3px solid ${PB}` }}>
+              <h3 style={{ color: PBL, marginBottom: 8, fontSize: 14 }}>Regra de ouro</h3>
+              <p style={{ color: TEXT, fontSize: 12, lineHeight: 1.8 }}>Você é quem responde. Sempre. Não delega pra robô, não usa IA pra simular conversa. O social selling funciona porque é real — a pessoa sente quando é automático e perde a confiança na hora. Se você captou o lead, você conduz até a reunião.</p>
+            </div>
           </div>
         </div>
 
