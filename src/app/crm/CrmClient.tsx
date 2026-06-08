@@ -327,6 +327,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
         </div>
 
         <div className="stats-bar">
+          <div className="stats-inner">
           {(view==='novos'?[
             { label:'Total leads',value:totalLeads,cor:'#6366F1' },
             { label:'Em reunião',value:crm.filter(c=>c.etapa===1).length,cor:'#0EA5E9' },
@@ -343,6 +344,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
           ]).map(s => (
             <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
+          </div>
         </div>
 
         {view==='novos' ? (

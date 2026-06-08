@@ -72,8 +72,9 @@ body{background:#0d0d0d;color:#fff;font-family:'Segoe UI',sans-serif;min-height:
   .crm-login-left{display:none}
   .crm-login-right{width:100%!important}
   .kanban-wrap{padding:10px 12px}
-  .stats-bar{gap:8px;padding:10px 12px;flex-wrap:nowrap}
-  .stat-item{min-width:120px;padding:10px 14px;flex-shrink:0}
+  .stats-bar{padding:10px 12px}
+  .stats-inner{gap:8px}
+  .stat-item{width:120px;padding:10px 12px}
   .sv{font-size:22px!important}
 }
 
@@ -153,8 +154,9 @@ select.finput option{background:#1a1a1a}
 .add-lead-btn:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
 
 /* ===== STATS BAR ===== */
-.stats-bar{display:flex;flex-wrap:nowrap;gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid #E5E7EB;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.stat-item{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px 18px;text-align:center;white-space:nowrap;flex-shrink:0;min-width:130px}
+.stats-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px 20px;background:#fff;border-bottom:1px solid #E5E7EB}
+.stats-inner{display:flex;flex-wrap:nowrap;gap:10px;width:max-content}
+.stat-item{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px 18px;text-align:center;white-space:nowrap;flex-shrink:0;width:130px}
 .stat-item .sv{font-size:28px;font-weight:800}
 .stat-item .sl{font-size:10px;color:#9CA3AF;margin-top:3px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600}
 
