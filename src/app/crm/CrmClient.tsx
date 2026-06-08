@@ -48,6 +48,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   const [planoSel, setPlanSel] = useState<string | null>(null)
   const [pagTipo, setPagTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [pagValor, setPagValor] = useState('')
+  const [razaoSocial, setRazaoSocial] = useState('')
   const [novoPlano, setNovoPlano] = useState('mensal')
   const [novoTipo, setNovoTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [msg, setMsg] = useState('')
@@ -148,7 +149,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarPagamento', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, data: new Date().toISOString().split('T')[0], user }) })
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarPagamento', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, razaoSocial, data: new Date().toISOString().split('T')[0], user }) })
     setMsg('✅ Lançado!')
     setTimeout(() => { setModalPag(false); recarregar() }, 600)
   }
@@ -389,7 +390,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                               {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                                  if (idx+1 === 3) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPag(true); return }
+                                  if (idx+1 === 3) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
                                 }}>→ {ETAPAS[idx+1].label}</button>
                               )}
@@ -474,7 +475,13 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
 
       <Modal show={modalPag}>
         <p className="modal-title">📝 Confirmar Contrato</p>
-        <p style={{fontSize:13,color:'#666',marginBottom:16}}>Cliente pagou! Selecione o plano contratado:</p>
+        <p style={{fontSize:13,color:'#666',marginBottom:16}}>Cliente pagou! Preencha os dados abaixo:</p>
+        <div className="modal-field">
+          <p className="modal-label">Razão Social / Nome do Cliente</p>
+          <input className="modal-input" type="text" placeholder="Ex: Empresa LTDA" value={razaoSocial} onChange={e=>setRazaoSocial(e.target.value)} />
+          <p style={{fontSize:11,color:'#9CA3AF',marginTop:4}}>Este nome aparecerá na lista de clientes e no portal do parceiro.</p>
+        </div>
+        <p style={{fontSize:12,fontWeight:600,color:'#374151',marginBottom:8}}>Plano contratado:</p>
         {[{id:'mensal',label:'📅 Plano Mensal',sub:'R$ 337/mês'},{id:'anual',label:'🏆 Plano Anual',sub:'R$ 3.639,60/ano (10% desc.)'},{id:'personalizado',label:'⭐ Plano Personalizado',sub:'Valor acordado'}].map(p => (
           <div key={p.id} className={'pagamento-opt '+(planoSel===p.id?'sel':'')} onClick={()=>{setPlanSel(p.id);setMsg('')}}>
             <p>{p.label}</p><span>{p.sub}</span>

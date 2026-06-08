@@ -149,16 +149,27 @@ export async function POST(req: Request) {
       let valorFechado = MENSAL
       if (body.plano === 'anual') valorFechado = ANUAL
       else if (body.plano === 'personalizado') valorFechado = body.tipo === 'sebrae' ? body.valor / 0.3 : body.valor
-      if (body.plano === 'mensal') await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [lead.nome, body.data, lead.parceiro || ''])
-      else if (body.plano === 'anual') await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [lead.nome, body.data, lead.parceiro || ''])
+      const nomeCliente = body.razaoSocial?.trim() || lead.nome
+      if (body.plano === 'mensal') await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
+      else if (body.plano === 'anual') await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
       else if (body.plano === 'personalizado') {
         const recTotal = valorFechado; const equiv = recTotal / ANUAL
-        await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, lead.nome, body.data, lead.parceiro || ''])
+        await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, nomeCliente, body.data, lead.parceiro || ''])
+      }
+      // Atualiza lead do parceiro: indicado → fechado
+      if (lead.leadId) await query('UPDATE leads_portal SET status = $1 WHERE id = $2', ['fechado', lead.leadId])
+      // Calcula e acumula comissão do parceiro
+      if (lead.parceiro) {
+        const fechadosRes = await queryRow('SELECT COUNT(*) as total FROM crm_leads WHERE parceiro = $1 AND etapa >= 4', [lead.parceiro])
+        const totalFechados = parseInt(fechadosRes?.total || '0') // conta o atual (já vai ser 4 ao final)
+        const posicao = totalFechados + 1
+        const comissao = posicao >= 11 ? 300 : posicao >= 7 ? 250 : posicao >= 4 ? 200 : 150
+        await query('UPDATE parceiros SET "aReceber" = COALESCE("aReceber", 0) + $1 WHERE id = $2', [comissao, lead.parceiro])
       }
       const historico = JSON.parse(lead.historico || '[]')
       historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema', plano: body.plano })
       await query('UPDATE crm_leads SET etapa=4, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
-      sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + lead.nome + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
+      sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + nomeCliente + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
       return Response.json({ ok: true })
     }
     if (action === 'excluirCrmLead') {
