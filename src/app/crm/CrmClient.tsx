@@ -61,7 +61,30 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   })
   const [loginError, setLoginError] = useState('')
   const [toasts, setToasts] = useState<{ id: number; msg: string; tipo: 'lead' | 'ok' }[]>([])
+  const [somAtivo, setSomAtivo] = useState(false)
+  const somAtivoRef = useRef(false)
   const crmCountRef = useRef<number | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+
+  const playLeadSound = useCallback(() => {
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext()
+      const ctx = audioCtxRef.current
+      const notas = [880, 1100, 1320] // A5 → C#6 → E6 (acorde alegre)
+      notas.forEach((freq, i) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12)
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12)
+        gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i * 0.12 + 0.02)
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4)
+        osc.start(ctx.currentTime + i * 0.12)
+        osc.stop(ctx.currentTime + i * 0.12 + 0.45)
+      })
+    } catch {}
+  }, [])
 
   const addToast = useCallback((msg: string, tipo: 'lead' | 'ok' = 'lead') => {
     const id = Date.now()
@@ -88,6 +111,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
         if (crmCountRef.current !== null && count > crmCountRef.current) {
           const diff = count - crmCountRef.current
           const recentes = novos.slice(0, diff)
+          if (somAtivoRef.current) playLeadSound()
           recentes.forEach((l: any) => {
             addToast(`🔔 Novo lead: ${l.parceiroNome ? l.parceiroNome + ' → ' : ''}${l.nome}`, 'lead')
           })
@@ -343,7 +367,19 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
               </div>
             )}
           </div>
-          <div className="topbar-right"><span className="user-chip">👤 {user}</span></div>
+          <div className="topbar-right">
+            <button
+              title={somAtivo ? 'Desativar som' : 'Ativar som de notificação'}
+              onClick={() => {
+                const novo = !somAtivo
+                setSomAtivo(novo)
+                somAtivoRef.current = novo
+                if (novo) playLeadSound()
+              }}
+              style={{ background: somAtivo ? '#EFF6FF' : '#F9FAFB', border: '1px solid ' + (somAtivo ? '#BFDBFE' : '#E5E7EB'), borderRadius: 8, padding: '4px 10px', fontSize: 16, cursor: 'pointer', lineHeight: 1 }}
+            >{somAtivo ? '🔔' : '🔕'}</button>
+            <span className="user-chip">👤 {user}</span>
+          </div>
         </div>
 
         <div className="stats-bar">
