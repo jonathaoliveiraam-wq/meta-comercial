@@ -141,6 +141,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   }, [moverLead])
 
   const confirmarPagamento = async () => {
+    if (!razaoSocial.trim()) { setMsg('Informe a Razão Social do cliente!'); return }
     if (!planoSel) { setMsg('Selecione um plano!'); return }
     setMsg('⏳ Lançando...')
     let v = MENSAL
