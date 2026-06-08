@@ -7,7 +7,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0d0d0d;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;}
+    body{background:#0d0d0d;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;}
+    canvas{max-width:100%!important;}
 
     /* LOGIN */
     #login-screen{min-height:100vh;display:flex;align-items:stretch;background:#0d0d1a;}
@@ -98,8 +99,13 @@
     @media(max-width:480px){
       .g3,.gc{grid-template-columns:1fr;}
       .rg{grid-template-columns:1fr!important;}
-      .kv{font-size:clamp(18px,7vw,26px);}
-      .rv{font-size:clamp(18px,6.5vw,24px);}
+      .kv{font-size:22px;}
+      .rv{font-size:20px;}
+      .big{font-size:20px;}
+      .pv{font-size:18px;}
+      .rc{padding:10px;}
+      .content{padding:10px;}
+      .card{padding:10px;}
     }
     .kl{font-size:13px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
     .kv{font-size:clamp(22px,3.5vw,52px);font-weight:800;word-break:break-word;}
