@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { initSchema, query, queryRow } from '@/lib/db'
 import { sendTelegram } from '@/lib/telegram'
 
