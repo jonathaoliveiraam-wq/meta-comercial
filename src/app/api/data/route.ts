@@ -225,26 +225,26 @@ export async function POST(req: Request) {
     if (action === 'loginParceiro') {
       const p = await queryRow('SELECT * FROM parceiros WHERE "user" = $1 AND senha = $2', [body.user, body.senha])
       if (!p) return Response.json({ error: 'Usuário ou senha incorretos.' }, { status: 401 })
-      const [crmLeads, leadsCount, mensaisCount, anuaisCount] = await Promise.all([
-        queryRow('SELECT COUNT(*)::int as t FROM crm_leads WHERE parceiro = $1 AND etapa >= 4', [p.id]),
-        queryRow('SELECT COUNT(*)::int as t FROM leads_portal WHERE "parceiroId" = $1', [p.id]),
-        queryRow('SELECT COUNT(*)::int as t FROM clientes_mensais WHERE parceiro = $1', [p.id]),
-        queryRow('SELECT COUNT(*)::int as t FROM clientes_anuais WHERE parceiro = $1', [p.id]),
+      const [fechadosRes, leadsPortalRes] = await Promise.all([
+        query('SELECT id, "leadId", nome, plano, valor, data FROM crm_leads WHERE parceiro = $1 AND etapa >= 4 ORDER BY data DESC', [p.id]),
+        query('SELECT * FROM leads_portal WHERE "parceiroId" = $1 ORDER BY data DESC', [p.id]),
       ])
-      const [mensaisRows, anuaisRows] = await Promise.all([
-        query('SELECT descricao, data, $1::text as plano FROM clientes_mensais WHERE parceiro = $2', ['Mensal', p.id]).then(r => r.rows),
-        query('SELECT descricao, data, $1::text as plano FROM clientes_anuais WHERE parceiro = $2', ['Anual', p.id]).then(r => r.rows),
-      ])
-      const totalMensais = mensaisCount?.t || 0
-      const totalAnuais = anuaisCount?.t || 0
-      const totalClientes = totalMensais + totalAnuais
-      const comissao = totalClientes <= 3 ? 150 : totalClientes <= 6 ? 200 : totalClientes <= 10 ? 250 : 300
-      const aReceber = totalClientes * comissao
+      const fechados: any[] = fechadosRes.rows
+      const fechadosLeadIds = new Set(fechados.map((r: any) => r.leadId).filter(Boolean))
+      const leadsAtivos: any[] = leadsPortalRes.rows.filter((l: any) => !fechadosLeadIds.has(l.id))
+      const totalFechados = fechados.length
+      const comissao = totalFechados <= 3 ? 150 : totalFechados <= 6 ? 200 : totalFechados <= 10 ? 250 : 300
       return Response.json({
-        parceiro: p, totalClientes, totalFechados: crmLeads?.t || 0, totalLeads: leadsCount?.t || 0,
-        comissaoAtual: comissao, aReceber, recebido: 0,
-        clientes: [...mensaisRows, ...anuaisRows],
-        recorencia: totalClientes * 50,
+        parceiro: p,
+        totalClientes: totalFechados,
+        totalFechados: totalFechados,
+        totalLeads: leadsPortalRes.rows.length,
+        comissaoAtual: comissao,
+        aReceber: p.aReceber || 0,
+        recebido: p.liberado || 0,
+        clientes: fechados,
+        leadsAtivos,
+        recorencia: totalFechados * 50,
       })
     }
     if (action === 'aceitarTermo') {
