@@ -148,22 +148,27 @@ export async function POST(req: Request) {
     if (action === 'confirmarPagamento') {
       const lead = await queryRow('SELECT * FROM crm_leads WHERE id = $1', [body.id])
       if (!lead) return Response.json({ error: 'Lead não encontrado' }, { status: 404 })
+      const jaFechado = Number(lead.etapa) >= 4
       let valorFechado = MENSAL
       if (body.plano === 'anual') valorFechado = ANUAL
       else if (body.plano === 'personalizado') valorFechado = body.tipo === 'sebrae' ? body.valor / 0.3 : body.valor
       const nomeCliente = body.razaoSocial?.trim() || lead.nome
-      if (body.plano === 'mensal') await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
-      else if (body.plano === 'anual') await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
-      else if (body.plano === 'personalizado') {
+      if (body.plano === 'mensal') {
+        const existe = await queryRow('SELECT id FROM clientes_mensais WHERE descricao = $1 AND parceiro = $2', [nomeCliente, lead.parceiro || ''])
+        if (!existe) await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
+      } else if (body.plano === 'anual') {
+        const existe = await queryRow('SELECT id FROM clientes_anuais WHERE descricao = $1 AND parceiro = $2', [nomeCliente, lead.parceiro || ''])
+        if (!existe) await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
+      } else if (body.plano === 'personalizado') {
         const recTotal = valorFechado; const equiv = recTotal / ANUAL
         await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, nomeCliente, body.data, lead.parceiro || ''])
       }
       // Atualiza lead do parceiro: indicado → fechado
       if (lead.leadId) await query('UPDATE leads_portal SET status = $1 WHERE id = $2', ['fechado', lead.leadId])
-      // Calcula e acumula comissão do parceiro
-      if (lead.parceiro) {
+      // Calcula e acumula comissão do parceiro (apenas na primeira confirmação)
+      if (lead.parceiro && !jaFechado) {
         const fechadosRes = await queryRow('SELECT COUNT(*) as total FROM crm_leads WHERE parceiro = $1 AND etapa >= 4', [lead.parceiro])
-        const totalFechados = parseInt(fechadosRes?.total || '0') // conta o atual (já vai ser 4 ao final)
+        const totalFechados = parseInt(fechadosRes?.total || '0')
         const posicao = totalFechados + 1
         const comissao = posicao >= 11 ? 300 : posicao >= 7 ? 250 : posicao >= 4 ? 200 : 150
         await query('UPDATE parceiros SET "aReceber" = COALESCE("aReceber", 0) + $1 WHERE id = $2', [comissao, lead.parceiro])
@@ -171,7 +176,7 @@ export async function POST(req: Request) {
       const historico = JSON.parse(lead.historico || '[]')
       historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema', plano: body.plano })
       await query('UPDATE crm_leads SET etapa=4, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
-      sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + nomeCliente + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
+      if (!jaFechado) sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + nomeCliente + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
       return Response.json({ ok: true })
     }
     if (action === 'excluirCrmLead') {

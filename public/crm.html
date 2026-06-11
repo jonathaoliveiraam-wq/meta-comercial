@@ -663,6 +663,7 @@
         <div class="card-actions">
           ${podeVoltar?`<button class="btn-voltar" onclick="moverLead('${c.id}',-1)">← Voltar</button>`:''}
           ${podeAvancar?`<button class="${btnClass}" onclick="moverLead('${c.id}',1)">→ ${proxLabel}</button>`:''}
+          ${etapaIdx===4?`<button class="btn-avancar btn-avancar-3" style="font-size:11px;padding:4px 8px;" onclick="reabrirPagamento('${c.id}')">💰 Registrar</button>`:''}
           <button class="btn-excluir" onclick="excluirLead('${c.id}')">🗑</button>
         </div>
       </div>`;
@@ -721,6 +722,15 @@
       msg.style.color='#059669'; msg.textContent='✅ Lançado com sucesso!';
       setTimeout(()=>{ fecharModal('modal-pagamento'); renderKanban(); }, 800);
     } catch(e) { msg.style.color='#EF4444'; msg.textContent='⚠️ Erro ao confirmar.'; }
+  }
+
+  function reabrirPagamento(id) {
+    leadPagamentoAtual = id;
+    planoSelecionado = null; pagTipo = 'recebido';
+    ['mensal','anual','personalizado'].forEach(p => document.getElementById('opt-'+p).classList.remove('sel'));
+    document.getElementById('custom-fields').style.display = 'none';
+    document.getElementById('pag-msg').textContent = '⚠️ Registrar cliente no financeiro (sem duplicar comissão)';
+    document.getElementById('modal-pagamento').style.display = 'flex';
   }
 
   function abrirModalNovo() {
