@@ -427,9 +427,12 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                               {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                                  if (idx+1 === 3) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg(''); setModalPag(true); return }
+                                  if (idx+1 === 4) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
                                 }}>→ {ETAPAS[idx+1].label}</button>
+                              )}
+                              {idx===4 && (
+                                <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#FEF9C3',border:'1px solid #FDE047',color:'#92400E',borderRadius:6,fontWeight:700 }} onClick={() => { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg('⚠️ Registrar no financeiro (sem duplicar comissão)'); setModalPag(true) }}>💰 Registrar</button>
                               )}
                               <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
                             </div>
