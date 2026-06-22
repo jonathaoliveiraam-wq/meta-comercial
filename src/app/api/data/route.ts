@@ -81,14 +81,14 @@ export async function POST(req: Request) {
     if (action === 'addLancamento') {
       const valorRec = body.tipo === 'sebrae' ? body.val / 0.3 : body.val
       const recTotal = body.qty * valorRec
-      const equiv = recTotal / ANUAL
+      const equiv = recTotal / MENSAL
       await query('INSERT INTO lancamentos (qty, val, tipo, valorRec, recTotal, equiv, descricao, data, parceiro) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || ''])
       return Response.json({ ok: true })
     }
     if (action === 'editLancamento') {
       const valorRec = body.tipo === 'sebrae' ? body.val / 0.3 : body.val
       const recTotal = body.qty * valorRec
-      const equiv = recTotal / ANUAL
+      const equiv = recTotal / MENSAL
       await query('UPDATE lancamentos SET qty=$1, val=$2, tipo=$3, valorRec=$4, recTotal=$5, equiv=$6, descricao=$7, data=$8, parceiro=$9 WHERE id=$10', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || '', body.id])
       return Response.json({ ok: true })
     }
@@ -160,7 +160,7 @@ export async function POST(req: Request) {
         const existe = await queryRow('SELECT id FROM clientes_anuais WHERE descricao = $1 AND parceiro = $2', [nomeCliente, lead.parceiro || ''])
         if (!existe) await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
       } else if (body.plano === 'personalizado') {
-        const recTotal = valorFechado; const equiv = recTotal / ANUAL
+        const recTotal = valorFechado; const equiv = recTotal / MENSAL
         await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, nomeCliente, body.data, lead.parceiro || ''])
       }
       // Atualiza lead do parceiro: indicado → fechado
