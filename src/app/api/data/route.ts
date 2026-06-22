@@ -26,6 +26,10 @@ export async function GET(req: Request) {
       const rows: any[] = (await query('SELECT * FROM crm_renovacoes ORDER BY data DESC')).rows
       return rows.map(r => ({ ...r, historico: JSON.parse(r.historico || '[]') }))
     },
+    crmServicos: async () => {
+      const rows: any[] = (await query('SELECT * FROM crm_servicos ORDER BY data DESC')).rows
+      return rows.map(r => ({ ...r, historico: JSON.parse(r.historico || '[]') }))
+    },
     renovacoes: () => query('SELECT * FROM renovacoes_historico ORDER BY data DESC').then(r => r.rows),
     all: async () => {
       const [mensais, anuais, clientesMensais, clientesAnuais, lancamentos, parceiros, leads, crmRows, crmRenRows, renovacoes, totalEquiv] = await Promise.all([
@@ -215,6 +219,38 @@ export async function POST(req: Request) {
     }
     if (action === 'excluirRenovacao') {
       await query('DELETE FROM crm_renovacoes WHERE id = $1', [body.id])
+      return Response.json({ ok: true })
+    }
+    if (action === 'criarServico') {
+      const id = 'srv_' + Date.now()
+      const hoje = new Date().toISOString().split('T')[0]
+      await query('INSERT INTO crm_servicos (id, nome, whats, segmento, obs, descricao, plano, valor, tipoCustom, etapa, data, historico) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11)',
+        [id, body.nome, body.whats, body.segmento||'', body.obs||'', body.descricao||'', 'servico', body.valor||0, 'recebido', hoje, JSON.stringify([{ etapa:0, data:hoje, user:body.user||'Sistema' }])])
+      return Response.json({ ok: true })
+    }
+    if (action === 'moverServico') {
+      const srv = await queryRow('SELECT historico FROM crm_servicos WHERE id = $1', [body.id])
+      if (!srv) return Response.json({ error: 'não encontrado' }, { status: 404 })
+      const historico = JSON.parse(srv.historico || '[]')
+      historico.push({ etapa: body.etapa, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' })
+      await query('UPDATE crm_servicos SET etapa=$1, historico=$2 WHERE id=$3', [body.etapa, JSON.stringify(body.historico || historico), body.id])
+      return Response.json({ ok: true })
+    }
+    if (action === 'confirmarServico') {
+      const srv = await queryRow('SELECT * FROM crm_servicos WHERE id = $1', [body.id])
+      if (!srv) return Response.json({ error: 'não encontrado' }, { status: 404 })
+      const valorFechado = body.valor || srv.valor || 0
+      const equiv = valorFechado / MENSAL
+      const historico = JSON.parse(srv.historico || '[]')
+      historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema' })
+      await query('UPDATE crm_servicos SET etapa=4, valor=$1, historico=$2 WHERE id=$3', [valorFechado, JSON.stringify(historico), body.id])
+      await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,\'\')',
+        [valorFechado, 'recebido', valorFechado, valorFechado, equiv, srv.descricao || srv.nome, body.data || new Date().toISOString().split('T')[0]])
+      sendTelegram('🛠️ <b>Serviço confirmado!</b>\nCliente: ' + srv.nome + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
+      return Response.json({ ok: true })
+    }
+    if (action === 'excluirServico') {
+      await query('DELETE FROM crm_servicos WHERE id = $1', [body.id])
       return Response.json({ ok: true })
     }
     if (action === 'importarLeads') {

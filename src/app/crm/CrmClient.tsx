@@ -11,7 +11,7 @@ import KanbanColumn from './KanbanColumn'
 import KanbanCard from './KanbanCard'
 import KanbanCardOverlay from './KanbanCardOverlay'
 
-const MENSAL = 337, ANUAL = 337 * 12 * 0.9
+const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
 const ETAPAS = [
   { id: 'indicacao', label: '📋 Indicação', cor: '#6366F1' },
@@ -28,22 +28,33 @@ const ETAPAS_REN = [
   { id: 'pagamento', label: '💳 Pagamento', cor: '#34D399' },
   { id: 'finalizado', label: '✅ Finalizado', cor: '#FDE68A' },
 ]
+const ETAPAS_SRV = [
+  { id: 'solicitacao', label: '📋 Solicitação', cor: '#6366F1' },
+  { id: 'proposta', label: '📄 Proposta', cor: '#FBBF24' },
+  { id: 'aprovado', label: '✔ Aprovado', cor: '#C084FC' },
+  { id: 'pagamento', label: '💳 Pagamento', cor: '#34D399' },
+  { id: 'finalizado', label: '✅ Finalizado', cor: '#10B981' },
+]
 
 interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[]; responsavel: string | null }
 interface CrmRen { id: string; nome: string; whats: string; segmento: string; obs: string; plano: string; valor: number; tipoCustom: string; etapa: number; data: string; historico: any[] }
+interface CrmSrv { id: string; nome: string; whats: string; segmento: string; obs: string; descricao: string; plano: string; valor: number; etapa: number; data: string; historico: any[] }
 
-interface Props { initialCrm: CrmLead[]; initialRenovacao: CrmRen[]; initialParceiros: any[] }
+interface Props { initialCrm: CrmLead[]; initialRenovacao: CrmRen[]; initialServicos: CrmSrv[]; initialParceiros: any[] }
 
-export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
+export default function CrmClient({ initialCrm, initialRenovacao, initialServicos }: Props) {
   const [crm, setCrm] = useState<CrmLead[]>(initialCrm)
   const [ren, setRen] = useState<CrmRen[]>(initialRenovacao)
+  const [srv, setSrv] = useState<CrmSrv[]>(initialServicos)
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [view, setView] = useState<'novos' | 'renovacao'>('novos')
+  const [view, setView] = useState<'novos' | 'renovacao' | 'servicos'>('novos')
 
   const [modalNovo, setModalNovo] = useState(false)
   const [modalPag, setModalPag] = useState(false)
   const [modalPagRen, setModalPagRen] = useState(false)
   const [modalNovaRen, setModalNovaRen] = useState(false)
+  const [modalNovoSrv, setModalNovoSrv] = useState(false)
+  const [modalPagSrv, setModalPagSrv] = useState(false)
   const [leadPagId, setLeadPagId] = useState<string | null>(null)
   const [planoSel, setPlanSel] = useState<string | null>(null)
   const [pagTipo, setPagTipo] = useState<'recebido' | 'sebrae'>('recebido')
@@ -61,8 +72,14 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   })
   const [loginError, setLoginError] = useState('')
   const [toasts, setToasts] = useState<{ id: number; msg: string; tipo: 'lead' | 'ok' }[]>([])
-  const [somAtivo, setSomAtivo] = useState(false)
-  const somAtivoRef = useRef(false)
+  const [somAtivo, setSomAtivo] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('crm-som')
+      return saved !== null ? saved === 'true' : true
+    }
+    return true
+  })
+  const somAtivoRef = useRef(true)
   const crmCountRef = useRef<number | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
 
@@ -93,11 +110,12 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   }, [])
 
   const recarregar = useCallback(async () => {
-    const [c, r] = await Promise.all([
+    const [c, r, s] = await Promise.all([
       fetch('/api/data?tipo=crm').then(r => r.json()),
       fetch('/api/data?tipo=crmRenovacao').then(r => r.json()),
+      fetch('/api/data?tipo=crmServicos').then(r => r.json()),
     ])
-    setCrm(c); setRen(r)
+    setCrm(c); setRen(r); setSrv(s)
   }, [])
 
   // Polling: verifica novos leads a cada 30s
@@ -138,6 +156,18 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     setCrm(updated)
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'moverLead', id, etapa: novaEtapa, historico: updated[idx].historico }) })
   }, [crm, user])
+
+  const moverServico = useCallback(async (id: string, novaEtapa: number) => {
+    const idx = srv.findIndex(c => c.id === id)
+    if (idx < 0) return
+    const updated = [...srv]
+    updated[idx] = {
+      ...updated[idx], etapa: novaEtapa,
+      historico: [...updated[idx].historico, { etapa: novaEtapa, data: new Date().toISOString().split('T')[0], user: user || 'Sistema' }],
+    }
+    setSrv(updated)
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'moverServico', id, etapa: novaEtapa, historico: updated[idx].historico }) })
+  }, [srv, user])
 
   const moverRenovacao = useCallback(async (id: string, novaEtapa: number) => {
     const idx = ren.findIndex(c => c.id === id)
@@ -208,6 +238,34 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarCrmLead', nome, whats, segmento: (document.getElementById('novo-segmento') as HTMLSelectElement)?.value || '', obs: (document.getElementById('novo-obs') as HTMLTextAreaElement)?.value || '', plano: novoPlano, valor, user }) })
     setMsg('✅ Lead adicionado!')
     setTimeout(() => { setModalNovo(false); recarregar() }, 600)
+  }
+
+  const salvarNovoServico = async () => {
+    const nome = (document.getElementById('srv-nome') as HTMLInputElement)?.value?.trim()
+    const whats = (document.getElementById('srv-whats') as HTMLInputElement)?.value?.trim()
+    const descricao = (document.getElementById('srv-descricao') as HTMLInputElement)?.value?.trim()
+    const valorStr = (document.getElementById('srv-valor') as HTMLInputElement)?.value
+    if (!nome || !whats) { setMsg('Preencha nome e WhatsApp!'); return }
+    setMsg('⏳ Salvando...')
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarServico', nome, whats, descricao: descricao || '', valor: parseFloat(valorStr) || 0, segmento: (document.getElementById('srv-segmento') as HTMLSelectElement)?.value || '', obs: (document.getElementById('srv-obs') as HTMLTextAreaElement)?.value || '', user }) })
+    setMsg('✅ Serviço adicionado!')
+    setTimeout(() => { setModalNovoSrv(false); recarregar() }, 600)
+  }
+
+  const confirmarPagamentoSrv = async () => {
+    if (!planoSel) { setMsg('Selecione um plano!'); return }
+    setMsg('⏳ Confirmando...')
+    let v = parseFloat(pagValor) || 0
+    if (v <= 0) { setMsg('Informe o valor!'); return }
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarServico', id: leadPagId, valor: v, data: new Date().toISOString().split('T')[0], user }) })
+    setMsg('✅ Serviço confirmado!')
+    setTimeout(() => { setModalPagSrv(false); recarregar() }, 600)
+  }
+
+  const excluirServico = async (id: string) => {
+    if (!confirm('Excluir este serviço?')) return
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirServico', id }) })
+    recarregar()
   }
 
   const salvarNovaRenovacao = async () => {
@@ -318,8 +376,16 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   const fechados = crmFiltrado.filter(c => c.etapa >= 4)
   const taxa = totalLeads ? Math.round(fechados.length / totalLeads * 100) : 0
 
+  const totalPipeline = crm.reduce((s, c) => s + (c.valor || MENSAL), 0)
+    + ren.reduce((s, c) => s + (c.valor || MENSAL), 0)
+    + srv.reduce((s, c) => s + (c.valor || 0), 0)
+
+  const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
+  const closeAllModals = () => { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false); setModalNovoSrv(false); setModalPagSrv(false) }
+
   const Modal = ({ show, children }: { show: boolean; children: React.ReactNode }) =>
-    show ? <div className="modal-bg" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false) } }}><div className="modal-box" onClick={e => e.stopPropagation()}>{children}</div></div> : null
+    show ? <div className="modal-bg" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) closeAllModals() }}><div className="modal-box" onClick={e => e.stopPropagation()}>{children}</div></div> : null
 
   const Toasts = () => (
     <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -345,13 +411,14 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
   return (
     <div className="app-layout">
       <Toasts />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
         <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
             <button onClick={() => { setSidebarCollapsed(false); }} style={{ background:'none',border:'none',cursor:'pointer',color:'#6B7280',fontSize:20,lineHeight:1,padding:'2px 6px',display: sidebarCollapsed ? 'block' : 'none' }} title="Abrir menu">☰</button>
-            <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':'🔄 Renovação'}</span>
+            <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':view==='renovacao'?'🔄 Renovação':'🛠️ Serviços'}</span>
+            <span style={{ background:'#F0FDF4',border:'1px solid #BBF7D0',color:'#15803D',borderRadius:20,padding:'3px 12px',fontSize:12,fontWeight:700 }}>💰 {fmtR(totalPipeline)} em pipeline</span>
             {view==='novos' && crm.filter(c=>c.etapa===0).length > 0 && (
               <span style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700 }}>
                 {crm.filter(c=>c.etapa===0).length} nova{crm.filter(c=>c.etapa===0).length>1?'s':''}
@@ -374,6 +441,7 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
                 const novo = !somAtivo
                 setSomAtivo(novo)
                 somAtivoRef.current = novo
+                localStorage.setItem('crm-som', String(novo))
                 if (novo) playLeadSound()
               }}
               style={{ background: somAtivo ? '#EFF6FF' : '#F9FAFB', border: '1px solid ' + (somAtivo ? '#BFDBFE' : '#E5E7EB'), borderRadius: 8, padding: '4px 10px', fontSize: 16, cursor: 'pointer', lineHeight: 1 }}
@@ -391,19 +459,61 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
             { label:'Fechados',value:fechados.length,cor:'#059669' },
             { label:'Onboarding',value:crm.filter(c=>c.etapa===5).length,cor:'#F97316' },
             { label:'Conversão',value:taxa+'%',cor:'#6366F1' },
-          ]:[
+          ]:view==='renovacao'?[
             { label:'Total',value:ren.length,cor:'#6366F1' },
             { label:'Em proposta',value:ren.filter(c=>c.etapa===1).length,cor:'#F59E0B' },
             { label:'Em contrato',value:ren.filter(c=>c.etapa===2).length,cor:'#8B5CF6' },
             { label:'Pagos',value:ren.filter(c=>c.etapa>=3).length,cor:'#059669' },
             { label:'Finalizados',value:ren.filter(c=>c.etapa===4).length,cor:'#F97316' },
+          ]:[
+            { label:'Total',value:srv.length,cor:'#6366F1' },
+            { label:'Em proposta',value:srv.filter(c=>c.etapa===1).length,cor:'#F59E0B' },
+            { label:'Aprovados',value:srv.filter(c=>c.etapa===2).length,cor:'#8B5CF6' },
+            { label:'Pagos',value:srv.filter(c=>c.etapa>=3).length,cor:'#059669' },
+            { label:'Finalizados',value:srv.filter(c=>c.etapa===4).length,cor:'#10B981' },
           ]).map(s => (
             <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
           </div>
         </div>
 
-        {view==='novos' ? (
+        {view==='servicos' ? (
+          <div className="kanban-wrap">
+            <div className="kanban">
+              {ETAPAS_SRV.map((etapa, idx) => {
+                const cards = srv.filter(c => c.etapa === idx)
+                return (
+                  <div key={etapa.id} className={'col ren-col-' + idx} style={{ borderTop: '3px solid ' + etapa.cor }}>
+                    <div className="col-header"><span className="col-title" style={{ color:etapa.cor }}>{etapa.label}</span><span className="col-count">{cards.length}</span></div>
+                    {cards.map(c => (
+                      <div key={c.id} className="card-lead">
+                        <div className="card-nome">{c.nome}</div>
+                        {c.descricao && <div className="card-info" style={{ color:'#6366F1',fontWeight:600 }}>🛠️ {c.descricao}</div>}
+                        <div className="card-info">📱 {c.whats}</div>
+                        <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6 }}>
+                          <span className="card-data">📅 {c.data?.split('-').reverse().join('/')||'—'}</span>
+                          <span style={{ fontSize:12,fontWeight:700,color:'#34D399' }}>{c.valor ? fmtR(c.valor) : '—'}</span>
+                        </div>
+                        <div className="card-actions" style={{ display:'flex',gap:4,marginTop:8 }}>
+                          {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverServico(c.id, idx-1)}>← Voltar</button>}
+                          {idx<4 && (
+                            <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
+                              if (idx+1 === 3) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setMsg(''); setModalPagSrv(true); return }
+                              moverServico(c.id, idx+1)
+                            }}>→ {ETAPAS_SRV[idx+1].label}</button>
+                          )}
+                          <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirServico(c.id)}>🗑</button>
+                        </div>
+                      </div>
+                    ))}
+                    {cards.length===0 && <div className="empty">Nenhum serviço aqui</div>}
+                    {idx===0 && <button className="add-lead-btn" onClick={()=>{setMsg('');setModalNovoSrv(true)}}>+ Adicionar serviço manual</button>}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ) : view==='novos' ? (
           <div className="kanban-wrap">
             <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={e => setActiveId(e.active.id as string)} onDragEnd={handleDragEnd}>
               <div className="kanban">
@@ -564,6 +674,26 @@ export default function CrmClient({ initialCrm, initialRenovacao }: Props) {
           </div>
         </div>}
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalPagRen(false)}>Cancelar</button><button className="modal-save" onClick={confirmarPagamentoRen}>✔ Confirmar Renovação</button></div>
+        <p className="modal-msg">{msg}</p>
+      </Modal>
+
+      <Modal show={modalNovoSrv}>
+        <p className="modal-title">🛠️ Novo Serviço Manual</p>
+        <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="srv-nome" placeholder="Ex: João Silva" /></div>
+        <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="srv-whats" placeholder="(92) 99999-9999" /></div>
+        <div className="modal-field"><p className="modal-label">Descrição do serviço</p><input className="modal-input" type="text" id="srv-descricao" placeholder="Ex: Declaração IR, Abertura empresa..." /></div>
+        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="number" id="srv-valor" placeholder="Ex: 350" /></div>
+        <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="srv-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
+        <div className="modal-field"><p className="modal-label">Observação</p><textarea className="modal-input" id="srv-obs" rows={2} placeholder="Contexto, prazo..." /></div>
+        <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalNovoSrv(false)}>Cancelar</button><button className="modal-save" onClick={salvarNovoServico}>✔ Salvar Serviço</button></div>
+        <p className="modal-msg">{msg}</p>
+      </Modal>
+
+      <Modal show={modalPagSrv}>
+        <p className="modal-title">💳 Confirmar Pagamento – Serviço</p>
+        <p style={{fontSize:13,color:'#666',marginBottom:16}}>Serviço pago! Informe o valor recebido:</p>
+        <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 350" /></div>
+        <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalPagSrv(false)}>Cancelar</button><button className="modal-save" onClick={confirmarPagamentoSrv}>✔ Confirmar Serviço</button></div>
         <p className="modal-msg">{msg}</p>
       </Modal>
     </div>

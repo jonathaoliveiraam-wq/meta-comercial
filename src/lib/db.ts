@@ -108,6 +108,20 @@ export async function initSchema() {
       data TEXT NOT NULL,
       historico TEXT DEFAULT '[]'
     );
+    CREATE TABLE IF NOT EXISTS crm_servicos (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      whats TEXT NOT NULL,
+      segmento TEXT DEFAULT '',
+      obs TEXT DEFAULT '',
+      descricao TEXT DEFAULT '',
+      plano TEXT DEFAULT 'servico',
+      valor DOUBLE PRECISION DEFAULT 0,
+      tipoCustom TEXT DEFAULT 'recebido',
+      etapa INTEGER DEFAULT 0,
+      data TEXT NOT NULL,
+      historico TEXT DEFAULT '[]'
+    );
     CREATE TABLE IF NOT EXISTS renovacoes_historico (
       id SERIAL PRIMARY KEY,
       "clienteId" TEXT NOT NULL,
