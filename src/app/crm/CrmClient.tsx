@@ -418,7 +418,6 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
             <button onClick={() => { setSidebarCollapsed(false); }} style={{ background:'none',border:'none',cursor:'pointer',color:'#6B7280',fontSize:20,lineHeight:1,padding:'2px 6px',display: sidebarCollapsed ? 'block' : 'none' }} title="Abrir menu">☰</button>
             <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':view==='renovacao'?'🔄 Renovação':'🛠️ Serviços'}</span>
-            <span style={{ background:'#F0FDF4',border:'1px solid #BBF7D0',color:'#15803D',borderRadius:20,padding:'3px 12px',fontSize:12,fontWeight:700 }}>💰 {fmtR(totalPipeline)} em pipeline</span>
             {view==='novos' && crm.filter(c=>c.etapa===0).length > 0 && (
               <span style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700 }}>
                 {crm.filter(c=>c.etapa===0).length} nova{crm.filter(c=>c.etapa===0).length>1?'s':''}
@@ -433,6 +432,17 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                 ))}
               </div>
             )}
+            <span style={{
+              background: 'linear-gradient(135deg,#059669,#10B981)',
+              color: '#fff',
+              borderRadius: 20,
+              padding: '4px 14px',
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: 0.3,
+              boxShadow: '0 2px 8px rgba(16,185,129,0.35)',
+              whiteSpace: 'nowrap',
+            }}>💰 {fmtR(totalPipeline)}</span>
           </div>
           <div className="topbar-right">
             <button
