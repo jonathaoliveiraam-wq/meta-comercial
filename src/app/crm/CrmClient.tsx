@@ -432,17 +432,6 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                 ))}
               </div>
             )}
-            <span style={{
-              background: 'linear-gradient(135deg,#059669,#10B981)',
-              color: '#fff',
-              borderRadius: 20,
-              padding: '4px 14px',
-              fontSize: 12,
-              fontWeight: 800,
-              letterSpacing: 0.3,
-              boxShadow: '0 2px 8px rgba(16,185,129,0.35)',
-              whiteSpace: 'nowrap',
-            }}>💰 {fmtR(totalPipeline)}</span>
           </div>
           <div className="topbar-right">
             <button
@@ -484,6 +473,15 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           ]).map(s => (
             <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
+            <div style={{
+              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+              background:'linear-gradient(135deg,#059669,#10B981)',
+              borderRadius:12, padding:'10px 20px', minWidth:160,
+              boxShadow:'0 3px 12px rgba(16,185,129,0.35)',
+            }}>
+              <div style={{ color:'#fff', fontSize:20, fontWeight:800, letterSpacing:0.5, whiteSpace:'nowrap' }}>{fmtR(totalPipeline)}</div>
+              <div style={{ color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:600, marginTop:2 }}>💰 Total em pipeline</div>
+            </div>
           </div>
         </div>
 
