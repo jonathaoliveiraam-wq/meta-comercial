@@ -35,7 +35,7 @@ export default function PlaybookPage() {
           </a>
         ))}
         <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 14, marginTop: 20 }}>
-          <a href="/dashboard" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>Dashboard</a>
+          <a href="/sistema.html" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>Dashboard</a>
           <a href="/crm" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>CRM</a>
           <a href="/parceiros" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>Parceiros</a>
         </div>

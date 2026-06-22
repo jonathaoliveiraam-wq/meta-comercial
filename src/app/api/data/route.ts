@@ -4,7 +4,7 @@ import { initSchema, query, queryRow } from '@/lib/db'
 import { sendTelegram } from '@/lib/telegram'
 
 const MENSAL = 337
-const ANUAL = 337 * 12 * 0.9
+const ANUAL = 337 * 12
 
 export async function GET(req: Request) {
   await initSchema()
