@@ -24,7 +24,7 @@ export default function GuiaKamilaPage() {
   }
   const tagStyle: React.CSSProperties = {
     display: 'inline-block', background: PB + '22', border: `1px solid ${PB}55`,
-    color: PBL, borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700,
+    color: PBL, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700,
   }
 
   function BtnCopiar({ id, texto }: { id: string; texto: string }) {
@@ -135,7 +135,7 @@ export default function GuiaKamilaPage() {
               <p style={{ fontSize: 12, color: TEXTMUTED, margin: '4px 0 12px' }}>Se respondeu → vai pro Passo 3. Se não respondeu → espera 3 dias:</p>
               <Script id="dm2" label="DM 2 (sem resposta em 3 dias)" labelStyle={{ background: '#33415522', border: '1px solid #33415555', color: TEXTMUTED }} texto={"Oi [Nome]! Só passando pra ver se você viu minha mensagem. Se não for o momento, sem problema, fico à disposição quando precisar de apoio contábil 🙂"} />
               <div style={{ padding: '8px 12px', background: '#1a1014', border: '1px solid #ef444433', borderRadius: 8, marginTop: 4 }}>
-                <p style={{ fontSize: 11, color: '#fca5a5', margin: 0, fontWeight: 600 }}>✗ Sem resposta na DM 2 → arquiva.</p>
+                <p style={{ fontSize: 12, color: '#fca5a5', margin: 0, fontWeight: 600 }}>✗ Sem resposta na DM 2 → arquiva.</p>
               </div>
             </div>
           </div>
@@ -170,11 +170,11 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={4} titulo="Marcar a reunião" cor="#059669" />
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
-              <p style={{ fontSize: 11, color: TEXTMUTED, margin: '0 0 10px' }}>Quando: tem CNPJ + sem contador ou insatisfeito + citou uma dor</p>
+              <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 10px' }}>Quando: tem CNPJ + sem contador ou insatisfeito + citou uma dor</p>
               <Script id="dm-reu" label="Marcar reunião" texto="Olha, pelo que você me contou faz muito sentido a gente conversar 20 min. Não é reunião de venda, quero te mostrar como funciona e você decide. Quando você tem um tempinho essa semana?" />
               <Script id="dm-whats" label="Topou? Puxa pro WhatsApp" texto="Perfeito! Vou te passar o nosso WhatsApp pra te enviar o link da reunião e o material. Qual o melhor número?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
-                <p style={{ fontSize: 11, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra o lead no CRM na hora.</p>
+                <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra o lead no CRM na hora.</p>
               </div>
             </div>
           </div>
@@ -233,7 +233,7 @@ export default function GuiaKamilaPage() {
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
               <Script id="ind-reu" label="Marcar reunião" texto="Show, [Nome]! Faz sentido a gente conversar 20 min pra eu te mostrar como funciona e você decide. Quando você tem um tempinho essa semana?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
-                <p style={{ fontSize: 11, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra no CRM e avisa o parceiro que o contato foi feito.</p>
+                <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra no CRM e avisa o parceiro que o contato foi feito.</p>
               </div>
             </div>
           </div>
@@ -245,7 +245,7 @@ export default function GuiaKamilaPage() {
           <div style={{ background: PB + '22', border: `2px solid ${PB}66`, borderRadius: 14, padding: '16px 20px', marginBottom: 24, display: 'flex', gap: 18, alignItems: 'center' }}>
             <div style={{ textAlign: 'center', flexShrink: 0 }}>
               <div style={{ fontSize: 38, fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>30</div>
-              <div style={{ fontSize: 10, color: PBL, fontWeight: 700, letterSpacing: '0.5px' }}>PERFIS/DIA</div>
+              <div style={{ fontSize: 12, color: PBL, fontWeight: 700, letterSpacing: '0.5px' }}>PERFIS/DIA</div>
             </div>
             <div style={{ borderLeft: `1px solid ${PB}44`, paddingLeft: 16 }}>
               <p style={{ fontSize: 13, color: '#f1f5f9', fontWeight: 600, margin: '0 0 4px' }}>Meta diária de prospecção</p>
