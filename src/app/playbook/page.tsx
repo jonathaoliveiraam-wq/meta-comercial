@@ -38,6 +38,7 @@ export default function PlaybookPage() {
           <a href="/sistema.html" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>Dashboard</a>
           <a href="/crm" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>CRM</a>
           <a href="/parceiros" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 11, color: '#334155', textDecoration: 'none' }}>Parceiros</a>
+          <a href="/guia-kamila" style={{ display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 12, color: PBL, textDecoration: 'none', fontWeight: 700, marginTop: 6, background: PB + '18', border: `1px solid ${PB}44` }}>💬 Guia da Kamila</a>
         </div>
       </nav>
 
