@@ -147,8 +147,8 @@ export default function GuiaKamilaPage() {
               {[
                 '"Você tem CNPJ aberto ou ainda tá como pessoa física?" (sem CNPJ = agradece e encerra)',
                 '"Já tem alguém te ajudando com a parte contábil, ou tá tocando por conta própria?"',
-                '"Você emite nota fiscal regularmente?"',
-                '"O que mais te incomoda hoje nessa parte: imposto, nota, ou prazo?"',
+                '"Você acredita que tá pagando a carga tributária certa pro seu tipo de negócio?"',
+                '"Se descobrisse que tá pagando imposto a mais, isso seria algo que você ia querer resolver?"',
               ].map((q, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#0d0d1a', borderRadius: 8, marginBottom: 6, alignItems: 'flex-start' }}>
                   <span style={{ color: PBL, fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{i + 1}.</span>
@@ -205,8 +205,8 @@ export default function GuiaKamilaPage() {
               <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 12px' }}>Quem vem de indicação quase sempre já tem CNPJ — não pergunta se tem, <strong style={{ color: TEXT }}>começa pela dor</strong>:</p>
               {[
                 '"Hoje você já tem alguém cuidando da parte contábil, ou tá tocando mais por conta própria?"',
-                '"Você emite nota fiscal com frequência?"',
-                '"O que mais te incomoda hoje nessa parte: imposto, nota, prazo, ou a organização no geral?"',
+                '"Você acredita que tá pagando a carga tributária certa pro seu tipo de negócio?"',
+                '"Se descobrisse que tá pagando imposto a mais, isso seria algo que você ia querer resolver?"',
               ].map((q, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#0d0d1a', borderRadius: 8, marginBottom: 6, alignItems: 'flex-start' }}>
                   <span style={{ color: PBL, fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{i + 1}.</span>
