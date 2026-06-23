@@ -131,7 +131,7 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={2} titulo="Primeira DM" />
             <div style={cardStyle}>
-              <Script id="dm1" label="DM 1" texto="Oi [Nome]! Comentei lá no seu post de [assunto], bacana demais. Sou da equipe da Faço a Conta, contabilidade digital. Pergunta rápida: você tem contador hoje ou tá tocando a parte fiscal por conta própria?" />
+              <Script id="dm1" label="DM 1" texto={"Oi [Nome]! Comentei lá no seu post de [assunto], curti muito. Uma curiosidade genuína: você acredita que tá pagando o imposto certo pro tipo de negócio que você tem, ou sente que pode ter algo errado aí?"} />
               <p style={{ fontSize: 12, color: TEXTMUTED, margin: '4px 0 12px' }}>Se respondeu → vai pro Passo 3. Se não respondeu → espera 3 dias:</p>
               <Script id="dm2" label="DM 2 (sem resposta em 3 dias)" labelStyle={{ background: '#33415522', border: '1px solid #33415555', color: TEXTMUTED }} texto={"Oi [Nome]! Só passando pra ver se você viu minha mensagem. Se não for o momento, sem problema, fico à disposição quando precisar de apoio contábil 🙂"} />
               <div style={{ padding: '8px 12px', background: '#1a1014', border: '1px solid #ef444433', borderRadius: 8, marginTop: 4 }}>
