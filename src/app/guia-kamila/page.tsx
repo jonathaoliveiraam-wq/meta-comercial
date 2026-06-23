@@ -88,7 +88,7 @@ export default function GuiaKamilaPage() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${BORDER}`, background: '#0d0d1a', position: 'sticky', top: 49, zIndex: 30, overflowX: 'auto' }}>
-        {['📱 DM (lead frio)', '🤝 Indicação (lead quente)', '📅 Rotina do dia'].map((label, i) => (
+        {['📱 DM (lead frio)', '🤝 Indicação (lead quente)', '📅 Rotina do dia', '💼 WhatsApp B2B (frio)'].map((label, i) => (
           <button key={i} onClick={() => setAba(i)} style={{
             flex: 1, padding: '13px 10px', background: 'none', border: 'none',
             borderBottom: `3px solid ${aba === i ? PB : 'transparent'}`,
@@ -336,6 +336,98 @@ export default function GuiaKamilaPage() {
                 <p style={{ fontSize: 13, color: TEXT, margin: 0, lineHeight: 1.6 }}>{r}</p>
               </div>
             ))}
+          </div>
+        </>}
+
+        {/* ─── ABA 3: WhatsApp B2B ─── */}
+        {aba === 3 && <>
+          <div style={{ ...cardStyle, marginBottom: 20, borderTop: '3px solid #f59e0b' }}>
+            <span style={{ ...tagStyle, background: '#f59e0b22', border: '1px solid #f59e0b55', color: '#fbbf24' }}>Quando usar</span>
+            <p style={{ fontSize: 13, color: TEXT, lineHeight: 1.8, margin: '8px 0 0' }}>
+              Contatos que vieram da base B2B (lista fria). A pessoa não te conhece. Manda em <strong style={{ color: '#fbbf24' }}>volume baixo e espaçado</strong>, nunca dispara tudo de uma vez. Sempre de um número secundário, não o principal da empresa.
+            </p>
+          </div>
+
+          {/* Regras de segurança */}
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ color: '#fca5a5', fontSize: 15, fontWeight: 700, marginBottom: 12 }}>⚠️ Regras de segurança (ler antes de começar)</h2>
+            <div style={{ ...cardStyle, borderTop: '3px solid #ef4444' }}>
+              {[
+                'Não dispara mais de 20-30 por dia, com intervalo entre elas.',
+                'Sempre dá saída fácil na mensagem ("se não fizer sentido, é só ignorar").',
+                'Se a pessoa pedir pra não receber mais, para na hora e remove da lista.',
+                'Diagnóstico só é oferecido se tiver quem entregue rápido (em até 48h).',
+              ].map((r, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, padding: '9px 12px', background: '#0d0d1a', borderRadius: 8, marginBottom: 6, alignItems: 'flex-start' }}>
+                  <span style={{ color: '#fca5a5', fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{i + 1}.</span>
+                  <p style={{ fontSize: 13, color: TEXT, margin: 0, lineHeight: 1.6 }}>{r}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mensagem 1 */}
+          <div style={{ marginBottom: 24 }}>
+            <Passo num={1} titulo="Abertura" />
+            <div style={cardStyle}>
+              <Script id="b2b1" label="Mensagem 1 — Abertura" texto={"Olá [Nome]! Tudo bem? Aqui é a Kamila, da Faço a Conta, contabilidade credenciada pelo SEBRAE aqui em Manaus. Vou ser direta pra não tomar seu tempo: cerca de 95% das empresas pagam impostos a mais sem saber, só por falta de uma revisão fiscal. Posso te explicar rapidinho como funciona um diagnóstico que mostra se esse é o seu caso?"} />
+            </div>
+          </div>
+
+          {/* Mensagem 2 */}
+          <div style={{ marginBottom: 24 }}>
+            <Passo num={2} titulo="A oferta" />
+            <div style={cardStyle}>
+              <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 12px' }}>Manda só se a pessoa responder:</p>
+              <Script id="b2b2" label="Mensagem 2 — A oferta" texto={"Funciona assim: a gente faz um diagnóstico gratuito da sua empresa e mostra, na prática, se você tá pagando imposto indevido e onde dá pra reduzir, tudo dentro da lei. Sem compromisso. Se fizer sentido, a gente segue; se não, você fica com a informação de graça. Quer que eu agende 15 min essa semana pra te mostrar?"} />
+            </div>
+          </div>
+
+          {/* Follow-up */}
+          <div style={{ marginBottom: 24 }}>
+            <Passo num={3} titulo="Follow-up" />
+            <div style={cardStyle}>
+              <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 12px' }}>Só se não responder em 2 dias. Manda uma vez só:</p>
+              <Script id="b2b3" label="Follow-up (1x, após 2 dias sem resposta)" labelStyle={{ background: '#33415522', border: '1px solid #33415555', color: TEXTMUTED }} texto={"Oi [Nome]! Passando só pra deixar registrado: o diagnóstico fiscal gratuito segue de pé quando você quiser. Muita empresa aqui de Manaus descobriu que pagava imposto a mais. Qualquer coisa, é só me chamar 🙂"} />
+              <div style={{ padding: '8px 12px', background: '#1a1014', border: '1px solid #ef444433', borderRadius: 8, marginTop: 4 }}>
+                <p style={{ fontSize: 12, color: '#fca5a5', margin: 0, fontWeight: 600 }}>✗ Sem resposta no follow-up → arquiva.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quando topar */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
+              <h3 style={{ color: '#86efac', fontSize: 14, fontWeight: 700, margin: '0 0 10px' }}>✓ Quando a pessoa topar o diagnóstico</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[
+                  'Registra no CRM na hora.',
+                  'Agenda os 15 min.',
+                  'A partir daí segue a qualificação normal (mesmas perguntas da aba DM) e o fechamento.',
+                ].map((r, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#86efac', flexShrink: 0, fontWeight: 700 }}>{i + 1}.</span>
+                    <p style={{ fontSize: 13, color: TEXT, margin: 0, lineHeight: 1.6 }}>{r}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Aviso Instagram */}
+          <div style={{ background: PB + '22', border: `2px solid ${PB}66`, borderRadius: 14, padding: '16px 18px', marginBottom: 24 }}>
+            <h3 style={{ color: PBL, fontSize: 14, fontWeight: 700, margin: '0 0 8px' }}>📱 Achou o Instagram do dono no lugar do WhatsApp?</h3>
+            <p style={{ fontSize: 13, color: TEXT, lineHeight: 1.7, margin: 0 }}>
+              Não usa esse script frio. Vai pra aba <strong style={{ color: PBL }}>DM</strong> e segue o ritual de aquecimento de lá (seguir, comentar, depois DM). WhatsApp aceita abordagem direta; Instagram não.
+            </p>
+          </div>
+
+          {/* Alerta diagnóstico */}
+          <div style={{ background: '#1a1400', border: '2px solid #f59e0b66', borderRadius: 14, padding: '16px 18px' }}>
+            <h3 style={{ color: '#fbbf24', fontSize: 14, fontWeight: 700, margin: '0 0 8px' }}>⚡ Antes de soltar o script — quem faz o diagnóstico?</h3>
+            <p style={{ fontSize: 13, color: TEXT, lineHeight: 1.8, margin: 0 }}>
+              O ponto que decide se essa aba gera dinheiro não é o script — é o diagnóstico grátis ter quem entregue rápido. Se a Kamila ofertar e topar 10 diagnósticos essa semana, alguém precisa fazer esses 10 em 48h, senão o lead esfria. <strong style={{ color: '#fbbf24' }}>Defina quem faz o diagnóstico antes de começar a mandar mensagem.</strong>
+            </p>
           </div>
         </>}
 
