@@ -114,7 +114,7 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={1} titulo="Ritual de 3 dias" />
             <div style={cardStyle}>
-              <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 12, margin: '0 0 12px' }}>Todo dia faz os 3 ao mesmo tempo — cada turma num estágio diferente:</p>
+              <p style={{ fontSize: 12, color: TEXTMUTED, marginBottom: 12, margin: '0 0 12px' }}>Todo dia faz os 3 ao mesmo tempo cada turma num estágio diferente:</p>
               {[
                 { dia: 'Dia 1', desc: '30 perfis novos: seguir + curtir 2 fotos do feed. Não manda DM ainda.', cor: PBL },
                 { dia: 'Dia 2', desc: 'Os de ontem: comentar 1 post do negócio dela. Não manda DM ainda.', cor: PBL },
@@ -171,7 +171,7 @@ export default function GuiaKamilaPage() {
             <Passo num={4} titulo="Marcar a reunião" cor="#059669" />
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
               <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 10px' }}>Quando: tem CNPJ + sem contador ou insatisfeito + citou uma dor</p>
-              <Script id="dm-reu" label="Marcar reunião" texto="Olha, pelo que você me contou faz muito sentido a gente conversar 20 min. A ideia é fazer um diagnóstico rápido do seu negócio e te mostrar onde você pode estar pagando imposto indevido — você vê na prática e decide. Quando você tem um tempinho essa semana?" />
+              <Script id="dm-reu" label="Marcar reunião" texto="Olha, pelo que você me contou faz muito sentido a gente conversar 20 min. A ideia é fazer um diagnóstico rápido do seu negócio e te mostrar onde você pode estar pagando imposto indevido você vê na prática e decide. Quando você tem um tempinho essa semana?" />
               <Script id="dm-whats" label="Topou? Puxa pro WhatsApp" texto="Perfeito! Vou te passar o nosso WhatsApp pra te enviar o link da reunião e o material. Qual o melhor número?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
                 <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra o lead no CRM na hora.</p>
@@ -202,7 +202,7 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={2} titulo="Qualificar" />
             <div style={cardStyle}>
-              <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 12px' }}>Quem vem de indicação quase sempre já tem CNPJ — não pergunta se tem, <strong style={{ color: TEXT }}>começa pela dor</strong>:</p>
+              <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 12px' }}>Quem vem de indicação quase sempre já tem CNPJ não pergunta se tem, <strong style={{ color: TEXT }}>começa pela dor</strong>:</p>
               {[
                 '"Hoje você já tem alguém cuidando da parte contábil, ou tá tocando mais por conta própria?"',
                 '"Você acredita que tá pagando a carga tributária certa pro seu tipo de negócio?"',
@@ -231,7 +231,7 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={3} titulo="Marcar a reunião" cor="#059669" />
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
-              <Script id="ind-reu" label="Marcar reunião" texto="Show, [Nome]! Faz sentido a gente conversar 20 min. Quero fazer um diagnóstico rápido do seu negócio e te mostrar onde você pode estar pagando imposto indevido — você vê na prática e decide se faz sentido pra você. Quando você tem um tempinho essa semana?" />
+              <Script id="ind-reu" label="Marcar reunião" texto="Show, [Nome]! Faz sentido a gente conversar 20 min. Quero fazer um diagnóstico rápido do seu negócio e te mostrar onde você pode estar pagando imposto indevido você vê na prática e decide se faz sentido pra você. Quando você tem um tempinho essa semana?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
                 <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra no CRM e avisa o parceiro que o contato foi feito.</p>
               </div>
@@ -255,7 +255,7 @@ export default function GuiaKamilaPage() {
 
           {/* Manhã */}
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ color: PBL, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>☀️ Manhã — prioridades</h2>
+            <h2 style={{ color: PBL, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>☀️ Manhã prioridades</h2>
             <div style={cardStyle}>
               {[
                 'Responder toda mensagem nova do dia anterior (nada sem resposta em 24h)',
