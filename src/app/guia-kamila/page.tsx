@@ -171,7 +171,7 @@ export default function GuiaKamilaPage() {
             <Passo num={4} titulo="Marcar a reunião" cor="#059669" />
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
               <p style={{ fontSize: 12, color: TEXTMUTED, margin: '0 0 10px' }}>Quando: tem CNPJ + sem contador ou insatisfeito + citou uma dor</p>
-              <Script id="dm-reu" label="Marcar reunião" texto="Olha, pelo que você me contou faz muito sentido a gente conversar 20 min. Não é reunião de venda, quero te mostrar como funciona e você decide. Quando você tem um tempinho essa semana?" />
+              <Script id="dm-reu" label="Marcar reunião" texto="Olha, pelo que você me contou faz muito sentido a gente conversar 20 min. A ideia é fazer um diagnóstico rápido do seu negócio e te mostrar onde pode estar sobrando imposto — você vê na prática e decide. Quando você tem um tempinho essa semana?" />
               <Script id="dm-whats" label="Topou? Puxa pro WhatsApp" texto="Perfeito! Vou te passar o nosso WhatsApp pra te enviar o link da reunião e o material. Qual o melhor número?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
                 <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra o lead no CRM na hora.</p>
@@ -231,7 +231,7 @@ export default function GuiaKamilaPage() {
           <div style={{ marginBottom: 24 }}>
             <Passo num={3} titulo="Marcar a reunião" cor="#059669" />
             <div style={{ ...cardStyle, borderTop: '3px solid #059669' }}>
-              <Script id="ind-reu" label="Marcar reunião" texto="Show, [Nome]! Faz sentido a gente conversar 20 min pra eu te mostrar como funciona e você decide. Quando você tem um tempinho essa semana?" />
+              <Script id="ind-reu" label="Marcar reunião" texto="Show, [Nome]! Faz sentido a gente conversar 20 min. Quero fazer um diagnóstico rápido do seu negócio e te mostrar onde pode estar sobrando imposto — você vê na prática e decide se faz sentido pra você. Quando você tem um tempinho essa semana?" />
               <div style={{ padding: '8px 12px', background: '#0f2d1a', border: '1px solid #22c55e33', borderRadius: 8 }}>
                 <p style={{ fontSize: 12, color: '#86efac', margin: 0, fontWeight: 600 }}>✓ Registra no CRM e avisa o parceiro que o contato foi feito.</p>
               </div>
