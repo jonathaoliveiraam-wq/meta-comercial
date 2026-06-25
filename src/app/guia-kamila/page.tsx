@@ -272,18 +272,28 @@ export default function GuiaKamilaPage() {
 
           {/* Ritual Instagram */}
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ color: PBL, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>📱 Ritual Instagram</h2>
-            <div style={cardStyle}>
+            <h2 style={{ color: PBL, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>📱 Ritual Instagram diário</h2>
+            <p style={{ color: TEXTMUTED, fontSize: 12, marginBottom: 12 }}>As 3 atividades acontecem <strong style={{ color: TEXT }}>todo dia ao mesmo tempo</strong>, cada uma num grupo diferente de pessoas.</p>
+
+            {/* Checklist do dia */}
+            <div style={{ ...cardStyle, borderTop: `3px solid ${PB}`, marginBottom: 12 }}>
+              <p style={{ fontSize: 12, color: PBL, fontWeight: 700, margin: '0 0 12px' }}>✅ O que fazer hoje (todos os dias):</p>
               {[
-                { dia: 'Dia 1', acao: 'Seguir 30 perfis novos + curtir 2 fotos de cada', cor: PBL },
-                { dia: 'Dia 2', acao: 'Comentar nos 30 de ontem', cor: PBL },
-                { dia: 'Dia 3', acao: 'Mandar DM 1 nos 30 que comentou ontem', cor: '#86efac' },
-              ].map(d => (
-                <div key={d.dia} style={{ display: 'flex', gap: 12, padding: '10px 14px', background: '#0d0d1a', borderRadius: 8, marginBottom: 8, alignItems: 'center' }}>
-                  <span style={{ color: d.cor, fontWeight: 800, fontSize: 12, flexShrink: 0, minWidth: 42 }}>{d.dia}</span>
-                  <p style={{ fontSize: 13, color: TEXT, margin: 0 }}>{d.acao}</p>
+                { grupo: 'Grupo A — perfis novos de hoje', acao: 'Seguir 20 perfis novos + curtir 2 fotos de cada. Não manda DM.', cor: '#a78bfa' },
+                { grupo: 'Grupo B — quem você seguiu ontem', acao: 'Comentar 1 post do negócio de cada um. Não manda DM.', cor: '#60a5fa' },
+                { grupo: 'Grupo C — quem você comentou ontem', acao: 'Mandar DM 1 pra cada um.', cor: '#86efac' },
+              ].map((d, i) => (
+                <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0d0d1a', borderRadius: 8, marginBottom: 8, alignItems: 'flex-start', border: `1px solid ${d.cor}22` }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: d.cor + '22', border: `1px solid ${d.cor}55`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12, color: d.cor, flexShrink: 0 }}>{i + 1}</div>
+                  <div>
+                    <p style={{ fontSize: 12, color: d.cor, fontWeight: 700, margin: '0 0 3px' }}>{d.grupo}</p>
+                    <p style={{ fontSize: 13, color: TEXT, margin: 0, lineHeight: 1.5 }}>{d.acao}</p>
+                  </div>
                 </div>
               ))}
+              <div style={{ padding: '10px 14px', background: PB + '11', border: `1px solid ${PB}33`, borderRadius: 8, marginTop: 4 }}>
+                <p style={{ fontSize: 12, color: PBL, margin: 0, fontWeight: 600 }}>A partir do 3º dia você faz as 3 atividades todos os dias. Se parar de seguir pessoas novas, o funil trava.</p>
+              </div>
             </div>
           </div>
 
