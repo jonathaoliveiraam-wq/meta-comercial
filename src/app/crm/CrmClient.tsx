@@ -59,6 +59,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const [planoSel, setPlanSel] = useState<string | null>(null)
   const [pagTipo, setPagTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [pagValor, setPagValor] = useState('')
+  const [srvDescPag, setSrvDescPag] = useState('')
   const [razaoSocial, setRazaoSocial] = useState('')
   const [novoPlano, setNovoPlano] = useState('mensal')
   const [novoTipo, setNovoTipo] = useState<'recebido' | 'sebrae'>('recebido')
@@ -253,13 +254,12 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }
 
   const confirmarPagamentoSrv = async () => {
-    if (!planoSel) { setMsg('Selecione um plano!'); return }
-    setMsg('⏳ Confirmando...')
-    let v = parseFloat(pagValor) || 0
+    const v = parseFloat(pagValor) || 0
     if (v <= 0) { setMsg('Informe o valor!'); return }
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarServico', id: leadPagId, valor: v, data: new Date().toISOString().split('T')[0], user }) })
+    setMsg('⏳ Confirmando...')
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarServico', id: leadPagId, valor: v, descricao: srvDescPag, data: new Date().toISOString().split('T')[0], user }) })
     setMsg('✅ Serviço confirmado!')
-    setTimeout(() => { setModalPagSrv(false); recarregar() }, 600)
+    setTimeout(() => { setModalPagSrv(false); setSrvDescPag(''); recarregar() }, 600)
   }
 
   const excluirServico = async (id: string) => {
@@ -506,7 +506,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                           {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverServico(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
                             <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                              if (idx+1 === 3) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setMsg(''); setModalPagSrv(true); return }
+                              if (idx+1 === 3) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); return }
                               moverServico(c.id, idx+1)
                             }}>→ {ETAPAS_SRV[idx+1].label}</button>
                           )}
@@ -699,7 +699,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
 
       <Modal show={modalPagSrv}>
         <p className="modal-title">💳 Confirmar Pagamento – Serviço</p>
-        <p style={{fontSize:13,color:'#666',marginBottom:16}}>Serviço pago! Informe o valor recebido:</p>
+        <div className="modal-field"><p className="modal-label">Descrição do serviço prestado</p><input className="modal-input" type="text" value={srvDescPag} onChange={e=>setSrvDescPag(e.target.value)} placeholder="Ex: Declaração IR, Abertura de empresa..." /></div>
         <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 350" /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalPagSrv(false)}>Cancelar</button><button className="modal-save" onClick={confirmarPagamentoSrv}>✔ Confirmar Serviço</button></div>
         <p className="modal-msg">{msg}</p>
