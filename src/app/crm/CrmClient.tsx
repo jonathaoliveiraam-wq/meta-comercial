@@ -506,7 +506,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                           {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverServico(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
                             <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                              if (idx+1 === 3) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); return }
+                              if (idx+1 === 4) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); return }
                               moverServico(c.id, idx+1)
                             }}>→ {ETAPAS_SRV[idx+1].label}</button>
                           )}
