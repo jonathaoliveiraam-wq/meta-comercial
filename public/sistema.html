@@ -737,6 +737,7 @@
     el.innerHTML = data.parceiros.map(p=>{
       const stats = calcTotalParceiro(p);
       const clientes = obterClientesParceiro(p.id);
+      const indicados = (data.leads||[]).filter(l => l.parceiroId === p.id).length;
       const faixaIdx = stats.total<=3?0:stats.total<=6?1:stats.total<=10?2:3;
       const faixaLabels=['1-3','4-6','7-10','11+'];
       const faixaVals=[150,200,250,300];
@@ -780,8 +781,9 @@
             <p style="font-size:11px;color:${p.termoAceito?'#00e676':'#ff9800'};">${termoInfo}</p>
           </div>
         </div>
-        <div class="parceiro-stats">
-          <div class="pstat"><div class="pstat-v">${stats.total}</div><div class="pstat-l">Indicações</div></div>
+        <div class="parceiro-stats" style="grid-template-columns:repeat(4,1fr);">
+          <div class="pstat"><div class="pstat-v" style="color:#38bdf8;">${indicados}</div><div class="pstat-l">Indicados</div></div>
+          <div class="pstat"><div class="pstat-v" style="color:#00e676;">${stats.total}</div><div class="pstat-l">Fechados</div></div>
           <div class="pstat"><div class="pstat-v" style="color:#ff9800;">R$ ${stats.valorAReceber.toLocaleString('pt-BR')}</div><div class="pstat-l">A receber</div></div>
           <div class="pstat"><div class="pstat-v">R$ ${stats.valorLiberado.toLocaleString('pt-BR')}</div><div class="pstat-l">Liberado</div></div>
         </div>
@@ -945,11 +947,12 @@
         clientesMensais: (Array.isArray(rec.clientesMensais) ? rec.clientesMensais : []).map(c => ({...c, desc: c.descricao})),
         clientesAnuais: (Array.isArray(rec.clientesAnuais) ? rec.clientesAnuais : []).map(c => ({...c, desc: c.descricao})),
         parceiros: Array.isArray(rec.parceiros) ? rec.parceiros : [],
+        leads: Array.isArray(rec.leads) ? rec.leads : [],
       };
       popularSelectsParceiros();
       render(); badge('✅ Supabase','#1b5e2022','#00e676');
     } catch(e) {
-      data = {mensais:0, anuais:0, lancamentos:[], clientesMensais:[], clientesAnuais:[], parceiros:[]};
+      data = {mensais:0, anuais:0, lancamentos:[], clientesMensais:[], clientesAnuais:[], parceiros:[], leads:[]};
       render(); badge('⚠️ Erro ao carregar','#f4433622','#f44336');
     }
   }
