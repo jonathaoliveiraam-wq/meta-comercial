@@ -11,6 +11,15 @@ import KanbanColumn from './KanbanColumn'
 import KanbanCard from './KanbanCard'
 import KanbanCardOverlay from './KanbanCardOverlay'
 
+function Modal({ show, onClose, children }: { show: boolean; onClose: () => void; children: React.ReactNode }) {
+  if (!show) return null
+  return (
+    <div className="modal-bg" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>{children}</div>
+    </div>
+  )
+}
+
 const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
 const ETAPAS = [
@@ -192,6 +201,16 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     const ad = active.data.current as { etapa: number } | undefined
     const od = over.data.current as { etapa: number } | undefined
     if (!ad || !od || od.etapa === ad.etapa || od.etapa < 0 || od.etapa > 5) return
+    if (od.etapa === 4) {
+      setLeadPagId(active.id as string)
+      setPlanSel(null)
+      setPagTipo('recebido')
+      setPagValor('')
+      setRazaoSocial('')
+      setMsg('')
+      setModalPag(true)
+      return
+    }
     await moverLead(active.id as string, od.etapa)
   }, [moverLead])
 
@@ -383,9 +402,6 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
   const closeAllModals = () => { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false); setModalNovoSrv(false); setModalPagSrv(false) }
-
-  const Modal = ({ show, children }: { show: boolean; children: React.ReactNode }) =>
-    show ? <div className="modal-bg" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) closeAllModals() }}><div className="modal-box" onClick={e => e.stopPropagation()}>{children}</div></div> : null
 
   const Toasts = () => (
     <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -603,7 +619,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         )}
       </div>
 
-      <Modal show={modalNovo}>
+      <Modal show={modalNovo} onClose={closeAllModals}>
         <p className="modal-title">➕ Novo Lead Manual</p>
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="novo-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="novo-whats" placeholder="(92) 99999-9999" /></div>
@@ -631,7 +647,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p className="modal-msg">{msg}</p>
       </Modal>
 
-      <Modal show={modalPag}>
+      <Modal show={modalPag} onClose={closeAllModals}>
         <p className="modal-title">📝 Confirmar Contrato</p>
         <p style={{fontSize:13,color:'#666',marginBottom:16}}>Cliente pagou! Preencha os dados abaixo:</p>
         <div className="modal-field">
@@ -656,7 +672,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p className="modal-msg">{msg}</p>
       </Modal>
 
-      <Modal show={modalNovaRen}>
+      <Modal show={modalNovaRen} onClose={closeAllModals}>
         <p className="modal-title">🔄 Nova Renovação Manual</p>
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="ren-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="ren-whats" placeholder="(92) 99999-9999" /></div>
@@ -666,7 +682,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p className="modal-msg">{msg}</p>
       </Modal>
 
-      <Modal show={modalPagRen}>
+      <Modal show={modalPagRen} onClose={closeAllModals}>
         <p className="modal-title">💳 Confirmar Pagamento – Renovação</p>
         <p style={{fontSize:13,color:'#666',marginBottom:16}}>Cliente renovou! Selecione o plano:</p>
         {[{id:'mensal',label:'📅 Plano Mensal',sub:'R$ 337/mês'},{id:'anual',label:'🏆 Plano Anual',sub:'R$ 3.639,60/ano'},{id:'personalizado',label:'⭐ Plano Personalizado',sub:'Valor acordado'}].map(p => (
@@ -685,7 +701,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p className="modal-msg">{msg}</p>
       </Modal>
 
-      <Modal show={modalNovoSrv}>
+      <Modal show={modalNovoSrv} onClose={closeAllModals}>
         <p className="modal-title">🛠️ Novo Serviço Manual</p>
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="srv-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="srv-whats" placeholder="(92) 99999-9999" /></div>
@@ -697,7 +713,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p className="modal-msg">{msg}</p>
       </Modal>
 
-      <Modal show={modalPagSrv}>
+      <Modal show={modalPagSrv} onClose={closeAllModals}>
         <p className="modal-title">💳 Confirmar Pagamento – Serviço</p>
         <div className="modal-field"><p className="modal-label">Descrição do serviço prestado</p><input className="modal-input" type="text" value={srvDescPag} onChange={e=>setSrvDescPag(e.target.value)} placeholder="Ex: Declaração IR, Abertura de empresa..." /></div>
         <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 350" /></div>
