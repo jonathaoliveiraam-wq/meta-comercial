@@ -20,6 +20,31 @@ function Modal({ show, onClose, children }: { show: boolean; onClose: () => void
   )
 }
 
+type ToastItem = { id: number; msg: string; tipo: 'lead' | 'ok' }
+
+function Toasts({ items, onDismiss }: { items: ToastItem[]; onDismiss: (id: number) => void }) {
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {items.map(t => (
+        <div key={t.id} style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: t.tipo === 'lead' ? 'linear-gradient(135deg, rgba(79,70,229,0.95), rgba(124,58,237,0.95))' : 'rgba(16,185,129,0.95)',
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${t.tipo === 'lead' ? 'rgba(129,140,248,0.4)' : 'rgba(52,211,153,0.4)'}`,
+          borderRadius: 14, padding: '14px 18px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          color: '#fff', fontSize: 14, fontWeight: 600,
+          maxWidth: 360, animation: 'slideIn 0.3s ease',
+          cursor: 'pointer',
+        }} onClick={() => onDismiss(t.id)}>
+          <span style={{ fontSize: 22, flexShrink: 0 }}>{t.tipo === 'lead' ? '🔔' : '✅'}</span>
+          <span style={{ lineHeight: 1.4 }}>{t.msg}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
 const ETAPAS = [
@@ -67,9 +92,8 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const [leadPagId, setLeadPagId] = useState<string | null>(null)
   const [planoSel, setPlanSel] = useState<string | null>(null)
   const [pagTipo, setPagTipo] = useState<'recebido' | 'sebrae'>('recebido')
-  const [pagValor, setPagValor] = useState('')
   const [srvDescPag, setSrvDescPag] = useState('')
-  const [razaoSocial, setRazaoSocial] = useState('')
+  const razaoSocialRef = useRef<HTMLInputElement>(null)
   const [novoPlano, setNovoPlano] = useState('mensal')
   const [novoTipo, setNovoTipo] = useState<'recebido' | 'sebrae'>('recebido')
   const [msg, setMsg] = useState('')
@@ -81,7 +105,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     return null
   })
   const [loginError, setLoginError] = useState('')
-  const [toasts, setToasts] = useState<{ id: number; msg: string; tipo: 'lead' | 'ok' }[]>([])
+  const [toasts, setToasts] = useState<ToastItem[]>([])
   const [somAtivo, setSomAtivo] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('crm-som')
@@ -205,8 +229,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
       setLeadPagId(active.id as string)
       setPlanSel(null)
       setPagTipo('recebido')
-      setPagValor('')
-      setRazaoSocial('')
+      if (razaoSocialRef.current) razaoSocialRef.current.value = ''
       setMsg('')
       setModalPag(true)
       return
@@ -215,12 +238,14 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }, [moverLead])
 
   const confirmarPagamento = async () => {
-    if (!razaoSocial.trim()) { setMsg('Informe a Razão Social do cliente!'); return }
+    const razaoSocial = razaoSocialRef.current?.value?.trim() || ''
+    const pagValorContrato = (document.getElementById('pag-valor-contrato') as HTMLInputElement)?.value || ''
+    if (!razaoSocial) { setMsg('Informe a Razão Social do cliente!'); return }
     if (!planoSel) { setMsg('Selecione um plano!'); return }
     setMsg('⏳ Lançando...')
     let v = MENSAL
     if (planoSel === 'personalizado') {
-      v = parseFloat(pagValor) || 0
+      v = parseFloat(pagValorContrato) || 0
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
@@ -234,7 +259,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     setMsg('⏳ Confirmando...')
     let v = MENSAL
     if (planoSel === 'personalizado') {
-      v = parseFloat(pagValor) || 0
+      v = parseFloat((document.getElementById('pag-valor-ren') as HTMLInputElement)?.value || '0') || 0
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
@@ -273,7 +298,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }
 
   const confirmarPagamentoSrv = async () => {
-    const v = parseFloat(pagValor) || 0
+    const v = parseFloat((document.getElementById('pag-valor-srv') as HTMLInputElement)?.value || '0') || 0
     if (v <= 0) { setMsg('Informe o valor!'); return }
     setMsg('⏳ Confirmando...')
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarServico', id: leadPagId, valor: v, descricao: srvDescPag, data: new Date().toISOString().split('T')[0], user }) })
@@ -403,30 +428,9 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
 
   const closeAllModals = () => { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false); setModalNovoSrv(false); setModalPagSrv(false) }
 
-  const Toasts = () => (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {toasts.map(t => (
-        <div key={t.id} style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          background: t.tipo === 'lead' ? 'linear-gradient(135deg, rgba(79,70,229,0.95), rgba(124,58,237,0.95))' : 'rgba(16,185,129,0.95)',
-          backdropFilter: 'blur(12px)',
-          border: `1px solid ${t.tipo === 'lead' ? 'rgba(129,140,248,0.4)' : 'rgba(52,211,153,0.4)'}`,
-          borderRadius: 14, padding: '14px 18px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          color: '#fff', fontSize: 14, fontWeight: 600,
-          maxWidth: 360, animation: 'slideIn 0.3s ease',
-          cursor: 'pointer',
-        }} onClick={() => setToasts(ts => ts.filter(x => x.id !== t.id))}>
-          <span style={{ fontSize: 22, flexShrink: 0 }}>{t.tipo === 'lead' ? '🔔' : '✅'}</span>
-          <span style={{ lineHeight: 1.4 }}>{t.msg}</span>
-        </div>
-      ))}
-    </div>
-  )
-
   return (
     <div className="app-layout">
-      <Toasts />
+      <Toasts items={toasts} onDismiss={id => setToasts(ts => ts.filter(x => x.id !== id))} />
       <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
@@ -522,7 +526,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                           {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverServico(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
                             <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                              if (idx+1 === 4) { setLeadPagId(c.id); setPagValor(String(c.valor||'')); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); return }
+                              if (idx+1 === 4) { setLeadPagId(c.id); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); setTimeout(()=>{ const el=document.getElementById('pag-valor-srv') as HTMLInputElement; if(el) el.value=String(c.valor||'') },0); return }
                               moverServico(c.id, idx+1)
                             }}>→ {ETAPAS_SRV[idx+1].label}</button>
                           )}
@@ -561,12 +565,12 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
                               {idx<5 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                                  if (idx+1 === 4) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg(''); setModalPag(true); return }
+                                  if (idx+1 === 4) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); if (razaoSocialRef.current) razaoSocialRef.current.value = ''; setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
                                 }}>→ {ETAPAS[idx+1].label}</button>
                               )}
                               {idx===4 && (
-                                <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#FEF9C3',border:'1px solid #FDE047',color:'#92400E',borderRadius:6,fontWeight:700 }} onClick={() => { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setRazaoSocial(''); setMsg('⚠️ Registrar no financeiro (sem duplicar comissão)'); setModalPag(true) }}>💰 Registrar</button>
+                                <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#FEF9C3',border:'1px solid #FDE047',color:'#92400E',borderRadius:6,fontWeight:700 }} onClick={() => { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); if (razaoSocialRef.current) razaoSocialRef.current.value = ''; setMsg('⚠️ Registrar no financeiro (sem duplicar comissão)'); setModalPag(true) }}>💰 Registrar</button>
                               )}
                               <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
                             </div>
@@ -602,7 +606,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                           {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverRenovacao(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
                             <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                              if (idx+1 === 3) { setLeadPagId(c.id); setPlanSel(null); setPagTipo('recebido'); setPagValor(''); setMsg(''); setModalPagRen(true); return }
+                              if (idx+1 === 3) { setLeadPagId(c.id); setPlanSel(null); setPagTipo('recebido'); setMsg(''); setModalPagRen(true); return }
                               moverRenovacao(c.id, idx+1)
                             }}>→ {ETAPAS_REN[idx+1].label}</button>
                           )}
@@ -652,7 +656,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <p style={{fontSize:13,color:'#666',marginBottom:16}}>Cliente pagou! Preencha os dados abaixo:</p>
         <div className="modal-field">
           <p className="modal-label">Razão Social / Nome do Cliente</p>
-          <input className="modal-input" type="text" placeholder="Ex: Empresa LTDA" value={razaoSocial} onChange={e=>setRazaoSocial(e.target.value)} />
+          <input ref={razaoSocialRef} className="modal-input" type="text" placeholder="Ex: Empresa LTDA" />
           <p style={{fontSize:11,color:'#9CA3AF',marginTop:4}}>Este nome aparecerá na lista de clientes e no portal do parceiro.</p>
         </div>
         <p style={{fontSize:12,fontWeight:600,color:'#374151',marginBottom:8}}>Plano contratado:</p>
@@ -662,7 +666,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           </div>
         ))}
         {planoSel==='personalizado' && <div style={{marginTop:12}}>
-          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 5000" /></div>
+          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-contrato" className="modal-input" type="number" placeholder="Ex: 5000" /></div>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
             <button className={'tbtn '+(pagTipo==='recebido'?'on':'off')} onClick={()=>setPagTipo('recebido')}>💰 Recebido</button>
             <button className={'tbtn '+(pagTipo==='sebrae'?'on':'off')} onClick={()=>setPagTipo('sebrae')}>🏦 SEBRAE</button>
@@ -691,7 +695,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           </div>
         ))}
         {planoSel==='personalizado' && <div style={{marginTop:12}}>
-          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 5000" /></div>
+          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-ren" className="modal-input" type="number" placeholder="Ex: 5000" /></div>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
             <button className={'tbtn '+(pagTipo==='recebido'?'on':'off')} onClick={()=>setPagTipo('recebido')}>💰 Recebido</button>
             <button className={'tbtn '+(pagTipo==='sebrae'?'on':'off')} onClick={()=>setPagTipo('sebrae')}>🏦 SEBRAE</button>
@@ -716,7 +720,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
       <Modal show={modalPagSrv} onClose={closeAllModals}>
         <p className="modal-title">💳 Confirmar Pagamento – Serviço</p>
         <div className="modal-field"><p className="modal-label">Descrição do serviço prestado</p><input className="modal-input" type="text" value={srvDescPag} onChange={e=>setSrvDescPag(e.target.value)} placeholder="Ex: Declaração IR, Abertura de empresa..." /></div>
-        <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input className="modal-input" type="number" value={pagValor} onChange={e=>setPagValor(e.target.value)} placeholder="Ex: 350" /></div>
+        <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-srv" className="modal-input" type="number" placeholder="Ex: 350" /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalPagSrv(false)}>Cancelar</button><button className="modal-save" onClick={confirmarPagamentoSrv}>✔ Confirmar Serviço</button></div>
         <p className="modal-msg">{msg}</p>
       </Modal>
