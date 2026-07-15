@@ -86,14 +86,14 @@ export async function POST(req: Request) {
       const valorRec = body.tipo === 'sebrae' ? body.val / 0.3 : body.val
       const recTotal = body.qty * valorRec
       const equiv = recTotal / MENSAL
-      await query('INSERT INTO lancamentos (qty, val, tipo, valorRec, recTotal, equiv, descricao, data, parceiro) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || ''])
+      await query('INSERT INTO lancamentos (qty, val, tipo, "valorRec", "recTotal", equiv, descricao, data, parceiro) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || ''])
       return Response.json({ ok: true })
     }
     if (action === 'editLancamento') {
       const valorRec = body.tipo === 'sebrae' ? body.val / 0.3 : body.val
       const recTotal = body.qty * valorRec
       const equiv = recTotal / MENSAL
-      await query('UPDATE lancamentos SET qty=$1, val=$2, tipo=$3, valorRec=$4, recTotal=$5, equiv=$6, descricao=$7, data=$8, parceiro=$9 WHERE id=$10', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || '', body.id])
+      await query('UPDATE lancamentos SET qty=$1, val=$2, tipo=$3, "valorRec"=$4, "recTotal"=$5, equiv=$6, descricao=$7, data=$8, parceiro=$9 WHERE id=$10', [body.qty, body.val, body.tipo, valorRec, recTotal, equiv, body.descricao, body.data, body.parceiro || '', body.id])
       return Response.json({ ok: true })
     }
     if (action === 'delLancamento') {
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
         if (!existe) await query('INSERT INTO clientes_anuais (descricao, data, parceiro) VALUES ($1, $2, $3)', [nomeCliente, body.data, lead.parceiro || ''])
       } else if (body.plano === 'personalizado') {
         const recTotal = valorFechado; const equiv = recTotal / MENSAL
-        await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, nomeCliente, body.data, lead.parceiro || ''])
+        await query('INSERT INTO lancamentos (qty,val,tipo,"valorRec","recTotal",equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8)', [body.valor, body.tipo || 'recebido', valorFechado, recTotal, equiv, nomeCliente, body.data, lead.parceiro || ''])
       }
       // Atualiza lead do parceiro: indicado → fechado
       if (lead.leadId) await query('UPDATE leads_portal SET status = $1 WHERE id = $2', ['fechado', lead.leadId])
@@ -184,13 +184,11 @@ export async function POST(req: Request) {
       return Response.json({ ok: true })
     }
     if (action === 'excluirCrmLead') {
+      const usuario = await queryRow('SELECT perfil FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario || usuario.perfil !== 'admin') return Response.json({ error: 'Apenas administradores podem excluir leads.' }, { status: 403 })
       const lead = await queryRow('SELECT * FROM crm_leads WHERE id = $1', [body.id])
+      if (lead?.etapa >= 4) return Response.json({ error: 'Este cliente já foi fechado e não pode ser excluído.' }, { status: 400 })
       if (lead?.leadId) await query('DELETE FROM leads_portal WHERE id = $1', [lead.leadId])
-      if (lead?.etapa >= 4) {
-        const nome = lead.nome
-        if (lead.plano === 'mensal') await query('DELETE FROM clientes_mensais WHERE descricao = $1', [nome])
-        else if (lead.plano === 'anual') await query('DELETE FROM clientes_anuais WHERE descricao = $1', [nome])
-      }
       await query('DELETE FROM crm_leads WHERE id = $1', [body.id])
       return Response.json({ ok: true })
     }
@@ -244,7 +242,7 @@ export async function POST(req: Request) {
       const historico = JSON.parse(srv.historico || '[]')
       historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema' })
       await query('UPDATE crm_servicos SET etapa=4, valor=$1, historico=$2 WHERE id=$3', [valorFechado, JSON.stringify(historico), body.id])
-      await query('INSERT INTO lancamentos (qty,val,tipo,valorRec,recTotal,equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,\'\')',
+      await query('INSERT INTO lancamentos (qty,val,tipo,"valorRec","recTotal",equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,\'\')',
         [valorFechado, 'recebido', valorFechado, valorFechado, equiv, srv.descricao || srv.nome, body.data || new Date().toISOString().split('T')[0]])
       sendTelegram('🛠️ <b>Serviço confirmado!</b>\nCliente: ' + srv.nome + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
       return Response.json({ ok: true })

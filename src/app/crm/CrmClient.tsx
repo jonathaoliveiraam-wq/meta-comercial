@@ -104,6 +104,14 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (typeof window !== 'undefined') return sessionStorage.getItem('crm-user')
     return null
   })
+  const [perfil, setPerfil] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('crm-perfil')
+    return null
+  })
+  const [usuarioLogin, setUsuarioLogin] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('crm-usuario')
+    return null
+  })
   const [loginError, setLoginError] = useState('')
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [somAtivo, setSomAtivo] = useState(() => {
@@ -249,7 +257,8 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarPagamento', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, razaoSocial, data: new Date().toISOString().split('T')[0], user }) })
+    const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarPagamento', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, razaoSocial, data: new Date().toISOString().split('T')[0], user }) })
+    if (!res.ok) { const data = await res.json().catch(() => ({})); setMsg('❌ ' + (data.error || 'Erro ao lançar. Tente novamente.')); return }
     setMsg('✅ Lançado!')
     setTimeout(() => { setModalPag(false); recarregar() }, 600)
   }
@@ -329,7 +338,9 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
 
   const excluirLead = async (id: string) => {
     if (!confirm('Excluir este lead?')) return
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirCrmLead', id }) })
+    const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirCrmLead', id, usuario: usuarioLogin }) })
+    const data = await res.json()
+    if (!res.ok) { addToast(data.error || 'Não foi possível excluir.', 'lead'); return }
     recarregar()
   }
 
@@ -339,7 +350,11 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     const data = await res.json()
     if (!res.ok) { setLoginError(data.error || '❌ Usuário ou senha incorretos.'); return }
     setUser(data.nome)
+    setPerfil(data.perfil)
+    setUsuarioLogin(u)
     sessionStorage.setItem('crm-user', data.nome)
+    sessionStorage.setItem('crm-perfil', data.perfil)
+    sessionStorage.setItem('crm-usuario', u)
     setLoginError('')
   }
 
@@ -431,7 +446,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   return (
     <div className="app-layout">
       <Toasts items={toasts} onDismiss={id => setToasts(ts => ts.filter(x => x.id !== id))} />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); sessionStorage.removeItem('crm-perfil'); sessionStorage.removeItem('crm-usuario'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
         <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>
@@ -572,7 +587,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               {idx===4 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#FEF9C3',border:'1px solid #FDE047',color:'#92400E',borderRadius:6,fontWeight:700 }} onClick={() => { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); if (razaoSocialRef.current) razaoSocialRef.current.value = ''; setMsg('⚠️ Registrar no financeiro (sem duplicar comissão)'); setModalPag(true) }}>💰 Registrar</button>
                               )}
-                              <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>
+                              {perfil === 'admin' && <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>}
                             </div>
                           </div>
                         ))}
