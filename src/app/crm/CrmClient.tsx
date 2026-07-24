@@ -47,6 +47,7 @@ function Toasts({ items, onDismiss }: { items: ToastItem[]; onDismiss: (id: numb
 
 const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
+const parseValorBR = (v?: string | null) => parseFloat((v || '').trim().replace(',', '.')) || 0
 const ETAPAS = [
   { id: 'indicacao', label: '📋 Indicação', cor: '#6366F1' },
   { id: 'reuniao', label: '📞 Reunião', cor: '#38BDF8' },
@@ -70,9 +71,9 @@ const ETAPAS_SRV = [
   { id: 'finalizado', label: '✅ Finalizado', cor: '#10B981' },
 ]
 
-interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[]; responsavel: string | null }
-interface CrmRen { id: string; nome: string; whats: string; segmento: string; obs: string; plano: string; valor: number; tipoCustom: string; etapa: number; data: string; historico: any[] }
-interface CrmSrv { id: string; nome: string; whats: string; segmento: string; obs: string; descricao: string; plano: string; valor: number; etapa: number; data: string; historico: any[] }
+interface CrmLead { id: string; leadId: string | null; nome: string; whats: string; segmento: string; obs: string; parceiro: string; parceiroNome: string; etapa: number; plano: string; valor: number; data: string; historico: any[]; responsavel: string | null; exclusaoPendente?: boolean; exclusaoPor?: string }
+interface CrmRen { id: string; nome: string; whats: string; segmento: string; obs: string; plano: string; valor: number; tipoCustom: string; etapa: number; data: string; historico: any[]; exclusaoPendente?: boolean; exclusaoPor?: string }
+interface CrmSrv { id: string; nome: string; whats: string; segmento: string; obs: string; descricao: string; plano: string; valor: number; etapa: number; data: string; historico: any[]; exclusaoPendente?: boolean; exclusaoPor?: string }
 
 interface Props { initialCrm: CrmLead[]; initialRenovacao: CrmRen[]; initialServicos: CrmSrv[]; initialParceiros: any[] }
 
@@ -81,7 +82,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const [ren, setRen] = useState<CrmRen[]>(initialRenovacao)
   const [srv, setSrv] = useState<CrmSrv[]>(initialServicos)
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [view, setView] = useState<'novos' | 'renovacao' | 'servicos'>('novos')
+  const [view, setView] = useState<'novos' | 'renovacao' | 'servicos' | 'pendencias'>('novos')
 
   const [modalNovo, setModalNovo] = useState(false)
   const [modalPag, setModalPag] = useState(false)
@@ -89,6 +90,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const [modalNovaRen, setModalNovaRen] = useState(false)
   const [modalNovoSrv, setModalNovoSrv] = useState(false)
   const [modalPagSrv, setModalPagSrv] = useState(false)
+  const [modalEditar, setModalEditar] = useState<{ tipo: 'lead' | 'renovacao' | 'servico'; id: string } | null>(null)
   const [leadPagId, setLeadPagId] = useState<string | null>(null)
   const [planoSel, setPlanSel] = useState<string | null>(null)
   const [pagTipo, setPagTipo] = useState<'recebido' | 'sebrae'>('recebido')
@@ -253,7 +255,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     setMsg('⏳ Lançando...')
     let v = MENSAL
     if (planoSel === 'personalizado') {
-      v = parseFloat(pagValorContrato) || 0
+      v = parseValorBR(pagValorContrato)
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
@@ -268,7 +270,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     setMsg('⏳ Confirmando...')
     let v = MENSAL
     if (planoSel === 'personalizado') {
-      v = parseFloat((document.getElementById('pag-valor-ren') as HTMLInputElement)?.value || '0') || 0
+      v = parseValorBR((document.getElementById('pag-valor-ren') as HTMLInputElement)?.value)
       if (v <= 0) { setMsg('Informe o valor!'); return }
       if (pagTipo === 'sebrae') v = v / 0.3
     }
@@ -285,7 +287,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     let valor = MENSAL
     if (novoPlano === 'anual') valor = ANUAL
     else if (novoPlano === 'personalizado' || novoPlano === 'servico') {
-      const vi = parseFloat((document.getElementById('novo-valor') as HTMLInputElement)?.value) || 0
+      const vi = parseValorBR((document.getElementById('novo-valor') as HTMLInputElement)?.value)
       if (vi <= 0) { setMsg('Informe o valor!'); return }
       valor = novoPlano === 'servico' ? vi : (novoTipo === 'sebrae' ? vi / 0.3 : vi)
     }
@@ -301,13 +303,13 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     const valorStr = (document.getElementById('srv-valor') as HTMLInputElement)?.value
     if (!nome || !whats) { setMsg('Preencha nome e WhatsApp!'); return }
     setMsg('⏳ Salvando...')
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarServico', nome, whats, descricao: descricao || '', valor: parseFloat(valorStr) || 0, segmento: (document.getElementById('srv-segmento') as HTMLSelectElement)?.value || '', obs: (document.getElementById('srv-obs') as HTMLTextAreaElement)?.value || '', user }) })
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarServico', nome, whats, descricao: descricao || '', valor: parseValorBR(valorStr), segmento: (document.getElementById('srv-segmento') as HTMLSelectElement)?.value || '', obs: (document.getElementById('srv-obs') as HTMLTextAreaElement)?.value || '', user }) })
     setMsg('✅ Serviço adicionado!')
     setTimeout(() => { setModalNovoSrv(false); recarregar() }, 600)
   }
 
   const confirmarPagamentoSrv = async () => {
-    const v = parseFloat((document.getElementById('pag-valor-srv') as HTMLInputElement)?.value || '0') || 0
+    const v = parseValorBR((document.getElementById('pag-valor-srv') as HTMLInputElement)?.value)
     if (v <= 0) { setMsg('Informe o valor!'); return }
     setMsg('⏳ Confirmando...')
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarServico', id: leadPagId, valor: v, descricao: srvDescPag, data: new Date().toISOString().split('T')[0], user }) })
@@ -316,15 +318,19 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }
 
   const excluirServico = async (id: string) => {
-    if (!confirm('Excluir este serviço?')) return
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirServico', id }) })
+    const isAdmin = perfil === 'admin'
+    if (!confirm(isAdmin ? 'Excluir este serviço?' : 'Solicitar exclusão deste serviço? Um admin vai aprovar.')) return
+    const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirServico', id, usuario: usuarioLogin }) })
+    const data = await res.json()
+    if (!res.ok) { addToast(data.error || 'Não foi possível excluir.', 'lead'); return }
+    if (data.pendente) addToast('🗑️ Solicitação de exclusão enviada. Aguardando aprovação do admin.', 'ok')
     recarregar()
   }
 
   const salvarNovaRenovacao = async () => {
     const nome = (document.getElementById('ren-nome') as HTMLInputElement)?.value?.trim()
     const whats = (document.getElementById('ren-whats') as HTMLInputElement)?.value?.trim()
-    const valor = parseFloat((document.getElementById('ren-valor') as HTMLInputElement)?.value) || MENSAL
+    const valor = parseValorBR((document.getElementById('ren-valor') as HTMLInputElement)?.value) || MENSAL
     if (!nome || !whats) { setMsg('Preencha nome e WhatsApp!'); return }
     setMsg('⏳ Salvando...')
     await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarRenovacao', nome, whats, plano: 'mensal', valor, user }) })
@@ -338,17 +344,64 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }, [])
 
   const excluirLead = async (id: string) => {
-    if (!confirm('Excluir este lead?')) return
+    const isAdmin = perfil === 'admin'
+    if (!confirm(isAdmin ? 'Excluir este lead?' : 'Solicitar exclusão deste lead? Um admin vai aprovar.')) return
     const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirCrmLead', id, usuario: usuarioLogin }) })
     const data = await res.json()
     if (!res.ok) { addToast(data.error || 'Não foi possível excluir.', 'lead'); return }
+    if (data.pendente) addToast('🗑️ Solicitação de exclusão enviada. Aguardando aprovação do admin.', 'ok')
     recarregar()
   }
 
   const excluirRenovacao = async (id: string) => {
-    if (!confirm('Excluir esta renovação?')) return
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirRenovacao', id }) })
+    const isAdmin = perfil === 'admin'
+    if (!confirm(isAdmin ? 'Excluir esta renovação?' : 'Solicitar exclusão desta renovação? Um admin vai aprovar.')) return
+    const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirRenovacao', id, usuario: usuarioLogin }) })
+    const data = await res.json()
+    if (!res.ok) { addToast(data.error || 'Não foi possível excluir.', 'lead'); return }
+    if (data.pendente) addToast('🗑️ Solicitação de exclusão enviada. Aguardando aprovação do admin.', 'ok')
     recarregar()
+  }
+
+  const aprovarExclusao = async (tipo: 'lead' | 'renovacao' | 'servico', id: string) => {
+    if (!confirm('Aprovar e excluir definitivamente?')) return
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'aprovarExclusao', tipo, id, usuario: usuarioLogin }) })
+    recarregar()
+  }
+
+  const recusarExclusao = async (tipo: 'lead' | 'renovacao' | 'servico', id: string) => {
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recusarExclusao', tipo, id, usuario: usuarioLogin }) })
+    recarregar()
+  }
+
+  const abrirEditar = (tipo: 'lead' | 'renovacao' | 'servico', item: any) => {
+    setMsg('')
+    setModalEditar({ tipo, id: item.id })
+    setTimeout(() => {
+      const set = (elId: string, v: any) => { const el = document.getElementById(elId) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null; if (el) el.value = v ?? '' }
+      set('edit-nome', item.nome)
+      set('edit-whats', item.whats)
+      set('edit-segmento', item.segmento)
+      set('edit-obs', item.obs)
+      set('edit-valor', item.valor != null ? String(item.valor) : '')
+      if (tipo === 'servico') set('edit-descricao', item.descricao)
+    }, 0)
+  }
+
+  const salvarEdicao = async () => {
+    if (!modalEditar) return
+    const nome = (document.getElementById('edit-nome') as HTMLInputElement)?.value?.trim()
+    const whats = (document.getElementById('edit-whats') as HTMLInputElement)?.value?.trim()
+    if (!nome || !whats) { setMsg('Preencha nome e WhatsApp!'); return }
+    setMsg('⏳ Salvando...')
+    const segmento = (document.getElementById('edit-segmento') as HTMLSelectElement)?.value || ''
+    const obs = (document.getElementById('edit-obs') as HTMLTextAreaElement)?.value || ''
+    const valor = parseValorBR((document.getElementById('edit-valor') as HTMLInputElement)?.value)
+    const action = modalEditar.tipo === 'lead' ? 'editarCrmLead' : modalEditar.tipo === 'renovacao' ? 'editarRenovacao' : 'editarServico'
+    const extra = modalEditar.tipo === 'servico' ? { descricao: (document.getElementById('edit-descricao') as HTMLInputElement)?.value?.trim() || '' } : {}
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, id: modalEditar.id, nome, whats, segmento, obs, valor, ...extra }) })
+    setMsg('✅ Atualizado!')
+    setTimeout(() => { setModalEditar(null); recarregar() }, 600)
   }
 
   const fazerLogin = async (u: string, s: string) => {
@@ -448,18 +501,24 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
 
   const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
-  const closeAllModals = () => { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false); setModalNovoSrv(false); setModalPagSrv(false) }
+  const pendentes = [
+    ...crm.filter(c => c.exclusaoPendente).map(c => ({ ...c, tipo: 'lead' as const })),
+    ...ren.filter(c => c.exclusaoPendente).map(c => ({ ...c, tipo: 'renovacao' as const })),
+    ...srv.filter(c => c.exclusaoPendente).map(c => ({ ...c, tipo: 'servico' as const })),
+  ]
+
+  const closeAllModals = () => { setModalNovo(false); setModalPag(false); setModalPagRen(false); setModalNovaRen(false); setModalNovoSrv(false); setModalPagSrv(false); setModalEditar(null) }
 
   return (
     <div className="app-layout">
       <Toasts items={toasts} onDismiss={id => setToasts(ts => ts.filter(x => x.id !== id))} />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); sessionStorage.removeItem('crm-perfil'); sessionStorage.removeItem('crm-usuario'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }, ...(perfil==='admin'?[{ icon:'🔔', label: pendentes.length>0 ? `Pendências (${pendentes.length})` : 'Pendências', onClick:()=>setView('pendencias') }]:[])]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); sessionStorage.removeItem('crm-perfil'); sessionStorage.removeItem('crm-usuario'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
         <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
             <button onClick={() => { setSidebarCollapsed(false); }} style={{ background:'none',border:'none',cursor:'pointer',color:'#6B7280',fontSize:20,lineHeight:1,padding:'2px 6px',display: sidebarCollapsed ? 'block' : 'none' }} title="Abrir menu">☰</button>
-            <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':view==='renovacao'?'🔄 Renovação':'🛠️ Serviços'}</span>
+            <span className="topbar-title" style={{ color:'#111827',fontSize:15 }}>{view==='novos'?'👥 Clientes Novos':view==='renovacao'?'🔄 Renovação':view==='servicos'?'🛠️ Serviços':'🔔 Pendências de exclusão'}</span>
             {view==='novos' && crm.filter(c=>c.etapa===0).length > 0 && (
               <span style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:20,padding:'3px 10px',fontSize:11,fontWeight:700 }}>
                 {crm.filter(c=>c.etapa===0).length} nova{crm.filter(c=>c.etapa===0).length>1?'s':''}
@@ -491,7 +550,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           </div>
         </div>
 
-        <div className="stats-bar">
+        {view!=='pendencias' && <div className="stats-bar">
           <div className="stats-inner">
           {(view==='novos'?[
             { label:'Total leads',value:totalLeads,cor:'#6366F1' },
@@ -525,9 +584,26 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
               <div style={{ color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:600, marginTop:2 }}>💰 Total em pipeline</div>
             </div>
           </div>
-        </div>
+        </div>}
 
-        {view==='servicos' ? (
+        {view==='pendencias' ? (
+          <div className="kanban-wrap" style={{ padding:20 }}>
+            {pendentes.length===0
+              ? <div className="empty">Nenhuma solicitação de exclusão pendente</div>
+              : pendentes.map(item => (
+                <div key={item.tipo+item.id} className="card-lead" style={{ maxWidth:480, marginBottom:10 }}>
+                  <div className="card-nome">{item.nome} <span style={{ fontSize:10,color:'#9CA3AF',fontWeight:600 }}>({item.tipo==='lead'?'Cliente Novo':item.tipo==='renovacao'?'Renovação':'Serviço'})</span></div>
+                  <div className="card-info">📱 {item.whats} · R$ {(item.valor||0).toLocaleString('pt-BR')}</div>
+                  <div className="card-info" style={{ color:'#EF4444' }}>Solicitado por: {item.exclusaoPor || '—'}</div>
+                  <div className="card-actions" style={{ display:'flex',gap:4,marginTop:8 }}>
+                    <button style={{ flex:1,background:'#ECFDF5',border:'1px solid #A7F3D0',color:'#059669',borderRadius:6,padding:'6px',fontSize:11,cursor:'pointer',fontWeight:700 }} onClick={()=>aprovarExclusao(item.tipo, item.id)}>✅ Aprovar exclusão</button>
+                    <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'6px',fontSize:11,cursor:'pointer',fontWeight:700 }} onClick={()=>recusarExclusao(item.tipo, item.id)}>❌ Recusar</button>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        ) : view==='servicos' ? (
           <div className="kanban-wrap">
             <div className="kanban">
               {ETAPAS_SRV.map((etapa, idx) => {
@@ -552,7 +628,10 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               moverServico(c.id, idx+1)
                             }}>→ {ETAPAS_SRV[idx+1].label}</button>
                           )}
-                          <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirServico(c.id)}>🗑</button>
+                          <button style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => abrirEditar('servico', c)}>✏️</button>
+                          {c.exclusaoPendente
+                            ? <span style={{ flex:1,textAlign:'center',fontSize:9,fontWeight:700,color:'#B45309',background:'#FEF3C7',border:'1px solid #FDE68A',borderRadius:6,padding:'4px' }}>⏳ Pendente</span>
+                            : <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirServico(c.id)}>🗑</button>}
                         </div>
                       </div>
                     ))}
@@ -594,7 +673,10 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               {idx===4 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#FEF9C3',border:'1px solid #FDE047',color:'#92400E',borderRadius:6,fontWeight:700 }} onClick={() => { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); if (razaoSocialRef.current) razaoSocialRef.current.value = ''; setMsg('⚠️ Registrar no financeiro (sem duplicar comissão)'); setModalPag(true) }}>💰 Registrar</button>
                               )}
-                              {perfil === 'admin' && <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>}
+                              <button style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => abrirEditar('lead', card)}>✏️</button>
+                              {card.exclusaoPendente
+                                ? <span style={{ flex:1,textAlign:'center',fontSize:9,fontWeight:700,color:'#B45309',background:'#FEF3C7',border:'1px solid #FDE68A',borderRadius:6,padding:'4px' }}>⏳ Pendente</span>
+                                : <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirLead(card.id)}>🗑</button>}
                             </div>
                           </div>
                         ))}
@@ -632,7 +714,10 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               moverRenovacao(c.id, idx+1)
                             }}>→ {ETAPAS_REN[idx+1].label}</button>
                           )}
-                          {perfil === 'admin' && <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirRenovacao(c.id)}>🗑</button>}
+                          <button style={{ background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => abrirEditar('renovacao', c)}>✏️</button>
+                          {c.exclusaoPendente
+                            ? <span style={{ flex:1,textAlign:'center',fontSize:9,fontWeight:700,color:'#B45309',background:'#FEF3C7',border:'1px solid #FDE68A',borderRadius:6,padding:'4px' }}>⏳ Pendente</span>
+                            : <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirRenovacao(c.id)}>🗑</button>}
                         </div>
                       </div>
                     ))}
@@ -663,7 +748,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         </div></div>
         {(novoPlano==='personalizado'||novoPlano==='servico') && <>
           {novoPlano==='servico' && <div className="modal-field"><p className="modal-label">Descrição</p><input className="modal-input" id="novo-desc-servico" placeholder="Ex: Abertura de empresa" /></div>}
-          <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="number" id="novo-valor" placeholder="Ex: 6500" /></div>
+          <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="text" inputMode="decimal" id="novo-valor" placeholder="Ex: 6500,00" /></div>
           {novoPlano!=='servico' && <div style={{display:'flex',gap:6,marginBottom:12}}>
             <button className={'tbtn '+(novoTipo==='recebido'?'on':'off')} onClick={()=>setNovoTipo('recebido')}>💰 Recebido</button>
             <button className={'tbtn '+(novoTipo==='sebrae'?'on':'off')} onClick={()=>setNovoTipo('sebrae')}>🏦 SEBRAE</button>
@@ -689,7 +774,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           </div>
         ))}
         {planoSel==='personalizado' && <div style={{marginTop:12}}>
-          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-contrato" className="modal-input" type="number" placeholder="Ex: 5000" /></div>
+          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-contrato" className="modal-input" type="text" inputMode="decimal" placeholder="Ex: 5000,00" /></div>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
             <button className={'tbtn '+(pagTipo==='recebido'?'on':'off')} onClick={()=>setPagTipo('recebido')}>💰 Recebido</button>
             <button className={'tbtn '+(pagTipo==='sebrae'?'on':'off')} onClick={()=>setPagTipo('sebrae')}>🏦 SEBRAE</button>
@@ -704,7 +789,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="ren-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="ren-whats" placeholder="(92) 99999-9999" /></div>
         <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="ren-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
-        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="number" id="ren-valor" defaultValue={337} placeholder="Ex: 337" /></div>
+        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="text" inputMode="decimal" id="ren-valor" defaultValue={337} placeholder="Ex: 337,00" /></div>
         <div className="modal-field"><p className="modal-label">Observação</p><textarea className="modal-input" id="ren-obs" rows={2} placeholder="Vencimento, contexto..." /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalNovaRen(false)}>Cancelar</button><button className="modal-save" onClick={salvarNovaRenovacao}>✔ Salvar Renovação</button></div>
         <p className="modal-msg">{msg}</p>
@@ -719,7 +804,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           </div>
         ))}
         {planoSel==='personalizado' && <div style={{marginTop:12}}>
-          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-ren" className="modal-input" type="number" placeholder="Ex: 5000" /></div>
+          <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-ren" className="modal-input" type="text" inputMode="decimal" placeholder="Ex: 5000,00" /></div>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
             <button className={'tbtn '+(pagTipo==='recebido'?'on':'off')} onClick={()=>setPagTipo('recebido')}>💰 Recebido</button>
             <button className={'tbtn '+(pagTipo==='sebrae'?'on':'off')} onClick={()=>setPagTipo('sebrae')}>🏦 SEBRAE</button>
@@ -734,7 +819,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="srv-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="srv-whats" placeholder="(92) 99999-9999" /></div>
         <div className="modal-field"><p className="modal-label">Descrição do serviço</p><input className="modal-input" type="text" id="srv-descricao" placeholder="Ex: Declaração IR, Abertura empresa..." /></div>
-        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="number" id="srv-valor" placeholder="Ex: 350" /></div>
+        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="text" inputMode="decimal" id="srv-valor" placeholder="Ex: 350,00" /></div>
         <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="srv-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
         <div className="modal-field"><p className="modal-label">Observação</p><textarea className="modal-input" id="srv-obs" rows={2} placeholder="Contexto, prazo..." /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalNovoSrv(false)}>Cancelar</button><button className="modal-save" onClick={salvarNovoServico}>✔ Salvar Serviço</button></div>
@@ -744,8 +829,20 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
       <Modal show={modalPagSrv} onClose={closeAllModals}>
         <p className="modal-title">💳 Confirmar Pagamento – Serviço</p>
         <div className="modal-field"><p className="modal-label">Descrição do serviço prestado</p><input className="modal-input" type="text" value={srvDescPag} onChange={e=>setSrvDescPag(e.target.value)} placeholder="Ex: Declaração IR, Abertura de empresa..." /></div>
-        <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-srv" className="modal-input" type="number" placeholder="Ex: 350" /></div>
+        <div className="modal-field"><p className="modal-label">Valor recebido (R$)</p><input id="pag-valor-srv" className="modal-input" type="text" inputMode="decimal" placeholder="Ex: 350,00" /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalPagSrv(false)}>Cancelar</button><button className="modal-save" onClick={confirmarPagamentoSrv}>✔ Confirmar Serviço</button></div>
+        <p className="modal-msg">{msg}</p>
+      </Modal>
+
+      <Modal show={!!modalEditar} onClose={closeAllModals}>
+        <p className="modal-title">✏️ Editar {modalEditar?.tipo==='lead'?'Lead':modalEditar?.tipo==='renovacao'?'Renovação':'Serviço'}</p>
+        <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="edit-nome" /></div>
+        <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="edit-whats" /></div>
+        <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="edit-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
+        {modalEditar?.tipo==='servico' && <div className="modal-field"><p className="modal-label">Descrição do serviço</p><input className="modal-input" type="text" id="edit-descricao" /></div>}
+        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="text" inputMode="decimal" id="edit-valor" /></div>
+        <div className="modal-field"><p className="modal-label">Observação</p><textarea className="modal-input" id="edit-obs" rows={2} /></div>
+        <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalEditar(null)}>Cancelar</button><button className="modal-save" onClick={salvarEdicao}>✔ Salvar Alterações</button></div>
         <p className="modal-msg">{msg}</p>
       </Modal>
     </div>

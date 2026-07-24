@@ -184,13 +184,17 @@ export async function POST(req: Request) {
       return Response.json({ ok: true })
     }
     if (action === 'excluirCrmLead') {
-      const usuario = await queryRow('SELECT perfil FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
-      if (!usuario || usuario.perfil !== 'admin') return Response.json({ error: 'Apenas administradores podem excluir leads.' }, { status: 403 })
+      const usuario = await queryRow('SELECT perfil, nome FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario) return Response.json({ error: 'Usuário inválido.' }, { status: 403 })
       const lead = await queryRow('SELECT * FROM crm_leads WHERE id = $1', [body.id])
       if (lead?.etapa >= 4) return Response.json({ error: 'Este cliente já foi fechado e não pode ser excluído.' }, { status: 400 })
-      if (lead?.leadId) await query('DELETE FROM leads_portal WHERE id = $1', [lead.leadId])
-      await query('DELETE FROM crm_leads WHERE id = $1', [body.id])
-      return Response.json({ ok: true })
+      if (usuario.perfil === 'admin') {
+        if (lead?.leadId) await query('DELETE FROM leads_portal WHERE id = $1', [lead.leadId])
+        await query('DELETE FROM crm_leads WHERE id = $1', [body.id])
+        return Response.json({ ok: true, pendente: false })
+      }
+      await query('UPDATE crm_leads SET "exclusaoPendente" = true, "exclusaoPor" = $1 WHERE id = $2', [usuario.nome, body.id])
+      return Response.json({ ok: true, pendente: true })
     }
     if (action === 'criarRenovacao') {
       const id = 'ren_' + Date.now()
@@ -216,8 +220,14 @@ export async function POST(req: Request) {
       return Response.json({ ok: true })
     }
     if (action === 'excluirRenovacao') {
-      await query('DELETE FROM crm_renovacoes WHERE id = $1', [body.id])
-      return Response.json({ ok: true })
+      const usuario = await queryRow('SELECT perfil, nome FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario) return Response.json({ error: 'Usuário inválido.' }, { status: 403 })
+      if (usuario.perfil === 'admin') {
+        await query('DELETE FROM crm_renovacoes WHERE id = $1', [body.id])
+        return Response.json({ ok: true, pendente: false })
+      }
+      await query('UPDATE crm_renovacoes SET "exclusaoPendente" = true, "exclusaoPor" = $1 WHERE id = $2', [usuario.nome, body.id])
+      return Response.json({ ok: true, pendente: true })
     }
     if (action === 'criarServico') {
       const id = 'srv_' + Date.now()
@@ -248,7 +258,49 @@ export async function POST(req: Request) {
       return Response.json({ ok: true })
     }
     if (action === 'excluirServico') {
-      await query('DELETE FROM crm_servicos WHERE id = $1', [body.id])
+      const usuario = await queryRow('SELECT perfil, nome FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario) return Response.json({ error: 'Usuário inválido.' }, { status: 403 })
+      if (usuario.perfil === 'admin') {
+        await query('DELETE FROM crm_servicos WHERE id = $1', [body.id])
+        return Response.json({ ok: true, pendente: false })
+      }
+      await query('UPDATE crm_servicos SET "exclusaoPendente" = true, "exclusaoPor" = $1 WHERE id = $2', [usuario.nome, body.id])
+      return Response.json({ ok: true, pendente: true })
+    }
+    if (action === 'aprovarExclusao') {
+      const usuario = await queryRow('SELECT perfil FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario || usuario.perfil !== 'admin') return Response.json({ error: 'Apenas administradores podem aprovar exclusões.' }, { status: 403 })
+      if (body.tipo === 'lead') {
+        const lead = await queryRow('SELECT "leadId" FROM crm_leads WHERE id = $1', [body.id])
+        if (lead?.leadId) await query('DELETE FROM leads_portal WHERE id = $1', [lead.leadId])
+        await query('DELETE FROM crm_leads WHERE id = $1', [body.id])
+      } else if (body.tipo === 'renovacao') {
+        await query('DELETE FROM crm_renovacoes WHERE id = $1', [body.id])
+      } else if (body.tipo === 'servico') {
+        await query('DELETE FROM crm_servicos WHERE id = $1', [body.id])
+      } else {
+        return Response.json({ error: 'Tipo inválido.' }, { status: 400 })
+      }
+      return Response.json({ ok: true })
+    }
+    if (action === 'recusarExclusao') {
+      const usuario = await queryRow('SELECT perfil FROM crm_usuarios WHERE usuario = $1 AND ativo = true', [body.usuario])
+      if (!usuario || usuario.perfil !== 'admin') return Response.json({ error: 'Apenas administradores podem recusar exclusões.' }, { status: 403 })
+      const tbl = body.tipo === 'lead' ? 'crm_leads' : body.tipo === 'renovacao' ? 'crm_renovacoes' : body.tipo === 'servico' ? 'crm_servicos' : null
+      if (!tbl) return Response.json({ error: 'Tipo inválido.' }, { status: 400 })
+      await query(`UPDATE ${tbl} SET "exclusaoPendente" = false, "exclusaoPor" = '' WHERE id = $1`, [body.id])
+      return Response.json({ ok: true })
+    }
+    if (action === 'editarCrmLead') {
+      await query('UPDATE crm_leads SET nome=$1, whats=$2, segmento=$3, obs=$4, valor=$5 WHERE id=$6', [body.nome, body.whats, body.segmento || '', body.obs || '', body.valor, body.id])
+      return Response.json({ ok: true })
+    }
+    if (action === 'editarRenovacao') {
+      await query('UPDATE crm_renovacoes SET nome=$1, whats=$2, segmento=$3, obs=$4, valor=$5 WHERE id=$6', [body.nome, body.whats, body.segmento || '', body.obs || '', body.valor, body.id])
+      return Response.json({ ok: true })
+    }
+    if (action === 'editarServico') {
+      await query('UPDATE crm_servicos SET nome=$1, whats=$2, segmento=$3, obs=$4, descricao=$5, valor=$6 WHERE id=$7', [body.nome, body.whats, body.segmento || '', body.obs || '', body.descricao || '', body.valor, body.id])
       return Response.json({ ok: true })
     }
     if (action === 'importarLeads') {

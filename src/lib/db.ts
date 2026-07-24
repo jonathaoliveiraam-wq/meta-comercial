@@ -145,5 +145,12 @@ export async function initSchema() {
 
     INSERT INTO configuracoes (chave, valor) VALUES ('meta_clientes', '240') ON CONFLICT (chave) DO NOTHING;
     INSERT INTO configuracoes (chave, valor) VALUES ('valor_mensal', '337') ON CONFLICT (chave) DO NOTHING;
+
+    ALTER TABLE crm_leads ADD COLUMN IF NOT EXISTS "exclusaoPendente" BOOLEAN DEFAULT false;
+    ALTER TABLE crm_leads ADD COLUMN IF NOT EXISTS "exclusaoPor" TEXT DEFAULT '';
+    ALTER TABLE crm_renovacoes ADD COLUMN IF NOT EXISTS "exclusaoPendente" BOOLEAN DEFAULT false;
+    ALTER TABLE crm_renovacoes ADD COLUMN IF NOT EXISTS "exclusaoPor" TEXT DEFAULT '';
+    ALTER TABLE crm_servicos ADD COLUMN IF NOT EXISTS "exclusaoPendente" BOOLEAN DEFAULT false;
+    ALTER TABLE crm_servicos ADD COLUMN IF NOT EXISTS "exclusaoPor" TEXT DEFAULT '';
   `)
 }
