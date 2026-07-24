@@ -324,9 +324,10 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const salvarNovaRenovacao = async () => {
     const nome = (document.getElementById('ren-nome') as HTMLInputElement)?.value?.trim()
     const whats = (document.getElementById('ren-whats') as HTMLInputElement)?.value?.trim()
+    const valor = parseFloat((document.getElementById('ren-valor') as HTMLInputElement)?.value) || MENSAL
     if (!nome || !whats) { setMsg('Preencha nome e WhatsApp!'); return }
     setMsg('⏳ Salvando...')
-    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarRenovacao', nome, whats, plano: 'mensal', user }) })
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'criarRenovacao', nome, whats, plano: 'mensal', valor, user }) })
     setMsg('✅ Renovação adicionada!')
     setTimeout(() => { setModalNovaRen(false); recarregar() }, 600)
   }
@@ -341,6 +342,12 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirCrmLead', id, usuario: usuarioLogin }) })
     const data = await res.json()
     if (!res.ok) { addToast(data.error || 'Não foi possível excluir.', 'lead'); return }
+    recarregar()
+  }
+
+  const excluirRenovacao = async (id: string) => {
+    if (!confirm('Excluir esta renovação?')) return
+    await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'excluirRenovacao', id }) })
     recarregar()
   }
 
@@ -625,6 +632,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                               moverRenovacao(c.id, idx+1)
                             }}>→ {ETAPAS_REN[idx+1].label}</button>
                           )}
+                          {perfil === 'admin' && <button style={{ background:'#FEF2F2',border:'1px solid #FECACA',color:'#EF4444',borderRadius:6,padding:'4px 6px',fontSize:10,cursor:'pointer' }} onClick={() => excluirRenovacao(c.id)}>🗑</button>}
                         </div>
                       </div>
                     ))}
@@ -696,6 +704,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
         <div className="modal-field"><p className="modal-label">Nome / Empresa</p><input className="modal-input" type="text" id="ren-nome" placeholder="Ex: João Silva" /></div>
         <div className="modal-field"><p className="modal-label">WhatsApp</p><input className="modal-input" type="text" id="ren-whats" placeholder="(92) 99999-9999" /></div>
         <div className="modal-field"><p className="modal-label">Segmento</p><select className="modal-input" id="ren-segmento"><option value="">Selecione</option><option>Comércio</option><option>Serviços</option><option>Indústria</option><option>Agronegócio</option><option>Saúde</option><option>Educação</option><option>Tecnologia</option><option>Alimentação</option><option>Construção</option><option>Outro</option></select></div>
+        <div className="modal-field"><p className="modal-label">Valor (R$)</p><input className="modal-input" type="number" id="ren-valor" defaultValue={337} placeholder="Ex: 337" /></div>
         <div className="modal-field"><p className="modal-label">Observação</p><textarea className="modal-input" id="ren-obs" rows={2} placeholder="Vencimento, contexto..." /></div>
         <div className="modal-btns"><button className="modal-cancel" onClick={()=>setModalNovaRen(false)}>Cancelar</button><button className="modal-save" onClick={salvarNovaRenovacao}>✔ Salvar Renovação</button></div>
         <p className="modal-msg">{msg}</p>
