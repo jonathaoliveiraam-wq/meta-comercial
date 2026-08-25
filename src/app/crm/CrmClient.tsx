@@ -47,7 +47,7 @@ function Toasts({ items, onDismiss }: { items: ToastItem[]; onDismiss: (id: numb
 
 const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
-const parseValorBR = (v?: string | null) => parseFloat((v || '').trim().replace(',', '.')) || 0
+const parseValorBR = (v?: string | null) => parseFloat((v || '').trim().replace(/\./g, '').replace(',', '.')) || 0
 const ETAPAS = [
   { id: 'indicacao', label: '📋 Indicação', cor: '#6366F1' },
   { id: 'reuniao', label: '📞 Reunião', cor: '#38BDF8' },
@@ -55,6 +55,7 @@ const ETAPAS = [
   { id: 'pagamento', label: '💳 Pagamento', cor: '#34D399' },
   { id: 'contrato', label: '📝 Contrato', cor: '#C084FC' },
   { id: 'onboarding', label: '🚀 Onboarding', cor: '#FDE68A' },
+  { id: 'followup', label: '⏳ Follow-up', cor: '#94A3B8' },
 ]
 const ETAPAS_REN = [
   { id: 'renovacao', label: '🔄 Renovação', cor: '#6366F1' },
@@ -234,7 +235,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (!over || active.id === over.id) return
     const ad = active.data.current as { etapa: number } | undefined
     const od = over.data.current as { etapa: number } | undefined
-    if (!ad || !od || od.etapa === ad.etapa || od.etapa < 0 || od.etapa > 5) return
+    if (!ad || !od || od.etapa === ad.etapa || od.etapa < 0 || od.etapa > 6) return
     if (od.etapa === 4) {
       setLeadPagId(active.id as string)
       setPlanSel(null)
@@ -495,7 +496,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const fechados = crmFiltrado.filter(c => c.etapa >= 4)
   const taxa = totalLeads ? Math.round(fechados.length / totalLeads * 100) : 0
 
-  const totalPipeline = crm.reduce((s, c) => s + (c.valor || MENSAL), 0)
+  const totalPipeline = crm.reduce((s, c) => s + (c.etapa === 6 ? 0 : (c.valor || MENSAL)), 0)
     + ren.reduce((s, c) => s + (c.valor || MENSAL), 0)
     + srv.reduce((s, c) => s + (c.valor || 0), 0)
 
@@ -664,7 +665,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                             </select>
                             <div className="card-actions" style={{ display:'flex',gap:4,marginTop:6 }}>
                               {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverLead(card.id, idx-1)}>← Voltar</button>}
-                              {idx<5 && (
+                              {idx<6 && (
                                 <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
                                   if (idx+1 === 4) { setLeadPagId(card.id); setPlanSel(null); setPagTipo('recebido'); if (razaoSocialRef.current) razaoSocialRef.current.value = ''; setMsg(''); setModalPag(true); return }
                                   moverLead(card.id, idx+1)
