@@ -27,3 +27,15 @@ Os arquivos em `public/` são a fonte de verdade para o layout. Os componentes N
 
 `equiv = recTotal / 337` — cada lançamento é convertido em planos equivalentes de R$337.
 Meta: 240 planos equivalentes.
+
+## Valores em dinheiro (CRÍTICO — bug já aconteceu 2x)
+
+Usuários digitam no formato brasileiro: `2.022` = dois mil e vinte e dois, `3.639,60` = três mil seiscentos e trinta e nove e sessenta.
+`parseFloat("2.022")` dá **2,022** — foi assim que valores de milhares viraram "R$ 2" no banco (jul–set/2026).
+
+- **Nunca** use `parseFloat`/`Number` direto em input de valor. Use `parseValorBR` (`src/app/crm/CrmClient.tsx` e `public/sistema.html`): vírgula = decimal; ponto só é milhar quando vem em grupos de 3 dígitos.
+- **Nunca** use `<input type="number">` para dinheiro — use `type="text" inputmode="decimal"`.
+- Ao preencher um input com valor existente, formate em pt-BR (`valorParaInput`), nunca `String(valor)` ("3639.6" vira 36396 ao salvar).
+- Na tela, não arredonde centavos: `maximumFractionDigits: 2`, `minimumFractionDigits: 0` só para inteiros.
+- SEBRAE: a conversão `÷ 0,3` é feita **só no servidor** (`route.ts`). O cliente envia o valor digitado.
+- `POST /api/data` recusa `valor`/`val` com exatamente 3 casas decimais (sinal de milhar lido como decimal). Não remova essa trava.
