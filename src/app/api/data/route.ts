@@ -137,7 +137,7 @@ export async function POST(req: Request) {
     if (action === 'criarCrmLead') {
       const id = 'crm_' + Date.now()
       const valor = body.valor || MENSAL
-      await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12)', [id, null, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiro || '', body.parceiroNome || '', body.plano || 'mensal', valor, body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }])])
+      await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico, responsavel) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12, $13)', [id, null, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiro || '', body.parceiroNome || '', body.plano || 'mensal', valor, body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }]), body.responsavel || null])
       sendTelegram('📋 <b>Novo lead manual no CRM!</b>\nNome: ' + body.nome + '\nWhats: ' + body.whats + '\nPlano: ' + (body.plano || 'mensal') + '\nValor: R$ ' + valor.toLocaleString('pt-BR'))
       return Response.json({ ok: true, id })
     }
@@ -145,8 +145,17 @@ export async function POST(req: Request) {
       await query('UPDATE crm_leads SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
       return Response.json({ ok: true })
     }
+    if (action === 'reordenar') {
+      const tabelas: Record<string, string> = { lead: 'crm_leads', renovacao: 'crm_renovacoes', servico: 'crm_servicos' }
+      const tabela = tabelas[body.tipo]
+      const ids: string[] = Array.isArray(body.ids) ? body.ids.map(String) : []
+      if (!tabela || !ids.length) return Response.json({ error: 'Parâmetros inválidos' }, { status: 400 })
+      await query(`UPDATE ${tabela} t SET ordem = v.ordem FROM unnest($1::text[], $2::int[]) AS v(id, ordem) WHERE t.id = v.id`, [ids, ids.map((_, i) => i)])
+      return Response.json({ ok: true })
+    }
     if (action === 'atribuirResponsavel') {
-      await query('UPDATE crm_leads SET responsavel = $1 WHERE id = $2', [body.responsavel || null, body.id])
+      const tabela = body.tipo === 'renovacao' ? 'crm_renovacoes' : body.tipo === 'servico' ? 'crm_servicos' : 'crm_leads'
+      await query(`UPDATE ${tabela} SET responsavel = $1 WHERE id = $2`, [body.responsavel || null, body.id])
       return Response.json({ ok: true })
     }
     if (action === 'confirmarPagamento') {
@@ -199,7 +208,7 @@ export async function POST(req: Request) {
     if (action === 'criarRenovacao') {
       const id = 'ren_' + Date.now()
       const valor = body.valor || MENSAL
-      await query('INSERT INTO crm_renovacoes (id, nome, whats, segmento, obs, plano, valor, tipoCustom, etapa, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10)', [id, body.nome, body.whats, body.segmento || '', body.obs || '', body.plano || 'mensal', valor, body.tipoCustom || 'recebido', body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }])])
+      await query('INSERT INTO crm_renovacoes (id, nome, whats, segmento, obs, plano, valor, tipoCustom, etapa, data, historico, responsavel) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11)', [id, body.nome, body.whats, body.segmento || '', body.obs || '', body.plano || 'mensal', valor, body.tipoCustom || 'recebido', body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }]), body.responsavel || null])
       return Response.json({ ok: true, id })
     }
     if (action === 'moverRenovacao') {
@@ -212,7 +221,7 @@ export async function POST(req: Request) {
       let valorFechado = MENSAL
       if (body.plano === 'anual') valorFechado = ANUAL
       else if (body.plano === 'personalizado') valorFechado = body.tipo === 'sebrae' ? body.valor / 0.3 : body.valor
-      await query('INSERT INTO renovacoes_historico (clienteId, nome, plano, valor, tipo, data, "user") VALUES ($1, $2, $3, $4, $5, $6, $7)', [body.id, ren.nome, body.plano, valorFechado, body.tipo || 'recebido', body.data || new Date().toISOString().split('T')[0], body.user || 'Sistema'])
+      await query('INSERT INTO renovacoes_historico ("clienteId", nome, plano, valor, tipo, data, "user") VALUES ($1, $2, $3, $4, $5, $6, $7)', [body.id, ren.nome, body.plano, valorFechado, body.tipo || 'recebido', body.data || new Date().toISOString().split('T')[0], body.user || 'Sistema'])
       const historico = JSON.parse(ren.historico || '[]')
       historico.push({ etapa: 3, data: body.data, user: body.user || 'Sistema', plano: body.plano })
       await query('UPDATE crm_renovacoes SET etapa=3, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
@@ -232,8 +241,8 @@ export async function POST(req: Request) {
     if (action === 'criarServico') {
       const id = 'srv_' + Date.now()
       const hoje = new Date().toISOString().split('T')[0]
-      await query('INSERT INTO crm_servicos (id, nome, whats, segmento, obs, descricao, plano, valor, tipoCustom, etapa, data, historico) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11)',
-        [id, body.nome, body.whats, body.segmento||'', body.obs||'', body.descricao||'', 'servico', body.valor||0, 'recebido', hoje, JSON.stringify([{ etapa:0, data:hoje, user:body.user||'Sistema' }])])
+      await query('INSERT INTO crm_servicos (id, nome, whats, segmento, obs, descricao, plano, valor, tipoCustom, etapa, data, historico, responsavel) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12)',
+        [id, body.nome, body.whats, body.segmento||'', body.obs||'', body.descricao||'', 'servico', body.valor||0, 'recebido', hoje, JSON.stringify([{ etapa:0, data:hoje, user:body.user||'Sistema' }]), body.responsavel || null])
       return Response.json({ ok: true })
     }
     if (action === 'moverServico') {

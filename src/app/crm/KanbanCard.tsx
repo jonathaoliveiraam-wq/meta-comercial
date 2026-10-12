@@ -8,22 +8,26 @@ interface Props {
   id: string; etapa: number; nome: string; whats: string
   segmento: string; parceiroNome: string; obs: string
   data: string; valor: number; plano: string
+  onEdit?: () => void
+  onOpen?: () => void
+  descricao?: string
 }
 
 const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 const fmtData = (d: string) => d ? d.split('-').reverse().join('/') : '—'
 
-export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroNome, obs, data, valor, plano }: Props) {
+export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroNome, obs, data, valor, plano, onEdit, onOpen, descricao }: Props) {
   const [hovered, setHovered] = useState(false)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, data: { etapa } })
 
-  const planoColor = plano === 'anual' ? '#8B5CF6' : plano === 'personalizado' ? '#F59E0B' : '#0EA5E9'
-  const planoBg   = plano === 'anual' ? '#F5F3FF' : plano === 'personalizado' ? '#FFFBEB' : '#F0F9FF'
-  const planoLabel = plano === 'anual' ? '🏆 Anual' : plano === 'personalizado' ? '⭐ Person.' : '📅 Mensal'
+  const planoColor = plano === 'anual' ? '#8B5CF6' : plano === 'personalizado' ? '#F59E0B' : plano === 'servico' ? '#059669' : '#0EA5E9'
+  const planoBg   = plano === 'anual' ? '#F5F3FF' : plano === 'personalizado' ? '#FFFBEB' : plano === 'servico' ? '#ECFDF5' : '#F0F9FF'
+  const planoLabel = plano === 'anual' ? '🏆 Anual' : plano === 'personalizado' ? '⭐ Person.' : plano === 'servico' ? '🛠️ Serviço' : '📅 Mensal'
 
   return (
     <div
       ref={setNodeRef}
+      onClick={onOpen}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -43,10 +47,20 @@ export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroN
           ? '0 6px 16px rgba(37,99,235,.12), 0 2px 4px rgba(0,0,0,.04)'
           : '0 1px 3px rgba(0,0,0,.06)',
         touchAction: 'none',
+        position: 'relative',
       }}
       {...attributes} {...listeners}
     >
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 3 }}>{nome}</div>
+      {onEdit && (
+        <button
+          title="Editar"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onEdit() }}
+          style={{ position: 'absolute', top: 8, right: 8, background: '#EFF6FF', border: '1px solid #BFDBFE', color: '#2563EB', borderRadius: 6, padding: '3px 6px', fontSize: 12, cursor: 'pointer', lineHeight: 1 }}
+        >✏️</button>
+      )}
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 3, paddingRight: onEdit ? 30 : 0 }}>{nome}</div>
+      {descricao && <div style={{ fontSize: 11, color: '#6366F1', fontWeight: 600, marginBottom: 3 }}>🛠️ {descricao}</div>}
       <div style={{ fontSize: 11, color: '#6B7280', marginBottom: parceiroNome || obs ? 7 : 0, lineHeight: 1.5 }}>
         📱 {whats}{segmento ? ' · ' + segmento : ''}
       </div>
