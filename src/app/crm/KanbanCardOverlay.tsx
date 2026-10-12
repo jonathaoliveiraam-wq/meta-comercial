@@ -1,7 +1,7 @@
 'use client'
 
 interface Props { id: string; crm: any[] }
-const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 })
 
 export default function KanbanCardOverlay({ id, crm }: Props) {
   const card = crm.find(c => c.id === id)

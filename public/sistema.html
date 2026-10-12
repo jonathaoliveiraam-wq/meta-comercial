@@ -386,7 +386,7 @@
                 <div style="flex:1"><p style="font-size:10px;color:#666;margin-bottom:4px">QTD</p>
                   <input type="number" id="inp-cqty" min="0" placeholder="0" style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/></div>
                 <div style="flex:2"><p style="font-size:10px;color:#666;margin-bottom:4px" id="label-cval">VALOR RECEBIDO (R$)</p>
-                  <input type="number" id="inp-cval" min="0" placeholder="Ex: 6500" style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/></div>
+                  <input type="text" inputmode="decimal" id="inp-cval" placeholder="Ex: 6.500,00" style="width:100%;background:#111;border:1px solid #333;border-radius:8px;color:#fff;text-align:center;font-size:15px;padding:8px 0;"/></div>
               </div>
             </div>
             <div style="margin-bottom:8px;">
@@ -465,6 +465,14 @@
   let pizza1, pizza2, barras, graficoMes;
 
   const fmt  = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  // "6.500,00" / "6500,5" / "6.500" / "6500.5" → número. Ponto só é milhar em grupos de 3 dígitos.
+  function parseValorBR(v) {
+    const t = String(v||'').trim().replace(/[R$\s]/g,'');
+    if (!t) return 0;
+    if (t.includes(',')) return parseFloat(t.replace(/\./g,'').replace(',','.')) || 0;
+    if (/^\d{1,3}(\.\d{3})+$/.test(t)) return parseFloat(t.replace(/\./g,'')) || 0;
+    return parseFloat(t) || 0;
+  }
   const fmtK = v => v >= 1000 ? 'R$ '+(v/1000).toFixed(1)+'k' : fmt(v);
   const hoje = () => new Date().toISOString().split('T')[0];
 
@@ -595,7 +603,7 @@
   // PERSONALIZADO
   async function confirmarCustom() {
     const qty  = parseFloat(document.getElementById('inp-cqty').value) || 0;
-    const val  = parseFloat(document.getElementById('inp-cval').value) || 0;
+    const val  = parseValorBR(document.getElementById('inp-cval').value);
     const desc = document.getElementById('inp-cdesc').value.trim();
     const dt   = document.getElementById('inp-cdata').value || hoje();
     const parceiroId = document.getElementById('inp-custom-parceiro').value || '';
@@ -643,7 +651,7 @@
     editCustomIdx = i;
     ativarTipo(l.tipo);
     document.getElementById('inp-cqty').value  = l.qty;
-    document.getElementById('inp-cval').value  = l.val;
+    document.getElementById('inp-cval').value  = (l.val||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
     document.getElementById('inp-cdesc').value = l.desc||l.descricao||'';
     document.getElementById('inp-cdata').value = l.data||hoje();
     document.getElementById('btn-confirmar').textContent='✔ Salvar Edição';

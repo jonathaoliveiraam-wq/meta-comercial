@@ -47,7 +47,15 @@ function Toasts({ items, onDismiss }: { items: ToastItem[]; onDismiss: (id: numb
 
 const MENSAL = 337, ANUAL = 337 * 12
 const RESPONSAVEIS = ['Jonatha', 'Carol', 'Kamila']
-const parseValorBR = (v?: string | null) => parseFloat((v || '').trim().replace(/\./g, '').replace(',', '.')) || 0
+// "3.639,60" / "3639,6" / "3.639" / "3639.6" → número. Ponto só é milhar quando vem em grupos de 3 dígitos.
+const parseValorBR = (v?: string | null) => {
+  const t = (v || '').trim().replace(/[R$\s]/g, '')
+  if (!t) return 0
+  if (t.includes(',')) return parseFloat(t.replace(/\./g, '').replace(',', '.')) || 0
+  if (/^\d{1,3}(\.\d{3})+$/.test(t)) return parseFloat(t.replace(/\./g, '')) || 0
+  return parseFloat(t) || 0
+}
+const valorParaInput = (v?: number | null) => v ? v.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }) : ''
 // Cards sem posição salva (novos) aparecem no topo; o resto segue a ordem arrastada
 const ordenar = <T extends { ordem?: number | null }>(arr: T[]) => [...arr].sort((a, b) => (a.ordem ?? -1) - (b.ordem ?? -1))
 
@@ -267,7 +275,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     reposicionar('lead', active.id as string, od.etapa, String(over.id))
   }, [moverLead, reposicionar])
 
-  const abrirPagamentoSrv = (c: CrmSrv) => { setLeadPagId(c.id); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); setTimeout(()=>{ const el=document.getElementById('pag-valor-srv') as HTMLInputElement; if(el) el.value=String(c.valor||'') },0) }
+  const abrirPagamentoSrv = (c: CrmSrv) => { setLeadPagId(c.id); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); setTimeout(()=>{ const el=document.getElementById('pag-valor-srv') as HTMLInputElement; if(el) el.value=valorParaInput(c.valor) },0) }
 
   const handleDragEndSrv = useCallback(async (event: DragEndEvent) => {
     setActiveId(null)
@@ -316,7 +324,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (planoSel === 'personalizado') {
       v = parseValorBR(pagValorContrato)
       if (v <= 0) { setMsg('Informe o valor!'); return }
-      if (pagTipo === 'sebrae') v = v / 0.3
+      // a conversão SEBRAE (÷ 0,3) é feita no servidor
     }
     const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarPagamento', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, razaoSocial, data: new Date().toISOString().split('T')[0], user }) })
     if (!res.ok) { const data = await res.json().catch(() => ({})); setMsg('❌ ' + (data.error || 'Erro ao lançar. Tente novamente.')); return }
@@ -331,7 +339,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (planoSel === 'personalizado') {
       v = parseValorBR((document.getElementById('pag-valor-ren') as HTMLInputElement)?.value)
       if (v <= 0) { setMsg('Informe o valor!'); return }
-      if (pagTipo === 'sebrae') v = v / 0.3
+      // a conversão SEBRAE (÷ 0,3) é feita no servidor
     }
     const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'confirmarRenovacao', id: leadPagId, plano: planoSel, valor: v, tipo: pagTipo, data: new Date().toISOString().split('T')[0], user }) })
     if (!res.ok) { const data = await res.json().catch(() => ({})); setMsg('❌ ' + (data.error || 'Erro ao confirmar. Tente novamente.')); return }
@@ -460,7 +468,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
       set('edit-whats', item.whats)
       set('edit-segmento', item.segmento)
       set('edit-obs', item.obs)
-      set('edit-valor', item.valor != null ? String(item.valor) : '')
+      set('edit-valor', valorParaInput(item.valor))
       if (tipo === 'servico') set('edit-descricao', item.descricao)
     }, 0)
   }
@@ -580,7 +588,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     + ren.reduce((s, c) => s + (c.valor || MENSAL), 0)
     + srv.reduce((s, c) => s + (c.valor || 0), 0)
 
-  const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 })
 
   const pendentes = [
     ...crm.filter(c => c.exclusaoPendente).map(c => ({ ...c, tipo: 'lead' as const })),
@@ -716,7 +724,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
                           {idx>0 && <button style={{ flex:1,background:'#F9FAFB',border:'1px solid #E5E7EB',color:'#6B7280',borderRadius:6,padding:'4px',fontSize:10,cursor:'pointer',fontWeight:600 }} onClick={() => moverServico(c.id, idx-1)}>← Voltar</button>}
                           {idx<4 && (
                             <button style={{ flex:1,fontSize:10,padding:'4px',cursor:'pointer',background:'#EFF6FF',border:'1px solid #BFDBFE',color:'#2563EB',borderRadius:6,fontWeight:700 }} onClick={() => {
-                              if (idx+1 === 4) { setLeadPagId(c.id); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); setTimeout(()=>{ const el=document.getElementById('pag-valor-srv') as HTMLInputElement; if(el) el.value=String(c.valor||'') },0); return }
+                              if (idx+1 === 4) { setLeadPagId(c.id); setSrvDescPag(c.descricao||''); setMsg(''); setModalPagSrv(true); setTimeout(()=>{ const el=document.getElementById('pag-valor-srv') as HTMLInputElement; if(el) el.value=valorParaInput(c.valor) },0); return }
                               moverServico(c.id, idx+1)
                             }}>→ {ETAPAS_SRV[idx+1].label}</button>
                           )}

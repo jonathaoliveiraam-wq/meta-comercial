@@ -63,6 +63,14 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { action } = body
 
+  // Dinheiro nunca tem 3 casas decimais: 2.022 é "R$ 2.022" digitado com ponto de milhar lido como decimal
+  for (const k of ['valor', 'val']) {
+    const v = Number(body[k])
+    if (body[k] != null && v > 0 && Math.abs(Math.round(v * 1000) - v * 1000) < 1e-6 && Math.abs(Math.round(v * 100) - v * 100) > 1e-6) {
+      return Response.json({ error: `Valor ${body[k]} parece errado (ponto de milhar lido como decimal?). Digite assim: 2.022,00` }, { status: 400 })
+    }
+  }
+
   try {
     if (action === 'addClienteMensal') {
       await query('INSERT INTO clientes_mensais (descricao, data, parceiro) VALUES ($1, $2, $3)', [body.descricao, body.data, body.parceiro || ''])

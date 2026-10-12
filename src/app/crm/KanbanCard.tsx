@@ -13,7 +13,7 @@ interface Props {
   descricao?: string
 }
 
-const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+const fmt = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 })
 const fmtData = (d: string) => d ? d.split('-').reverse().join('/') : '—'
 
 export default function KanbanCard({ id, etapa, nome, whats, segmento, parceiroNome, obs, data, valor, plano, onEdit, onOpen, descricao }: Props) {
