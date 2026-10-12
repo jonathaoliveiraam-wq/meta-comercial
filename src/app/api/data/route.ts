@@ -19,15 +19,15 @@ export async function GET(req: Request) {
     parceirosSimple: () => query('SELECT id, nome FROM parceiros ORDER BY nome').then(r => r.rows),
     leadsPortal: () => query('SELECT * FROM leads_portal ORDER BY data DESC').then(r => r.rows),
     crm: async () => {
-      const rows: any[] = (await query('SELECT * FROM crm_leads ORDER BY data DESC')).rows
+      const rows: any[] = (await query('SELECT * FROM crm_leads ORDER BY data DESC, id DESC')).rows
       return rows.map(r => ({ ...r, historico: JSON.parse(r.historico || '[]') }))
     },
     crmRenovacao: async () => {
-      const rows: any[] = (await query('SELECT * FROM crm_renovacoes ORDER BY data DESC')).rows
+      const rows: any[] = (await query('SELECT * FROM crm_renovacoes ORDER BY data DESC, id DESC')).rows
       return rows.map(r => ({ ...r, historico: JSON.parse(r.historico || '[]') }))
     },
     crmServicos: async () => {
-      const rows: any[] = (await query('SELECT * FROM crm_servicos ORDER BY data DESC')).rows
+      const rows: any[] = (await query('SELECT * FROM crm_servicos ORDER BY data DESC, id DESC')).rows
       return rows.map(r => ({ ...r, historico: JSON.parse(r.historico || '[]') }))
     },
     renovacoes: () => query('SELECT * FROM renovacoes_historico ORDER BY data DESC').then(r => r.rows),
@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       await query('INSERT INTO leads_portal (id, "parceiroId", "parceiroNome", nome, whats, segmento, obs, data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, body.parceiroId, body.parceiroNome, body.nome, body.whats, body.segmento || '', body.obs || '', hoje])
       const crmId = 'crm_' + id
       await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12)', [crmId, id, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiroId || '', body.parceiroNome || '', 'mensal', MENSAL, hoje, JSON.stringify([{ etapa: 0, data: hoje, user: 'Portal Parceiro' }])])
-      sendTelegram('📨 <b>Nova indicação de parceiro!</b>\nParceiro: ' + (body.parceiroNome || '—') + '\nCliente: ' + body.nome + '\nWhats: ' + body.whats)
+      await sendTelegram('📨 <b>Nova indicação de parceiro!</b>\nParceiro: ' + (body.parceiroNome || '—') + '\nCliente: ' + body.nome + '\nWhats: ' + body.whats)
       return Response.json({ ok: true, id })
     }
     if (action === 'editLead') {
@@ -138,11 +138,11 @@ export async function POST(req: Request) {
       const id = 'crm_' + Date.now()
       const valor = body.valor || MENSAL
       await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico, responsavel) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12, $13)', [id, null, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiro || '', body.parceiroNome || '', body.plano || 'mensal', valor, body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }]), body.responsavel || null])
-      sendTelegram('📋 <b>Novo lead manual no CRM!</b>\nNome: ' + body.nome + '\nWhats: ' + body.whats + '\nPlano: ' + (body.plano || 'mensal') + '\nValor: R$ ' + valor.toLocaleString('pt-BR'))
+      await sendTelegram('📋 <b>Novo lead manual no CRM!</b>\nNome: ' + body.nome + '\nWhats: ' + body.whats + '\nPlano: ' + (body.plano || 'mensal') + '\nValor: R$ ' + valor.toLocaleString('pt-BR'))
       return Response.json({ ok: true, id })
     }
     if (action === 'moverLead') {
-      await query('UPDATE crm_leads SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
+      await query('UPDATE crm_leads SET etapa = $1, historico = $2, ordem = NULL WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
       return Response.json({ ok: true })
     }
     if (action === 'reordenar') {
@@ -189,7 +189,7 @@ export async function POST(req: Request) {
       const historico = JSON.parse(lead.historico || '[]')
       historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema', plano: body.plano })
       await query('UPDATE crm_leads SET etapa=4, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
-      if (!jaFechado) sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + nomeCliente + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
+      if (!jaFechado) await sendTelegram('💳 <b>Venda fechada!</b>\nCliente: ' + nomeCliente + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR') + '\nUsuário: ' + (body.user || 'Sistema'))
       return Response.json({ ok: true })
     }
     if (action === 'excluirCrmLead') {
@@ -209,10 +209,11 @@ export async function POST(req: Request) {
       const id = 'ren_' + Date.now()
       const valor = body.valor || MENSAL
       await query('INSERT INTO crm_renovacoes (id, nome, whats, segmento, obs, plano, valor, tipoCustom, etapa, data, historico, responsavel) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11)', [id, body.nome, body.whats, body.segmento || '', body.obs || '', body.plano || 'mensal', valor, body.tipoCustom || 'recebido', body.data || new Date().toISOString().split('T')[0], JSON.stringify([{ etapa: 0, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' }]), body.responsavel || null])
+      await sendTelegram('🔄 <b>Nova renovação no CRM!</b>\nCliente: ' + body.nome + '\nWhats: ' + body.whats + '\nResponsável: ' + (body.responsavel || '—') + '\nValor: R$ ' + Number(valor).toLocaleString('pt-BR'))
       return Response.json({ ok: true, id })
     }
     if (action === 'moverRenovacao') {
-      await query('UPDATE crm_renovacoes SET etapa = $1, historico = $2 WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
+      await query('UPDATE crm_renovacoes SET etapa = $1, historico = $2, ordem = NULL WHERE id = $3', [body.etapa, JSON.stringify(body.historico), body.id])
       return Response.json({ ok: true })
     }
     if (action === 'confirmarRenovacao') {
@@ -224,8 +225,8 @@ export async function POST(req: Request) {
       await query('INSERT INTO renovacoes_historico ("clienteId", nome, plano, valor, tipo, data, "user") VALUES ($1, $2, $3, $4, $5, $6, $7)', [body.id, ren.nome, body.plano, valorFechado, body.tipo || 'recebido', body.data || new Date().toISOString().split('T')[0], body.user || 'Sistema'])
       const historico = JSON.parse(ren.historico || '[]')
       historico.push({ etapa: 3, data: body.data, user: body.user || 'Sistema', plano: body.plano })
-      await query('UPDATE crm_renovacoes SET etapa=3, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
-      sendTelegram('🔄 <b>Renovação confirmada!</b>\nCliente: ' + ren.nome + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
+      await query('UPDATE crm_renovacoes SET etapa=3, ordem=NULL, plano=$1, valor=$2, historico=$3 WHERE id=$4', [body.plano, valorFechado, JSON.stringify(historico), body.id])
+      await sendTelegram('🔄 <b>Renovação confirmada!</b>\nCliente: ' + ren.nome + '\nPlano: ' + body.plano + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
       return Response.json({ ok: true })
     }
     if (action === 'excluirRenovacao') {
@@ -243,6 +244,7 @@ export async function POST(req: Request) {
       const hoje = new Date().toISOString().split('T')[0]
       await query('INSERT INTO crm_servicos (id, nome, whats, segmento, obs, descricao, plano, valor, tipoCustom, etapa, data, historico, responsavel) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12)',
         [id, body.nome, body.whats, body.segmento||'', body.obs||'', body.descricao||'', 'servico', body.valor||0, 'recebido', hoje, JSON.stringify([{ etapa:0, data:hoje, user:body.user||'Sistema' }]), body.responsavel || null])
+      await sendTelegram('🛠️ <b>Novo serviço no CRM!</b>\nCliente: ' + body.nome + '\nServiço: ' + (body.descricao || '—') + '\nResponsável: ' + (body.responsavel || '—') + '\nValor: R$ ' + Number(body.valor || 0).toLocaleString('pt-BR'))
       return Response.json({ ok: true })
     }
     if (action === 'moverServico') {
@@ -250,7 +252,7 @@ export async function POST(req: Request) {
       if (!srv) return Response.json({ error: 'não encontrado' }, { status: 404 })
       const historico = JSON.parse(srv.historico || '[]')
       historico.push({ etapa: body.etapa, data: new Date().toISOString().split('T')[0], user: body.user || 'Sistema' })
-      await query('UPDATE crm_servicos SET etapa=$1, historico=$2 WHERE id=$3', [body.etapa, JSON.stringify(body.historico || historico), body.id])
+      await query('UPDATE crm_servicos SET etapa=$1, historico=$2, ordem=NULL WHERE id=$3', [body.etapa, JSON.stringify(body.historico || historico), body.id])
       return Response.json({ ok: true })
     }
     if (action === 'confirmarServico') {
@@ -260,10 +262,10 @@ export async function POST(req: Request) {
       const equiv = valorFechado / MENSAL
       const historico = JSON.parse(srv.historico || '[]')
       historico.push({ etapa: 4, data: body.data, user: body.user || 'Sistema' })
-      await query('UPDATE crm_servicos SET etapa=4, valor=$1, historico=$2 WHERE id=$3', [valorFechado, JSON.stringify(historico), body.id])
+      await query('UPDATE crm_servicos SET etapa=4, ordem=NULL, valor=$1, historico=$2 WHERE id=$3', [valorFechado, JSON.stringify(historico), body.id])
       await query('INSERT INTO lancamentos (qty,val,tipo,"valorRec","recTotal",equiv,descricao,data,parceiro) VALUES (1,$1,$2,$3,$4,$5,$6,$7,\'\')',
         [valorFechado, 'recebido', valorFechado, valorFechado, equiv, srv.descricao || srv.nome, body.data || new Date().toISOString().split('T')[0]])
-      sendTelegram('🛠️ <b>Serviço confirmado!</b>\nCliente: ' + srv.nome + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
+      await sendTelegram('🛠️ <b>Serviço confirmado!</b>\nCliente: ' + srv.nome + '\nValor: R$ ' + valorFechado.toLocaleString('pt-BR'))
       return Response.json({ ok: true })
     }
     if (action === 'excluirServico') {

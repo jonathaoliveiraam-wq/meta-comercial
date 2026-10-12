@@ -200,7 +200,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (idx < 0) return
     const updated = [...crm]
     updated[idx] = {
-      ...updated[idx], etapa: novaEtapa,
+      ...updated[idx], etapa: novaEtapa, ordem: null,
       historico: [...updated[idx].historico, { etapa: novaEtapa, data: new Date().toISOString().split('T')[0], user: user || 'Sistema' }],
     }
     setCrm(updated)
@@ -212,7 +212,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (idx < 0) return
     const updated = [...srv]
     updated[idx] = {
-      ...updated[idx], etapa: novaEtapa,
+      ...updated[idx], etapa: novaEtapa, ordem: null,
       historico: [...updated[idx].historico, { etapa: novaEtapa, data: new Date().toISOString().split('T')[0], user: user || 'Sistema' }],
     }
     setSrv(updated)
@@ -224,7 +224,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     if (idx < 0) return
     const updated = [...ren]
     updated[idx] = {
-      ...updated[idx], etapa: novaEtapa,
+      ...updated[idx], etapa: novaEtapa, ordem: null,
       historico: [...updated[idx].historico, { etapa: novaEtapa, data: new Date().toISOString().split('T')[0], user: user || 'Sistema' }],
     }
     setRen(updated)

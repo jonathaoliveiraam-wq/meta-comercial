@@ -7,9 +7,9 @@ export default async function CrmPage() {
   await initSchema()
 
   const [crm, crmRenovacao, crmServicos, parceiros] = await Promise.all([
-    query('SELECT * FROM crm_leads').then(r => r.rows as any[]),
-    query('SELECT * FROM crm_renovacoes').then(r => r.rows as any[]),
-    query('SELECT * FROM crm_servicos').then(r => r.rows as any[]),
+    query('SELECT * FROM crm_leads ORDER BY data DESC, id DESC').then(r => r.rows as any[]),
+    query('SELECT * FROM crm_renovacoes ORDER BY data DESC, id DESC').then(r => r.rows as any[]),
+    query('SELECT * FROM crm_servicos ORDER BY data DESC, id DESC').then(r => r.rows as any[]),
     query('SELECT id, nome FROM parceiros').then(r => r.rows),
   ])
 
