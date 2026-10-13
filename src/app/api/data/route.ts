@@ -6,6 +6,9 @@ import { sendTelegram } from '@/lib/telegram'
 const MENSAL = 337
 const ANUAL = 337 * 12
 
+// Senha de parceiro nunca sai pela API pública
+const semSenha = ({ senha, ...p }: any) => p
+
 export async function GET(req: Request) {
   await initSchema()
   const { searchParams } = new URL(req.url)
@@ -15,7 +18,7 @@ export async function GET(req: Request) {
     clientesMensais: () => query('SELECT * FROM clientes_mensais ORDER BY id DESC').then(r => r.rows),
     clientesAnuais: () => query('SELECT * FROM clientes_anuais ORDER BY id DESC').then(r => r.rows),
     lancamentos: () => query('SELECT * FROM lancamentos ORDER BY id DESC').then(r => r.rows),
-    parceiros: () => query('SELECT * FROM parceiros ORDER BY nome').then(r => r.rows),
+    parceiros: () => query('SELECT * FROM parceiros ORDER BY nome').then(r => r.rows.map(semSenha)),
     parceirosSimple: () => query('SELECT id, nome FROM parceiros ORDER BY nome').then(r => r.rows),
     leadsPortal: () => query('SELECT * FROM leads_portal ORDER BY data DESC').then(r => r.rows),
     crm: async () => {
@@ -38,7 +41,7 @@ export async function GET(req: Request) {
         query('SELECT * FROM clientes_mensais ORDER BY id DESC').then(r => r.rows),
         query('SELECT * FROM clientes_anuais ORDER BY id DESC').then(r => r.rows),
         query('SELECT * FROM lancamentos ORDER BY id DESC').then(r => r.rows),
-        query('SELECT * FROM parceiros ORDER BY nome').then(r => r.rows),
+        query('SELECT * FROM parceiros ORDER BY nome').then(r => r.rows.map(semSenha)),
         query('SELECT * FROM leads_portal ORDER BY data DESC').then(r => r.rows),
         query('SELECT * FROM crm_leads').then(r => r.rows as any[]),
         query('SELECT * FROM crm_renovacoes').then(r => r.rows as any[]),
@@ -114,7 +117,7 @@ export async function POST(req: Request) {
       return Response.json({ ok: true, id })
     }
     if (action === 'editParceiro') {
-      await query('UPDATE parceiros SET nome=$1, "user"=$2, senha=$3, whats=$4, email=$5, pix=$6 WHERE id=$7', [body.nome, body.user, body.senha, body.whats || '', body.email || '', body.pix || '', body.id])
+      await query('UPDATE parceiros SET nome=$1, "user"=$2, senha=COALESCE($3, senha), whats=$4, email=$5, pix=$6 WHERE id=$7', [body.nome, body.user, body.senha || null, body.whats || '', body.email || '', body.pix || '', body.id])
       return Response.json({ ok: true })
     }
     if (action === 'delParceiro') {
