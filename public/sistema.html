@@ -447,16 +447,16 @@
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body),
     });
+    if (r.status === 401) { sessaoExpirada(); throw new Error('Sessão expirada'); }
     return r.json();
   }
 
-  const TG_TOKEN  = '8639780068:AAGqild5uWcsDkn383SlUeA252BnoypXx0I';
-  const TG_CHATID = '1407909663';
+  function sessaoExpirada() {
+    sessionStorage.removeItem('logado');
+    sessionStorage.removeItem('nomeUsuario');
+    location.reload();
+  }
 
-  const USUARIOS = [
-    { user: 'comercial',  senha: '123456',  nome: 'Comercial'  },
-    { user: 'financeiro', senha: 'F@c2026', nome: 'Financeiro' },
-  ];
 
   let data = { mensais:0, anuais:0, lancamentos:[], clientesMensais:[], clientesAnuais:[], parceiros:[] };
   let chartsReady = false;
@@ -476,30 +476,31 @@
   const fmtK = v => v >= 1000 ? 'R$ '+(v/1000).toFixed(1)+'k' : fmt(v);
   const hoje = () => new Date().toISOString().split('T')[0];
 
+  // O aviso sai pelo servidor; o token do bot não fica na página
   async function alertarTelegram(msg) {
-    try {
-      await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: TG_CHATID, text: msg, parse_mode: 'HTML' })
-      });
-    } catch(e) { console.error('Telegram:', e); }
+    try { await apiCall({ action: 'notificar', msg }); } catch(e) { console.error('Telegram:', e); }
   }
 
   // AUTH
-  function entrar() {
+  async function entrar() {
     const u = document.getElementById('inp-user').value.trim().toLowerCase();
     const s = document.getElementById('inp-senha').value.trim();
-    const found = USUARIOS.find(x => x.user === u && x.senha === s);
-    if (found) {
+    document.getElementById('login-error').textContent = '⏳ Verificando...';
+    try {
+      const r = await fetch('/api/auth', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ usuario: u, senha: s }) });
+      const j = await r.json();
+      if (!r.ok) { document.getElementById('login-error').textContent = j.error || '❌ Usuário ou senha incorretos.'; return; }
+      document.getElementById('login-error').textContent = '';
       sessionStorage.setItem('logado','1');
-      sessionStorage.setItem('nomeUsuario', found.nome);
+      sessionStorage.setItem('nomeUsuario', j.nome);
       mostrarApp();
-    } else {
-      document.getElementById('login-error').textContent = '❌ Usuário ou senha incorretos.';
+    } catch(e) {
+      document.getElementById('login-error').textContent = '❌ Erro de conexão. Tente novamente.';
     }
   }
 
   function sair() {
+    fetch('/api/auth', { method: 'DELETE' });
     sessionStorage.removeItem('logado');
     sessionStorage.removeItem('nomeUsuario');
     document.getElementById('login-screen').style.display = 'flex';
@@ -947,7 +948,9 @@
   async function load() {
     badge('⏳ Carregando...','#ffca2822','#ffca28');
     try {
-      const rec = await fetch('/api/data?tipo=all').then(r => r.json());
+      const resp = await fetch('/api/data?tipo=all');
+      if (resp.status === 401) { sessaoExpirada(); return; }
+      const rec = await resp.json();
       data = {
         mensais: rec.mensais || 0,
         anuais: rec.anuais || 0,

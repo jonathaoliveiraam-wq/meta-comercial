@@ -45,7 +45,8 @@ export default function ParceirosPage() {
       body: JSON.stringify({ action: 'loginParceiro', user: u, senha: s }),
     }).then(r => r.json())
     if (r.error) { setLoginError(r.error); return }
-    setParceiro(r.parceiro)
+    // a API não devolve mais a senha; guarda a digitada pra recarregar os dados depois de indicar
+    setParceiro({ ...r.parceiro, senha: s })
     setStats(r)
     setLoginError('')
     if (!r.parceiro.termoAceito) setPasso('termo')

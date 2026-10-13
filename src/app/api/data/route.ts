@@ -2,14 +2,16 @@ export const dynamic = 'force-dynamic'
 
 import { initSchema, query, queryRow } from '@/lib/db'
 import { sendTelegram } from '@/lib/telegram'
+import { sessaoDoRequest, criarToken, cookieSessao } from '@/lib/session'
 
 const MENSAL = 337
 const ANUAL = 337 * 12
 
 // Senha de parceiro nunca sai pela API pública
-const semSenha = ({ senha, ...p }: any) => p
+const semSenha = ({ senha, senha_hash, ...p }: any) => p
 
 export async function GET(req: Request) {
+  if (sessaoDoRequest(req)?.t !== 'equipe') return Response.json({ error: 'Sessão expirada. Entre novamente.' }, { status: 401 })
   await initSchema()
   const { searchParams } = new URL(req.url)
   const tipo = searchParams.get('tipo') || 'all'
@@ -66,6 +68,25 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { action } = body
 
+  // Quem pode o quê: sem sessão só o login do parceiro; parceiro só as ações do portal e nos próprios dados; equipe tudo
+  const sess = sessaoDoRequest(req)
+  const DO_PARCEIRO = ['addLead', 'editLead', 'delLead', 'aceitarTermo', 'editarPerfilParceiro', 'resetSenha', 'notificar']
+  if (action !== 'loginParceiro') {
+    if (!sess) return Response.json({ error: 'Sessão expirada. Entre novamente.' }, { status: 401 })
+    if (sess.t === 'parceiro') {
+      if (!DO_PARCEIRO.includes(action)) return Response.json({ error: 'Sem permissão.' }, { status: 403 })
+      body.parceiroId = sess.id
+      body.parceiroNome = sess.nome
+      if (['aceitarTermo', 'editarPerfilParceiro', 'resetSenha'].includes(action)) body.id = sess.id
+      if (['editLead', 'delLead'].includes(action)) {
+        const lead = await queryRow('SELECT "parceiroId" FROM leads_portal WHERE id = $1', [body.id])
+        if (!lead || lead.parceiroId !== sess.id) return Response.json({ error: 'Sem permissão.' }, { status: 403 })
+      }
+    } else {
+      body.usuario = sess.id
+    }
+  }
+
   // Dinheiro nunca tem 3 casas decimais: 2.022 é "R$ 2.022" digitado com ponto de milhar lido como decimal
   for (const k of ['valor', 'val']) {
     const v = Number(body[k])
@@ -113,11 +134,11 @@ export async function POST(req: Request) {
     }
     if (action === 'addParceiro') {
       const id = 'p_' + Date.now()
-      await query('INSERT INTO parceiros (id, nome, "user", senha) VALUES ($1, $2, $3, $4)', [id, body.nome, body.user, body.senha])
+      await query('INSERT INTO parceiros (id, nome, "user", senha_hash) VALUES ($1, $2, $3, crypt($4, gen_salt(\'bf\')))', [id, body.nome, body.user, body.senha])
       return Response.json({ ok: true, id })
     }
     if (action === 'editParceiro') {
-      await query('UPDATE parceiros SET nome=$1, "user"=$2, senha=COALESCE($3, senha), whats=$4, email=$5, pix=$6 WHERE id=$7', [body.nome, body.user, body.senha || null, body.whats || '', body.email || '', body.pix || '', body.id])
+      await query('UPDATE parceiros SET nome=$1, "user"=$2, senha_hash=COALESCE(crypt($3, gen_salt(\'bf\')), senha_hash), whats=$4, email=$5, pix=$6 WHERE id=$7', [body.nome, body.user, body.senha || null, body.whats || '', body.email || '', body.pix || '', body.id])
       return Response.json({ ok: true })
     }
     if (action === 'delParceiro') {
@@ -125,7 +146,8 @@ export async function POST(req: Request) {
       return Response.json({ ok: true })
     }
     if (action === 'resetSenha') {
-      await query('UPDATE parceiros SET senha = $1 WHERE id = $2', [body.senha, body.id])
+      if (!body.senha || String(body.senha).length < 6) return Response.json({ error: 'Senha deve ter no mínimo 6 caracteres.' }, { status: 400 })
+      await query('UPDATE parceiros SET senha_hash = crypt($1, gen_salt(\'bf\')), senha = NULL WHERE id = $2', [body.senha, body.id])
       return Response.json({ ok: true })
     }
     if (action === 'addLead') {
@@ -134,7 +156,7 @@ export async function POST(req: Request) {
       await query('INSERT INTO leads_portal (id, "parceiroId", "parceiroNome", nome, whats, segmento, obs, data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, body.parceiroId, body.parceiroNome, body.nome, body.whats, body.segmento || '', body.obs || '', hoje])
       const crmId = 'crm_' + id
       await query('INSERT INTO crm_leads (id, "leadId", nome, whats, segmento, obs, parceiro, "parceiroNome", etapa, plano, valor, data, historico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12)', [crmId, id, body.nome, body.whats, body.segmento || '', body.obs || '', body.parceiroId || '', body.parceiroNome || '', 'mensal', MENSAL, hoje, JSON.stringify([{ etapa: 0, data: hoje, user: 'Portal Parceiro' }])])
-      await sendTelegram('📨 <b>Nova indicação de parceiro!</b>\nParceiro: ' + (body.parceiroNome || '—') + '\nCliente: ' + body.nome + '\nWhats: ' + body.whats)
+      await sendTelegram('🤝 <b>Nova indicação de parceiro!</b>\n👤 Parceiro: <b>' + (body.parceiroNome || '—') + '</b>\n\n🏢 Empresa/Empresário: <b>' + body.nome + '</b>\n📱 WhatsApp: <b>' + body.whats + '</b>\n🏷️ Segmento: <b>' + (body.segmento || '—') + '</b>\n' + (body.obs ? '📝 Obs: ' + body.obs + '\n' : '') + '\n💡 Entre em contato para fechar!')
       return Response.json({ ok: true, id })
     }
     if (action === 'editLead') {
@@ -338,7 +360,7 @@ export async function POST(req: Request) {
       return Response.json({ ok: true, novos })
     }
     if (action === 'loginParceiro') {
-      const p = await queryRow('SELECT * FROM parceiros WHERE "user" = $1 AND senha = $2', [body.user, body.senha])
+      const p = await queryRow('SELECT *, (senha_hash = crypt(\'Parceiro@2026\', senha_hash)) AS "senhaPadrao" FROM parceiros WHERE "user" = $1 AND senha_hash = crypt($2, senha_hash)', [String(body.user || '').trim().toLowerCase(), body.senha || ''])
       if (!p) return Response.json({ error: 'Usuário ou senha incorretos.' }, { status: 401 })
       const [fechadosRes, leadsPortalRes] = await Promise.all([
         query('SELECT id, "leadId", nome, plano, valor, data FROM crm_leads WHERE parceiro = $1 AND etapa >= 4 ORDER BY data DESC', [p.id]),
@@ -349,8 +371,10 @@ export async function POST(req: Request) {
       const leadsAtivos: any[] = leadsPortalRes.rows.filter((l: any) => !fechadosLeadIds.has(l.id))
       const totalFechados = fechados.length
       const comissao = totalFechados <= 3 ? 150 : totalFechados <= 6 ? 200 : totalFechados <= 10 ? 250 : 300
+      const token = criarToken({ t: 'parceiro', id: p.id, nome: p.nome })
       return Response.json({
-        parceiro: p,
+        parceiro: semSenha(p),
+        senhaPadrao: p.senhaPadrao,
         totalClientes: totalFechados,
         totalFechados: totalFechados,
         totalLeads: leadsPortalRes.rows.length,
@@ -360,7 +384,11 @@ export async function POST(req: Request) {
         clientes: fechados,
         leadsAtivos,
         recorencia: totalFechados * 50,
-      })
+      }, { headers: { 'Set-Cookie': cookieSessao(token) } })
+    }
+    if (action === 'notificar') {
+      await sendTelegram(String(body.msg || '').slice(0, 3500))
+      return Response.json({ ok: true })
     }
     if (action === 'aceitarTermo') {
       await query('UPDATE parceiros SET "termoAceito" = 1, "termoData" = $1, "termoVersao" = $2, "termoIp" = $3 WHERE id = $4', [body.data, body.versao, body.ip, body.id])

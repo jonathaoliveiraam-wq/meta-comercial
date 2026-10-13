@@ -168,11 +168,13 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   }, [])
 
   const recarregar = useCallback(async () => {
-    const [c, r, s] = await Promise.all([
-      fetch('/api/data?tipo=crm').then(r => r.json()),
-      fetch('/api/data?tipo=crmRenovacao').then(r => r.json()),
-      fetch('/api/data?tipo=crmServicos').then(r => r.json()),
-    ])
+    const res = await Promise.all(['crm', 'crmRenovacao', 'crmServicos'].map(t => fetch('/api/data?tipo=' + t)))
+    if (res.some(r => r.status === 401)) {
+      ;['crm-user', 'crm-perfil', 'crm-usuario'].forEach(k => sessionStorage.removeItem(k))
+      window.location.reload()
+      return
+    }
+    const [c, r, s] = await Promise.all(res.map(r => r.json()))
     setCrm(c); setRen(r); setSrv(s)
   }, [])
 
@@ -501,7 +503,11 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
     sessionStorage.setItem('crm-perfil', data.perfil)
     sessionStorage.setItem('crm-usuario', u)
     setLoginError('')
+    recarregar()
   }
+
+  // Confere a sessão ao abrir: se o cookie expirou, recarregar() devolve pro login
+  useEffect(() => { if (user) recarregar() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) return (
     <div style={{ minHeight: '100vh', display: 'flex' }}>
@@ -601,7 +607,7 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   return (
     <div className="app-layout">
       <Toasts items={toasts} onDismiss={id => setToasts(ts => ts.filter(x => x.id !== id))} />
-      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }, ...(perfil==='admin'?[{ icon:'🔔', label: pendentes.length>0 ? `Pendências (${pendentes.length})` : 'Pendências', onClick:()=>setView('pendencias') }]:[])]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:()=>{ sessionStorage.removeItem('crm-user'); sessionStorage.removeItem('crm-perfil'); sessionStorage.removeItem('crm-usuario'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      <Sidebar title="CRM Comercial" items={[{ icon:'👥',label:'Clientes Novos',onClick:()=>setView('novos') },{ icon:'🔄',label:'Renovação',onClick:()=>setView('renovacao') },{ icon:'🛠️',label:'Serviços',onClick:()=>setView('servicos') }, ...(perfil==='admin'?[{ icon:'🔔', label: pendentes.length>0 ? `Pendências (${pendentes.length})` : 'Pendências', onClick:()=>setView('pendencias') }]:[])]} bottomItems={[{ icon:'📊',label:'Dashboard',href:'/sistema.html' },{ icon:'📖',label:'Playbook',href:'/playbook' },{ icon:'🚪',label:'Sair',onClick:async()=>{ await fetch('/api/auth', { method: 'DELETE' }); sessionStorage.removeItem('crm-user'); sessionStorage.removeItem('crm-perfil'); sessionStorage.removeItem('crm-usuario'); window.location.reload() } }]} user={user} variant="crm" collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
 
       <div className={`main-crm${sidebarCollapsed ? ' expanded' : ''}`}>
         <div className="topbar" style={{ background: '#fff', borderBottom: '1px solid #E5E7EB' }}>

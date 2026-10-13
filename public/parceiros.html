@@ -342,8 +342,6 @@
 </div>
 
 <script>
-  const TG_TOKEN  = '8639780068:AAGqild5uWcsDkn383SlUeA252BnoypXx0I';
-  const TG_CHATID = '1407909663';
   const SENHA_PADRAO = 'Parceiro@2026';
 
   let parceiro = null;
@@ -373,6 +371,7 @@
     window.open('https://wa.me/5592981260273?text='+encodeURIComponent(texto), '_blank');
   }
 
+  let senhaLogin = '';
   async function entrar() {
     const u = document.getElementById('inp-user').value.trim().toLowerCase();
     const s = document.getElementById('inp-senha').value.trim();
@@ -382,7 +381,8 @@
       parceiro = j.parceiro;
       parceiroData = j;
       leadsData = j.leadsAtivos || [];
-      if(parceiro.senha === SENHA_PADRAO || !parceiro.termoAceito) {
+      senhaLogin = s;
+      if(j.senhaPadrao || !parceiro.termoAceito) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('termo-screen').style.display = 'flex';
         setTimeout(verificarScroll, 100);
@@ -467,11 +467,12 @@
       if(senha) await apiPost('resetSenha', {id:parceiro.id, senha});
       await apiPost('editarPerfilParceiro', {id:parceiro.id, nome:parceiro.nome, whats:tel, email, nascimento:nasc, pix});
       const newUser = parceiro.user;
-      const j = await apiPost('loginParceiro', {user:newUser, senha});
+      const senhaAtual = senha || senhaLogin;
+      const j = await apiPost('loginParceiro', {user:newUser, senha:senhaAtual});
       parceiro = j.parceiro;
       parceiroData = j;
       leadsData = j.leadsAtivos || [];
-      sessionStorage.setItem('parceiro', JSON.stringify({user:newUser, senha}));
+      sessionStorage.setItem('parceiro', JSON.stringify({user:newUser, senha:senhaAtual}));
       document.getElementById('perfil-screen').style.display = 'none';
       mostrarApp();
     } catch(e) { err.style.color='#f44336'; err.textContent='⚠️ Erro ao salvar. Tente novamente.'; }
@@ -689,15 +690,7 @@
       msg.style.color='#00e676';msg.textContent='✅ Indicação salva com sucesso!';
       renderDashboard();
 
-      // Telegram em background
-      const texto = '🤝 <b>Nova Indicação de Parceiro!</b>\n'
-        +'👤 Parceiro: <b>'+parceiro.nome+'</b>\n\n'
-        +'🏢 Empresa/Empresário: <b>'+nome+'</b>\n'
-        +'📱 WhatsApp: <b>'+whats+'</b>\n'
-        +'🏷️ Segmento: <b>'+segmento+'</b>\n'
-        +(obs?'📝 Obs: '+obs+'\n':'')
-        +'\n💡 Entre em contato para fechar!';
-      fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHATID,text:texto,parse_mode:'HTML'})}).catch(()=>{});
+      // O aviso no Telegram sai pelo servidor (addLead)
     } catch(e) {
       msg.style.color='#f87171';
       msg.textContent='⚠️ Falha ao salvar. Entre em contato com o comercial para confirmar.';
