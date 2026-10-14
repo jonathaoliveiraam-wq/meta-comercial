@@ -590,9 +590,16 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
   const fechados = crmFiltrado.filter(c => c.etapa >= 4)
   const taxa = totalLeads ? Math.round(fechados.length / totalLeads * 100) : 0
 
-  const totalPipeline = crm.reduce((s, c) => s + (c.etapa === 6 ? 0 : (c.valor || MENSAL)), 0)
-    + ren.reduce((s, c) => s + (c.valor || MENSAL), 0)
-    + srv.reduce((s, c) => s + (c.valor || 0), 0)
+  // Saldo de cada área (Clientes Novos não conta o Follow-up) e o total geral das três
+  const saldoNovos = crm.reduce((s, c) => s + (c.etapa === 6 ? 0 : (c.valor || MENSAL)), 0)
+  const saldoRen = ren.reduce((s, c) => s + (c.valor || MENSAL), 0)
+  const saldoSrv = srv.reduce((s, c) => s + (c.valor || 0), 0)
+  const saldoGeral = saldoNovos + saldoRen + saldoSrv
+  const saldoArea = view === 'renovacao'
+    ? { valor: saldoRen, label: '🔄 Saldo Renovação', cor: '#6366F1,#818CF8', sombra: '99,102,241' }
+    : view === 'servicos'
+      ? { valor: saldoSrv, label: '🛠️ Saldo Serviços', cor: '#D97706,#F59E0B', sombra: '217,119,6' }
+      : { valor: saldoNovos, label: '👥 Saldo Clientes Novos', cor: '#2563EB,#3B82F6', sombra: '37,99,235' }
 
   const fmtR = (v: number) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 })
 
@@ -677,15 +684,20 @@ export default function CrmClient({ initialCrm, initialRenovacao, initialServico
           ]).map(s => (
             <div key={s.label} className="stat-item"><div className="sv" style={{ color:s.cor }}>{s.value}</div><div className="sl">{s.label}</div></div>
           ))}
-            <div style={{
-              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-              background:'linear-gradient(135deg,#059669,#10B981)',
-              borderRadius:12, padding:'10px 20px', minWidth:160,
-              boxShadow:'0 3px 12px rgba(16,185,129,0.35)',
-            }}>
-              <div style={{ color:'#fff', fontSize:20, fontWeight:800, letterSpacing:0.5, whiteSpace:'nowrap' }}>{fmtR(totalPipeline)}</div>
-              <div style={{ color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:600, marginTop:2 }}>💰 Total em pipeline</div>
-            </div>
+            {[
+              { valor: saldoArea.valor, label: saldoArea.label, cor: saldoArea.cor, sombra: saldoArea.sombra },
+              { valor: saldoGeral, label: '💰 Total geral', cor: '#059669,#10B981', sombra: '16,185,129' },
+            ].map(b => (
+              <div key={b.label} title={b.label === '💰 Total geral' ? 'Clientes Novos ' + fmtR(saldoNovos) + ' + Renovação ' + fmtR(saldoRen) + ' + Serviços ' + fmtR(saldoSrv) : undefined} style={{
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+                background:'linear-gradient(135deg,' + b.cor + ')',
+                borderRadius:12, padding:'10px 20px', minWidth:160,
+                boxShadow:'0 3px 12px rgba(' + b.sombra + ',0.35)',
+              }}>
+                <div style={{ color:'#fff', fontSize:20, fontWeight:800, letterSpacing:0.5, whiteSpace:'nowrap' }}>{fmtR(b.valor)}</div>
+                <div style={{ color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:600, marginTop:2 }}>{b.label}</div>
+              </div>
+            ))}
           </div>
         </div>}
 
