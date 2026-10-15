@@ -366,7 +366,13 @@ export async function POST(req: Request) {
         query('SELECT id, "leadId", nome, plano, valor, data FROM crm_leads WHERE parceiro = $1 AND etapa >= 4 ORDER BY data DESC', [p.id]),
         query('SELECT * FROM leads_portal WHERE "parceiroId" = $1 ORDER BY data DESC', [p.id]),
       ])
-      const fechados: any[] = fechadosRes.rows
+      // Clientes ligados ao parceiro só no dashboard (antes do CRM ou lançados à mão); os que têm crm_id já vêm do CRM
+      const doDashboard: any[] = (await query(
+        `SELECT 'cm_' || id AS id, descricao AS nome, 'mensal' AS plano, ${MENSAL} AS valor, data FROM clientes_mensais WHERE parceiro = $1 AND crm_id IS NULL
+         UNION ALL SELECT 'ca_' || id, descricao, 'anual', ${ANUAL}, data FROM clientes_anuais WHERE parceiro = $1 AND crm_id IS NULL
+         UNION ALL SELECT 'lc_' || id, descricao, 'personalizado', val, data FROM lancamentos WHERE parceiro = $1 AND crm_id IS NULL`,
+        [p.id])).rows
+      const fechados: any[] = [...fechadosRes.rows, ...doDashboard].sort((a, b) => String(b.data).localeCompare(String(a.data)))
       const fechadosLeadIds = new Set(fechados.map((r: any) => r.leadId).filter(Boolean))
       const leadsAtivos: any[] = leadsPortalRes.rows.filter((l: any) => !fechadosLeadIds.has(l.id))
       const totalFechados = fechados.length
@@ -379,7 +385,8 @@ export async function POST(req: Request) {
         totalFechados: totalFechados,
         totalLeads: leadsPortalRes.rows.length,
         comissaoAtual: comissao,
-        aReceber: p.aReceber || 0,
+        // mesma conta do admin (sistema.html): clientes × comissão da faixa atual (pagamentos ainda não são registrados)
+        aReceber: totalFechados * comissao,
         recebido: p.liberado || 0,
         clientes: fechados,
         leadsAtivos,
